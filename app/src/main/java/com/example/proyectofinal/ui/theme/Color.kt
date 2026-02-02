@@ -9,3 +9,23 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+// Colores apliacion
+val PrincipalRojo = Color(0xFF8D342A)
+val EnPrincipalBlanco = Color(0xFFFFFFFF)
+val CardsRosa = Color(0xFFF2D9D7)
+val SubCardsRosa = Color(0xFFE6C1BE)
+val EnCardRojoOscuro = Color(0xFF2B0401)
+val Validaciones = Color(0xFF000BD6)
+val Warning = Color(0xFF8A6d1D)
+val Error = Color(0xFFC21000)
+
+// Colores cinturones
+val Blanco = Color(0xFFFFFFFF)
+val Amarillo = Color(0xFFFFD400)
+val Naranja = Color(0xFFFF6000)
+val Purpura = Color(0xFF441159)
+val Azul = Color(0xFF10238F)
+val Verde = Color(0xFF225C25)
+val Marron = Color(0xFF4F2D15)
+val Negro = Color(0xFF0A0A0A)

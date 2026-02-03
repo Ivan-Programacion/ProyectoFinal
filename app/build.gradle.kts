@@ -60,4 +60,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.text.google.fonts)
     // Para que la pantalal de carga y logo se vean bien
     implementation(libs.androidx.core.splashscreen)
+    // Para más inconos
+    implementation(libs.androidx.compose.material.icons.extended)
 }

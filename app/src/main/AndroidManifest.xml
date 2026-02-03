@@ -15,10 +15,9 @@
             android:name=".ViewModel.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.ProyectoFinal">
+            android:theme="@style/Theme.App.Starting"> <!-- Se añade el nombre de la etiqueta del Theme para la pantalla de carga-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

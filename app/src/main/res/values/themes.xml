@@ -2,4 +2,14 @@
 <resources>
 
     <style name="Theme.ProyectoFinal" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Para optimizar la imagen de carga -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#8D342A</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_arkenpoapp</item>
+
+        <item name="windowSplashScreenAnimationDuration">200</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.ProyectoFinal</item>
+    </style>
 </resources>

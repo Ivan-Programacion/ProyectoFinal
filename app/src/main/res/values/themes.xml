@@ -6,7 +6,7 @@
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#8D342A</item>
 
-        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_arkenpoapp</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/logo_vector</item>
 
         <item name="windowSplashScreenAnimationDuration">200</item>
 

@@ -32,16 +32,16 @@ fun Login(paddingValues: PaddingValues = PaddingValues()) {
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("TÍTULO")
+        Text("Título g y u", style = MaterialTheme.typography.headlineLarge)
         ElevatedCard(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface
             )
         ) {
-        Text("Usuario", Modifier.padding(16.dp))
+        Text("Usuario g y u j", Modifier.padding(16.dp))
         OutlinedTextField(modifier = Modifier.padding(16.dp), value = "Hola", onValueChange = {})
-        Text("Contraseña", Modifier.padding(16.dp))
+        Text("Contraseña g y", Modifier.padding(16.dp))
         OutlinedTextField(modifier = Modifier.padding(16.dp), value = "Hola", onValueChange = {})
     }
 

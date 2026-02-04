@@ -21,11 +21,14 @@ val Warning = Color(0xFF8A6d1D)
 val Error = Color(0xFFC21000)
 
 // Colores cinturones
-val Blanco = Color(0xFFFFFFFF)
-val Amarillo = Color(0xFFFFD400)
-val Naranja = Color(0xFFFF6000)
-val Purpura = Color(0xFF441159)
-val Azul = Color(0xFF10238F)
-val Verde = Color(0xFF225C25)
-val Marron = Color(0xFF4F2D15)
-val Negro = Color(0xFF0A0A0A)
+data class coloresCinturones(
+    val Blanco: Color = Color(0xFFFFFFFF),
+    val Amarillo: Color = Color(0xFFFFD400),
+    val Naranja: Color = Color(0xFFFF6000),
+    val Purpura: Color = Color(0xFF441159),
+    val Azul: Color = Color(0xFF10238F),
+    val Verde: Color = Color(0xFF225C25),
+    val Marron: Color = Color(0xFF4F2D15),
+    val Negro: Color = Color(0xFF0A0A0A)
+)
+

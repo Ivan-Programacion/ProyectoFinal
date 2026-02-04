@@ -44,6 +44,12 @@ import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.App
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
+
+/*
+FALTA POR HACER:
+- En caso de que haya errores
+- Toast emergente para avisar
+ */
 @Composable
 fun Login(paddingValues: PaddingValues = PaddingValues()) {
     var passwordVisible by remember { mutableStateOf(false) }

@@ -20,8 +20,12 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     // Botones
     primary = EnCardRojoOscuro,
-    secondary = CardsRosa,
-    tertiary = Verde,
+    // Warning
+    secondary = Warning,
+    // Validaciones
+    tertiary = Validaciones,
+    // Errores
+    error = Error,
 
     background = PrincipalRojo,
     surface = CardsRosa,

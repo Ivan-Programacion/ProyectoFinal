@@ -51,7 +51,7 @@ FALTA POR HACER:
 - Toast emergente para avisar
  */
 @Composable
-fun Login(paddingValues: PaddingValues = PaddingValues()) {
+fun Login(paddingValues: PaddingValues = PaddingValues(), controller: () -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
@@ -133,11 +133,11 @@ fun Login(paddingValues: PaddingValues = PaddingValues()) {
                 Spacer(Modifier.height(24.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = { controller() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    shape = RoundedCornerShape(12.dp), // AÑADIRLO AL FUNCIONAL --> 12 dps
+                    shape = RoundedCornerShape(12.dp),
                 ) {
                     Text("Acceder", fontWeight = FontWeight.Bold)
                 }
@@ -153,7 +153,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues()) {
             )
             Text(
                 "Crear cuenta",
-                fontWeight = FontWeight.Bold, // Bolda para que se vea
+                fontWeight = FontWeight.Bold, // Bold para que se vea
                 modifier = Modifier.clickable {} // Para crear cuenta
             )
         }

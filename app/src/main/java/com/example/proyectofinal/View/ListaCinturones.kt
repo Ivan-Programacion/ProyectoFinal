@@ -55,7 +55,6 @@ fun ListaCinturones(paddingValues: PaddingValues = PaddingValues()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF8D342A))
             .padding(paddingValues) // Importante para no pisar el Navbar
     ) {
         Card(
@@ -75,15 +74,6 @@ fun ListaCinturones(paddingValues: PaddingValues = PaddingValues()) {
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp) // Espacio más compacto entre cinturones
             ) {
-                item {
-                    Text(
-                        text = "Cinturones",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
-                    )
-                }
-
                 items(belts) { (name, color) ->
                     BeltItem(name = name, beltColor = color)
                 }

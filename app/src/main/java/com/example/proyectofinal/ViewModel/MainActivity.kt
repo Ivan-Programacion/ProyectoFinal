@@ -11,13 +11,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +34,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.Logic.tituloTopBar
 import com.example.proyectofinal.View.ListaCinturones
 import com.example.proyectofinal.View.Login
+import com.example.proyectofinal.View.Perfil
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 class MainActivity : ComponentActivity() {
@@ -58,6 +63,10 @@ fun App() {
     // AÑADIR ESTO PARA LAS TRANSICIONES
     var beforeRoute by remember { mutableStateOf("listaCinturones") }
     Scaffold(
+        topBar = {
+            if (currentRoute != "login") TopBar(currentRoute)
+            else Spacer(Modifier.padding(bottom = 104.dp))
+        },
         bottomBar = {
             if (currentRoute != "login") NavBar({
                 beforeRoute = it
@@ -68,10 +77,27 @@ fun App() {
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         NavHost(controller, startDestination = "login") {
-            composable("login") { Login(innerPadding) { controller.navigate("listaCinturones") } }
-            composable("listaCinturones") { ListaCinturones(innerPadding) }
+            composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate("listaCinturones") } }
+            composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) }
+            composable(StateNavigate.perfil.value) { Perfil(innerPadding) }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class) // Está en fase de prueba
+@Composable
+fun TopBar(currentRoute: String?) {
+    TopAppBar(
+        {
+            Text(
+                tituloTopBar(currentRoute),
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        actions = {
+            // REALIZAR LOGICA PARA FAV
+            // REALIZAR LOGICA PARA VOLVER ATRÁS EN OTRAS PANTALLAS
+        })
 }
 
 @Composable

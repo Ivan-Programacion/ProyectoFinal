@@ -89,7 +89,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: () -> Unit
                     modifier = Modifier.fillMaxWidth(),
                     value = "",
                     onValueChange = {},
-                    placeholder = { Text("ej. Carlos") },
+                    placeholder = { Text("ej. carlos@gmail.com") },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true

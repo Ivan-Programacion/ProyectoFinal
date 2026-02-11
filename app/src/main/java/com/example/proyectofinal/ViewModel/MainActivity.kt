@@ -114,6 +114,11 @@ fun NavBar(controller: (route: String) -> Unit) {
                 controller("favoritos")
             },
             icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = MaterialTheme.colorScheme.onSecondary
+            ),
             label = { Text("Favoritos") })
         NavigationBarItem(
             state == StateNavigate.listaCinturones,
@@ -136,6 +141,11 @@ fun NavBar(controller: (route: String) -> Unit) {
                 controller("perfil")
             },
             { Icon(Icons.Default.AccountCircle, contentDescription = "Perfil") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = MaterialTheme.colorScheme.onSecondary
+            ),
             label = { Text("Perfil") })
     }
 }

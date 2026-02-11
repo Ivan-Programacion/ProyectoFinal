@@ -66,7 +66,8 @@ fun ListaCinturones(paddingValues: PaddingValues = PaddingValues()) {
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface
-            )
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),

@@ -35,6 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.Logic.tituloTopBar
+import com.example.proyectofinal.View.Favoritos
 import com.example.proyectofinal.View.ListaCinturones
 import com.example.proyectofinal.View.Login
 import com.example.proyectofinal.View.Perfil
@@ -80,6 +81,7 @@ fun App() {
             composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate("listaCinturones") } }
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) }
+            composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) }
         }
     }
 }

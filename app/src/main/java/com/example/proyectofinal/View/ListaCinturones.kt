@@ -35,23 +35,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.proyectofinal.Logic.belts
 import com.example.proyectofinal.ViewModel.App
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import com.example.proyectofinal.ui.theme.coloresCinturones
 
 @Composable
 fun ListaCinturones(paddingValues: PaddingValues = PaddingValues()) {
-    val belts = listOf(
-        "Blanco" to coloresCinturones().Blanco,
-        "Amarillo" to coloresCinturones().Amarillo,
-        "Naranja" to coloresCinturones().Naranja,
-        "Púrpura" to coloresCinturones().Purpura,
-        "Azul" to coloresCinturones().Azul,
-        "Verde" to coloresCinturones().Verde,
-        "Marrón" to coloresCinturones().Marron,
-        "Negro" to coloresCinturones().Negro
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()

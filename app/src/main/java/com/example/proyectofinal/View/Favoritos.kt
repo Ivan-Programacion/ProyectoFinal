@@ -108,14 +108,12 @@ fun SeccionFavoritos(titulo: String, items: List<Pair<String, androidx.compose.u
                     modifier = Modifier.padding(start = 4.dp)
                 )
             } else {
-                // Para añadir el nombre del cinturón (momentaneo hasta que tengamos la api)
-                var nombreCinturon = ""
-                items.forEach { (nombre, colorCinturon) ->
-                    cinturonesMap.forEach { (color, valor) ->
-                        if(colorCinturon == valor)
-                            nombreCinturon = color
-                    }
-                    ItemFavorito(nombre = nombre, nombreCinturon = nombreCinturon , colorCinturon = colorCinturon)
+                items.forEach { (nombreTecnica, colorCinturon) ->
+                    // Para añadir el nombre del cinturón (momentaneo hasta que tengamos la api)
+                    // con .find para encontrar la priemra coincidencia
+                    // Es como utilizar un forMap de Java (foreach y entryset)
+                    val nombreCinturon = cinturonesMap.entries.find { it.value == colorCinturon }?.key ?: "Desconocido"
+                    ItemFavorito(nombre = nombreTecnica, nombreCinturon = nombreCinturon , colorCinturon = colorCinturon)
                 }
             }
         }

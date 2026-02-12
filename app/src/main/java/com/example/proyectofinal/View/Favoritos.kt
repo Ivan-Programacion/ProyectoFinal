@@ -104,7 +104,7 @@ fun SeccionFavoritos(titulo: String, items: List<Pair<String, androidx.compose.u
             if (items.isEmpty()) {
                 Text(
                     text = "No tienes favoritos en esta categoría",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             } else {
@@ -113,7 +113,7 @@ fun SeccionFavoritos(titulo: String, items: List<Pair<String, androidx.compose.u
                     // con .find para encontrar la priemra coincidencia
                     // Es como utilizar un forMap de Java (foreach y entryset)
                     val nombreCinturon = cinturonesMap.entries.find { it.value == colorCinturon }?.key ?: "Desconocido"
-                    ItemFavorito(nombre = nombreTecnica, nombreCinturon = nombreCinturon , colorCinturon = colorCinturon)
+                    ItemFavorito(nombreTecnica = nombreTecnica, nombreCinturon = nombreCinturon , colorCinturon = colorCinturon)
                 }
             }
         }
@@ -121,7 +121,7 @@ fun SeccionFavoritos(titulo: String, items: List<Pair<String, androidx.compose.u
 }
 
 @Composable
-fun ItemFavorito(nombre: String, nombreCinturon: String ,colorCinturon: Color) {
+fun ItemFavorito(nombreTecnica: String, nombreCinturon: String, colorCinturon: Color) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,7 +150,7 @@ fun ItemFavorito(nombre: String, nombreCinturon: String ,colorCinturon: Color) {
 
                 Column {
                     Text(
-                        text = nombre,
+                        text = nombreTecnica,
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     Text(

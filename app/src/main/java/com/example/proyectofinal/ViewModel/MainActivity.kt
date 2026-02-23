@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,6 +38,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.Logic.obtenerIndice
 import com.example.proyectofinal.Logic.tituloTopBar
 import com.example.proyectofinal.View.Favoritos
 import com.example.proyectofinal.View.ListaCinturones
@@ -77,7 +82,49 @@ fun App() {
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        NavHost(controller, startDestination = "login") {
+        NavHost(
+            controller,
+            startDestination = "login",
+            enterTransition = {
+                // Pantalla actual
+                val rutaInicial = initialState.destination.route
+                // Pantalla destino
+                val rutaDestino = targetState.destination.route
+                // Las pasamos a la función para obtener su índice
+                // login -> -1
+                // favoritos -> 0
+                // listaCinturones -> 1
+                // perfil -> 2
+                val inicial = obtenerIndice(rutaInicial)
+                val destino = obtenerIndice(rutaDestino)
+
+                // Si es la pantalal de inicio (índice -1) hacemos transicion normal
+                if (inicial == -1) {
+                    fadeIn(animationSpec = tween(700))
+                    // Si no, hacemos transicion horizontal según la posición
+                } else {
+                    if (destino > inicial) {
+                        // AVANCE (Ej: Favoritos -> Cinturones): Entra desde la DERECHA
+                        slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
+                    } else {
+                        // RETROCESO (Ej: Perfil -> Cinturones): Entra desde la IZQUIERDA
+                        slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(500))
+                    }
+                }
+            },
+            exitTransition = {
+                val inicial = obtenerIndice(initialState.destination.route)
+                val destino = obtenerIndice(targetState.destination.route)
+
+                if (destino > inicial) {
+                    // AVANCE: La pantalla actual sale por la IZQUIERDA para dar con la nueva pantalla
+                    slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+                } else {
+                    // RETROCESO: La pantalla actual sale por la DERECHA para dar con la nueva pantalla
+                    slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(500))
+                }
+            }
+        ) {
             composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate("listaCinturones") } }
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) }

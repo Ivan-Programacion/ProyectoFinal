@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Spacer
@@ -39,11 +40,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.Logic.obtenerIndice
+import com.example.proyectofinal.Logic.pantallasIniciales
 import com.example.proyectofinal.Logic.tituloTopBar
 import com.example.proyectofinal.View.Favoritos
 import com.example.proyectofinal.View.ListaCinturones
 import com.example.proyectofinal.View.Login
 import com.example.proyectofinal.View.Perfil
+import com.example.proyectofinal.View.RegistroInfo
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 class MainActivity : ComponentActivity() {
@@ -70,14 +73,18 @@ fun App() {
     var beforeRoute by remember { mutableStateOf("listaCinturones") }
     Scaffold(
         topBar = {
-            if (currentRoute != "login") TopBar(currentRoute)
+            // Si NO estamos navegando antes de entrar en la aplicación por las pantalals login, registro, etc
+            if (currentRoute !in pantallasIniciales) TopBar(currentRoute)
+            // Si lo estamos, no añadimos el TopBar
             else Spacer(Modifier.padding(bottom = 104.dp))
         },
         bottomBar = {
-            if (currentRoute != "login") NavBar({
+            // Si NO estamos navegando antes de entrar en la aplicación por las pantalals login, registro, etc
+            if (currentRoute !in pantallasIniciales) NavBar({
                 beforeRoute = it
                 controller.navigate(it)
             })
+            // Si lo estamos, no añadimos el NavBar
             else Spacer(Modifier.padding(bottom = 104.dp))
         },
         modifier = Modifier.fillMaxSize()
@@ -86,21 +93,13 @@ fun App() {
             controller,
             startDestination = "login",
             enterTransition = {
-                // Pantalla actual
-                val rutaInicial = initialState.destination.route
-                // Pantalla destino
-                val rutaDestino = targetState.destination.route
                 // Las pasamos a la función para obtener su índice
-                // login -> -1
-                // favoritos -> 0
-                // listaCinturones -> 1
-                // perfil -> 2
-                val inicial = obtenerIndice(rutaInicial)
-                val destino = obtenerIndice(rutaDestino)
+                val inicial = obtenerIndice(initialState.destination.route)
+                val destino = obtenerIndice(targetState.destination.route)
 
-                // Si es la pantalal de inicio (índice -1) hacemos transicion normal
-                if (inicial == -1) {
-                    fadeIn(animationSpec = tween(700))
+                // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc)
+                if (destino < 0) {
+                    fadeIn(animationSpec = tween(200))
                     // Si no, hacemos transicion horizontal según la posición
                 } else {
                     if (destino > inicial) {
@@ -115,17 +114,23 @@ fun App() {
             exitTransition = {
                 val inicial = obtenerIndice(initialState.destination.route)
                 val destino = obtenerIndice(targetState.destination.route)
-
-                if (destino > inicial) {
-                    // AVANCE: La pantalla actual sale por la IZQUIERDA para dar con la nueva pantalla
-                    slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+                // Si el destino es una de las pantallas iniciales
+                if (inicial < 0) {
+                    fadeOut(animationSpec = tween(200))
+                    // Si no, hacemos transicion horizontal según la posición
                 } else {
-                    // RETROCESO: La pantalla actual sale por la DERECHA para dar con la nueva pantalla
-                    slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(500))
+                    if (destino > inicial) {
+                        // AVANCE: La pantalla actual sale por la IZQUIERDA para dar con la nueva pantalla
+                        slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+                    } else {
+                        // RETROCESO: La pantalla actual sale por la DERECHA para dar con la nueva pantalla
+                        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(500))
+                    }
                 }
             }
         ) {
-            composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate("listaCinturones") } }
+            composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate(it) } }
+            composable(StateNavigate.registro.value) { RegistroInfo(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) }
             composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) }

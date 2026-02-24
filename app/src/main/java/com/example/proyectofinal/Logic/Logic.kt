@@ -29,6 +29,7 @@ val belts = listOf(
 // Función que, dependiendo de la pantalla donde estemos, realizará una transición u otra al cambiar de pantalla
 fun obtenerIndice (ruta: String?): Int {
     return when (ruta) {
+        "registro" -> -2
         "login" -> -1
         "favoritos" -> 0
         "lista_cinturones" -> 1
@@ -36,3 +37,9 @@ fun obtenerIndice (ruta: String?): Int {
         else -> 1 // Si es nulo, asumimos la central para evitar saltos raros
     }
 }
+
+// Lista que contiene las pantallas iniciales antes de entrar en la aplicación
+val pantallasIniciales = listOf(
+    StateNavigate.login.value,
+    StateNavigate.registro.value,
+)

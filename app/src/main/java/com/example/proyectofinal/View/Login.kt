@@ -51,7 +51,7 @@ FALTA POR HACER:
 - Toast emergente para avisar
  */
 @Composable
-fun Login(paddingValues: PaddingValues = PaddingValues(), controller: () -> Unit) {
+fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
@@ -133,7 +133,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: () -> Unit
                 Spacer(Modifier.height(24.dp))
 
                 Button(
-                    onClick = { controller() },
+                    onClick = { controller("listaCinturones") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -149,12 +149,12 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: () -> Unit
         ) {
             Text(
                 "¿No tienes cuenta? ",
-                modifier = Modifier.clickable {} // Para crear cuenta
+                modifier = Modifier.clickable { controller("registro") } // Para crear cuenta
             )
             Text(
                 "Crear cuenta",
                 fontWeight = FontWeight.Bold, // Bold para que se vea
-                modifier = Modifier.clickable {} // Para crear cuenta
+                modifier = Modifier.clickable { controller("registro") } // Para crear cuenta
             )
         }
     }

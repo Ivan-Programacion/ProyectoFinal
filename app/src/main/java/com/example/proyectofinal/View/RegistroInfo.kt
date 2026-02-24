@@ -40,13 +40,11 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
-    // Estados para el formulario
+    // Estados para el formulario provisional
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
-    var contrasena by remember { mutableStateOf("") }
-    var repetirContrasena by remember { mutableStateOf("") }
 
     // Estados para la fecha de nacimiento
     var dia by remember { mutableStateOf("") }
@@ -73,8 +71,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
             ) {
                 Text(
                     text = "Crear cuenta",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.Start)
                 )
 
@@ -90,7 +87,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
 
                 // --- FECHA DE NACIMIENTO ---
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Text("Fecha de nacimiento", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text("Fecha de nacimiento", fontWeight = FontWeight.Bold)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -113,6 +110,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     }
                 }
 
+                // --- CAMPOS DE TEXTO ---
                 FilaRegistro(
                     label = "Email",
                     value = email,
@@ -121,16 +119,8 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 FilaRegistro(
                     label = "Teléfono",
                     value = telefono,
-                    placeholder = "600 000 000"
+                    placeholder = "612345678"
                 ) { telefono = it }
-
-                // Password (usando VisualTransformation para ocultar texto)
-                FilaRegistro(
-                    label = "Contraseña",
-                    value = contrasena,
-                    placeholder = "••••••",
-                    esPassword = true
-                ) { contrasena = it }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -153,7 +143,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         modifier = Modifier.clickable { controller("login") })
                     Text(
                         text = "Iniciar sesión",
-                        //color = Color(0xFF1976D2), // Azul estándar de link
+                        color = MaterialTheme.colorScheme.tertiary, // color azul establecido
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { controller("login") }
                     )
@@ -163,34 +153,32 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
     }
 }
 
+// Creamos composable para cada registro
 @Composable
 fun FilaRegistro(
     label: String,
     value: String,
     placeholder: String,
-    esPassword: Boolean = false,
     onValueChange: (String) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
             fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(placeholder, color = Color.LightGray) },
+            placeholder = { Text(placeholder) },
             shape = RoundedCornerShape(12.dp),
-            singleLine = true,
-            visualTransformation = if (esPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = if (esPassword) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default
+            singleLine = true
         )
     }
 }
 
+// Creamos composable para cada valor del campo fecha
 @Composable
 fun CampoFecha(
     value: String,
@@ -202,7 +190,7 @@ fun CampoFecha(
         value = value,
         onValueChange = { if (it.length <= 4) onValueChange(it) },
         modifier = modifier,
-        placeholder = { Text(placeholder, fontSize = 12.sp) },
+        placeholder = { Text(placeholder) },
         shape = RoundedCornerShape(12.dp),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)

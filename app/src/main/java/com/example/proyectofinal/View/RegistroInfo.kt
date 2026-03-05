@@ -1,6 +1,7 @@
 package com.example.proyectofinal.View
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,15 +12,25 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -35,8 +46,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectofinal.Logic.anios
+import com.example.proyectofinal.Logic.dias
+import com.example.proyectofinal.Logic.meses
+import com.example.proyectofinal.ViewModel.App
+import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
 fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
@@ -93,20 +110,26 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         CampoFecha(
-                            value = dia,
-                            placeholder = "Día",
-                            modifier = Modifier.weight(1f)
-                        ) { dia = it }
+                            label = "Día",
+                            opciones = dias,
+                            seleccionado = dia,
+                            modifier = Modifier.weight(1f),
+                            onValueChange = { dia = it }
+                        )
                         CampoFecha(
-                            value = mes,
-                            placeholder = "Mes",
-                            modifier = Modifier.weight(1f)
-                        ) { mes = it }
+                            label = "Mes",
+                            opciones = meses,
+                            seleccionado = mes,
+                            modifier = Modifier.weight(1.2f),
+                            onValueChange = { mes = it }
+                        )
                         CampoFecha(
-                            value = anio,
-                            placeholder = "Año",
-                            modifier = Modifier.weight(1.2f)
-                        ) { anio = it }
+                            label = "Año",
+                            opciones = anios,
+                            seleccionado = anio,
+                            modifier = Modifier.weight(1.3f),
+                            onValueChange = { anio = it }
+                        )
                     }
                 }
 
@@ -178,21 +201,70 @@ fun FilaRegistro(
     }
 }
 
-// Creamos composable para cada valor del campo fecha
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CampoFecha(
-    value: String,
-    placeholder: String,
-    modifier: Modifier,
+    label: String,
+    opciones: List<String>,
+    seleccionado: String,
+    modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { if (it.length <= 4) onValueChange(it) },
-        modifier = modifier,
-        placeholder = { Text(placeholder) },
-        shape = RoundedCornerShape(12.dp),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-    )
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+                .menuAnchor() // Imprescindible para el menú
+                .fillMaxWidth()
+                .height(45.dp) // Altura personalizada más baja
+                .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = seleccionado.ifEmpty { label },
+                maxLines = 1
+            )
+
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = Color.Gray
+            )
+        }
+
+        // Menu desplegable
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(120.dp)
+                .background(Color.White)
+        ) {
+            opciones.forEach { opcion ->
+                DropdownMenuItem(
+                    text = { Text(opcion) },
+                    onClick = {
+                        onValueChange(opcion)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegistroInfopreviw() {
+    ProyectoFinalTheme {
+        RegistroInfo(controller = {})
+    }
 }

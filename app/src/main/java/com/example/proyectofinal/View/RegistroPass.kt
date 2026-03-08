@@ -13,12 +13,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -33,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +52,8 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
     var repeatPassword by remember { mutableStateOf("") }
     var aceptoTerminos by remember { mutableStateOf(false) }
 
+    var passwordVisible by remember { mutableStateOf(false) }
+    var repeatPasswordVisible by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -86,8 +94,14 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         placeholder = { Text("Introduce una contraseña") },
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, contentDescription = "Toggle password visibility")
+                            }
+                        }
                     )
                     // Texto de condiciones (basado en tu imagen)
                     Text(
@@ -101,7 +115,9 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 FilaRegistroPassword(
                     label = "Confirmar contraseña",
                     value = repeatPassword,
-                    placeholder = "Repite la contraseña"
+                    placeholder = "Repite la contraseña",
+                    isVisible = repeatPasswordVisible,
+                    onToggleVisibility = { repeatPasswordVisible = !repeatPasswordVisible },
                 ) { repeatPassword = it }
 
                 // --- CHECKBOX TÉRMINOS Y CONDICIONES ---
@@ -160,6 +176,8 @@ fun FilaRegistroPassword(
     label: String,
     value: String,
     placeholder: String,
+    isVisible: Boolean,
+    onToggleVisibility: () -> Unit,
     onValueChange: (String) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -175,8 +193,14 @@ fun FilaRegistroPassword(
             placeholder = { Text(placeholder) },
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                val image = if (isVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = onToggleVisibility) {
+                    Icon(imageVector = image, contentDescription = "Toggle password visibility")
+                }
+            }
         )
     }
 }

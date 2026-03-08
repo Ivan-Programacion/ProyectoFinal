@@ -53,6 +53,8 @@ FALTA POR HACER:
  */
 @Composable
 fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+    var userValue by remember { mutableStateOf("") }
+    var passValue by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
@@ -82,14 +84,14 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -
                 horizontalAlignment = Alignment.Start // Alineación a la izquierda para las etiquetas
             ) {
                 Text(
-                    "Usuario",
+                    "Correo electrónico",
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = "",
-                    onValueChange = {},
+                    value = userValue,
+                    onValueChange = { userValue = it },
                     placeholder = { Text("ej. carlos@gmail.com") },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
@@ -105,8 +107,8 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = "",
-                    onValueChange = {},
+                    value = passValue,
+                    onValueChange = { passValue = it },
                     placeholder = { Text("Introduce tu contraseña") },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),

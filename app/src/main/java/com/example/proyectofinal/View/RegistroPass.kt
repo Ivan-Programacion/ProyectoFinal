@@ -7,13 +7,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -42,6 +48,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -54,6 +61,14 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
 
     var passwordVisible by remember { mutableStateOf(false) }
     var repeatPasswordVisible by remember { mutableStateOf(false) }
+
+    // ESTADO PARA EL DIALOG
+    var showDialog by remember { mutableStateOf(false) }
+
+    // Lógica del Dialog
+    if (showDialog) {
+        TerminosCondiciones(onDismiss = { showDialog = false })
+    }
     Box(
         modifier = Modifier
             .fillMaxSize(),
@@ -97,9 +112,13 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         trailingIcon = {
-                            val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                            val image =
+                                if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(imageVector = image, contentDescription = "Toggle password visibility")
+                                Icon(
+                                    imageVector = image,
+                                    contentDescription = "Toggle password visibility"
+                                )
                             }
                         }
                     )
@@ -138,7 +157,8 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         color = MaterialTheme.colorScheme.tertiary,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { /* Abrir TyC */ }
+                        // Si quiere ver los terminos, salta el Dialog
+                        modifier = Modifier.clickable { showDialog = true }
                     )
                 }
 
@@ -166,6 +186,81 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         modifier = Modifier.clickable { controller(StateNavigate.login.value) }
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun TerminosCondiciones(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // --- CABECERA MEJORADA ---
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Términos y Condiciones",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2D0C03),
+                        // Añadimos padding al final para que el texto nunca toque la 'x'
+                        modifier = Modifier
+                            .padding(end = 40.dp)
+                            .align(Alignment.CenterStart)
+                    )
+
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            // Ajustamos un poco la posición para que no esté tan pegada al borde
+                            .offset(x = 12.dp, y = (-12).dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                            tint = Color(0xFF2D0C03),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- CUERPO DEL TEXTO ---
+                Text(
+                    text = "Este es un texto de ejemplo para mostrar cómo se verían los términos y " +
+                            "condiciones en un modal flotante sobre la pantalla de Contraseña. " +
+                            "Aquí se incluirá toda la información legal completa.\n\nEl usuario " +
+                            "podrá leer, hacer scroll y cerrar el modal sin salir de la pantalla " +
+                            "principal de registro, manteniendo los datos ya introducidos.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Texto adicional para probar el scroll
+                Text(
+                    text = "Al aceptar estos términos, el usuario confirma que es mayor de edad y " +
+                            "que los datos proporcionados son verídicos. Esta aplicación se reserva " +
+                            "el derecho de modificar estas condiciones en cualquier momento previo aviso.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

@@ -47,6 +47,7 @@ import com.example.proyectofinal.View.ListaCinturones
 import com.example.proyectofinal.View.Login
 import com.example.proyectofinal.View.Perfil
 import com.example.proyectofinal.View.RegistroInfo
+import com.example.proyectofinal.View.RegistroPass
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 class MainActivity : ComponentActivity() {
@@ -134,6 +135,7 @@ fun App() {
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) }
             composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) }
+            composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
         }
     }
 }

@@ -42,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.App
+import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 
@@ -133,7 +134,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -
                 Spacer(Modifier.height(24.dp))
 
                 Button(
-                    onClick = { controller("listaCinturones") },
+                    onClick = { controller(StateNavigate.listaCinturones.value) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -149,12 +150,12 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -
         ) {
             Text(
                 "¿No tienes cuenta? ",
-                modifier = Modifier.clickable { controller("registro") } // Para crear cuenta
+                modifier = Modifier.clickable { controller(StateNavigate.registro.value) } // Para crear cuenta
             )
             Text(
                 "Crear cuenta",
                 fontWeight = FontWeight.Bold, // Bold para que se vea
-                modifier = Modifier.clickable { controller("registro") } // Para crear cuenta
+                modifier = Modifier.clickable { controller(StateNavigate.registro.value) } // Para crear cuenta
             )
         }
     }

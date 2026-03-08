@@ -53,6 +53,7 @@ import com.example.proyectofinal.Logic.anios
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.ViewModel.App
+import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
@@ -149,7 +150,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
 
                 // --- BOTÓN SIGUIENTE ---
                 Button(
-                    onClick = { /* Lógica de registro */ },
+                    onClick = { controller(StateNavigate.registroPass.value) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),
@@ -163,12 +164,12 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         "¿Ya tienes cuenta? ",
-                        modifier = Modifier.clickable { controller("login") })
+                        modifier = Modifier.clickable { controller(StateNavigate.login.value) })
                     Text(
                         text = "Iniciar sesión",
                         color = MaterialTheme.colorScheme.tertiary, // color azul establecido
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { controller("login") }
+                        modifier = Modifier.clickable { controller(StateNavigate.login.value) }
                     )
                 }
             }

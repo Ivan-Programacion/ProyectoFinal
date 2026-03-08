@@ -5,5 +5,6 @@ enum class StateNavigate(val value: String) {
     registro("registro"),
     listaCinturones("listaCinturones"),
     perfil("perfil"),
-    favoritos("favoritos")
+    favoritos("favoritos"),
+    registroPass("registroPass")
 }

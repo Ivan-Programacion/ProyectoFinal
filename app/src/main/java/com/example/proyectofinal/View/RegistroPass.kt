@@ -33,9 +33,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectofinal.ViewModel.StateNavigate
+import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
 fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
@@ -47,7 +49,7 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
     Box(
         modifier = Modifier
             .fillMaxSize(),
-            //.background(Color(0xFF8D342A)), // Mismo fondo que RegistroInfo
+        //.background(Color(0xFF8D342A)), // Mismo fondo que RegistroInfo
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -90,9 +92,7 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     // Texto de condiciones (basado en tu imagen)
                     Text(
                         text = "Debe tener al menos 8 caracteres, combinando letras y números.",
-                        fontSize = 12.sp,
-                        color = Color.Gray,
-                        lineHeight = 16.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -116,11 +116,11 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         onCheckedChange = { aceptoTerminos = it },
                         colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2D0C03))
                     )
-                    Text(text = "Acepto los ", fontSize = 14.sp)
+                    Text(text = "Acepto los ", style = MaterialTheme.typography.bodySmall)
                     Text(
                         text = "Términos y Condiciones",
-                        fontSize = 14.sp,
-                        color = Color.Blue, // O el color tertiary que uses
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { /* Abrir TyC */ }
                     )
@@ -133,20 +133,20 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         .fillMaxWidth()
                         .height(55.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D0C03)),
                     enabled = aceptoTerminos && password.isNotEmpty() // Validación básica
                 ) {
-                    Text("Crear cuenta", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("Crear cuenta", fontWeight = FontWeight.Bold)
                 }
 
                 // --- LINK A LOGIN ---
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("¿Ya tienes cuenta? ", fontSize = 14.sp)
+                    Text(
+                        "¿Ya tienes cuenta? ",
+                        modifier = Modifier.clickable { controller(StateNavigate.login.value) })
                     Text(
                         text = "Iniciar sesión",
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
                         modifier = Modifier.clickable { controller(StateNavigate.login.value) }
                     )
                 }
@@ -178,5 +178,13 @@ fun FilaRegistroPassword(
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegistroPasspreview() {
+    ProyectoFinalTheme {
+        RegistroPass(controller = {})
     }
 }

@@ -154,10 +154,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D0C03))
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Siguiente", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("Siguiente", fontWeight = FontWeight.Bold)
                 }
 
                 // --- LINK A LOGIN ---

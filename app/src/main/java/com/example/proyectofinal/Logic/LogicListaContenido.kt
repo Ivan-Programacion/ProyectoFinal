@@ -23,3 +23,6 @@ var provisionalContentFormBeltList = listOf<String>(
 var provisionalContentSetBeltList = listOf<String>(
     "Set cinturón"
 )
+
+// Lista de los colores de los cinturones convertida a Map
+val mapBeltColor = belts.toMap()

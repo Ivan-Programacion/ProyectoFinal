@@ -10,6 +10,7 @@ fun tituloTopBar(screen: String?): String {
         StateNavigate.listaCinturones.value -> return ScreenTitle.listaCinturones.value
         StateNavigate.perfil.value -> return ScreenTitle.perfil.value
         StateNavigate.favoritos.value -> return ScreenTitle.favoritos.value
+        StateNavigate.listaContenido.value -> return ScreenTitle.listaContenido.value
     }
     return ""
 }

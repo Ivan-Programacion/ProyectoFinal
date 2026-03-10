@@ -29,13 +29,13 @@ val belts = listOf(
 // Función que, dependiendo de la pantalla donde estemos, realizará una transición u otra al cambiar de pantalla
 fun obtenerIndice (ruta: String?): Int {
     return when (ruta) {
+        "listaContenido" -> -4
         "registroPass" -> -3
         "registro" -> -2
         "login" -> -1
         "favoritos" -> 0
         "listaCinturones" -> 1
         "perfil" -> 2
-        "listaContenido" -> 3
         else -> 1 // Si es nulo, asumimos la central para evitar saltos raros
     }
 }

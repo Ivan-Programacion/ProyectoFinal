@@ -99,16 +99,16 @@ fun App() {
                 val destino = obtenerIndice(targetState.destination.route)
 
                 // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc)
-                if (destino < 0) {
-                    fadeIn(animationSpec = tween(200))
+                if (destino < 0 || inicial < 0) {
+                    fadeIn(animationSpec = tween(100))
                     // Si no, hacemos transicion horizontal según la posición
                 } else {
                     if (destino > inicial) {
                         // AVANCE (Ej: Favoritos -> Cinturones): Entra desde la DERECHA
-                        slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
+                        slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(400))
                     } else {
                         // RETROCESO (Ej: Perfil -> Cinturones): Entra desde la IZQUIERDA
-                        slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(500))
+                        slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(400))
                     }
                 }
             },
@@ -116,16 +116,16 @@ fun App() {
                 val inicial = obtenerIndice(initialState.destination.route)
                 val destino = obtenerIndice(targetState.destination.route)
                 // Si el destino es una de las pantallas iniciales
-                if (inicial < 0) {
-                    fadeOut(animationSpec = tween(200))
+                if (inicial < 0 || destino < 0) {
+                    fadeOut(animationSpec = tween(100))
                     // Si no, hacemos transicion horizontal según la posición
                 } else {
                     if (destino > inicial) {
                         // AVANCE: La pantalla actual sale por la IZQUIERDA para dar con la nueva pantalla
-                        slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+                        slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(400))
                     } else {
                         // RETROCESO: La pantalla actual sale por la DERECHA para dar con la nueva pantalla
-                        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(500))
+                        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400))
                     }
                 }
             }

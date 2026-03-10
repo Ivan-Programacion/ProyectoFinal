@@ -35,6 +35,7 @@ fun obtenerIndice (ruta: String?): Int {
         "favoritos" -> 0
         "listaCinturones" -> 1
         "perfil" -> 2
+        "listaContenido" -> 3
         else -> 1 // Si es nulo, asumimos la central para evitar saltos raros
     }
 }

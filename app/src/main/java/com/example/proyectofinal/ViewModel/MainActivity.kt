@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -44,6 +43,7 @@ import com.example.proyectofinal.Logic.pantallasIniciales
 import com.example.proyectofinal.Logic.tituloTopBar
 import com.example.proyectofinal.View.Favoritos
 import com.example.proyectofinal.View.ListaCinturones
+import com.example.proyectofinal.View.ListaContenido
 import com.example.proyectofinal.View.Login
 import com.example.proyectofinal.View.Perfil
 import com.example.proyectofinal.View.RegistroInfo
@@ -132,10 +132,11 @@ fun App() {
         ) {
             composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.registro.value) { RegistroInfo(innerPadding) { controller.navigate(it) } }
-            composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) }
+            composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) }
             composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) }
             composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
+            composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) }
         }
     }
 }

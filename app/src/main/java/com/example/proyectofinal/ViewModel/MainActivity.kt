@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -31,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -150,6 +153,25 @@ fun TopBar(currentRoute: String?) {
                 tituloTopBar(currentRoute),
                 style = MaterialTheme.typography.titleMedium
             )
+        },
+        navigationIcon = {
+            // Si es una pantalla secundaría que proviene de una principal:
+            /*
+            Funciíón "obtenerIndice(route)":
+            - Principales de 0 a 3
+            - Inciales de -1 a -3
+            - Auxiliares de -4 paraa abajo
+             */
+            if (obtenerIndice(currentRoute) < -3) {
+                // Flecha para atrás de navegación
+                IconButton(onClick = { /* Añadir la navegación de volver atrás */}) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Volver atrás",
+                        tint = Color(0xFF2D0C03) // Marrón oscuro de la identidad de tu App
+                    )
+                }
+            }
         },
         actions = {
             // REALIZAR LOGICA PARA FAV

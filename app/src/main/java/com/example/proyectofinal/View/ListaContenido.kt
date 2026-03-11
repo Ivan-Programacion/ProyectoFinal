@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +45,16 @@ fun ListaContenido(paddingValues: PaddingValues = PaddingValues()) {
             .fillMaxSize()
             .padding(paddingValues)
             // Probando color de fondo del cinturón
-            //.background(mapBeltColor.getValue("Blanco"))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        mapBeltColor.getValue("Negro"), // Color cinturón
+                        MaterialTheme.colorScheme.background // Color de fondo predeterminado
+                    ),
+                    startY = 0f,
+                    endY = 500f // Ajustar esto para ajustar el tamaño del degradado
+                )
+            )
     ) {
         LazyColumn(
             modifier = Modifier

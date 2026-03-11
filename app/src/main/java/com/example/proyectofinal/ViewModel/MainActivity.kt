@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -78,7 +80,8 @@ fun App() {
     Scaffold(
         topBar = {
             // Si NO estamos navegando antes de entrar en la aplicación por las pantalals login, registro, etc
-            if (currentRoute !in pantallasIniciales) TopBar(currentRoute)
+            // controller.popBackStack() --> Para volver atrás en caso de que la pantalla tenga flecha hacia atrás
+            if (currentRoute !in pantallasIniciales) TopBar(currentRoute) { controller.popBackStack() }
             // Si lo estamos, no añadimos el TopBar
             else Spacer(Modifier.padding(bottom = 104.dp))
         },
@@ -100,10 +103,14 @@ fun App() {
                 // Las pasamos a la función para obtener su índice
                 val inicial = obtenerIndice(initialState.destination.route)
                 val destino = obtenerIndice(targetState.destination.route)
+                // Si la pantalla inicial y la de destino son iguales, no hacemos nada
+                if(destino == inicial) {
+                    EnterTransition.None
 
-                // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc)
-                if (destino < 0 || inicial < 0) {
+                // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc), hacemos fadeIn
+                } else if (destino < 0 || inicial < 0) {
                     fadeIn(animationSpec = tween(100))
+
                     // Si no, hacemos transicion horizontal según la posición
                 } else {
                     if (destino > inicial) {
@@ -116,11 +123,17 @@ fun App() {
                 }
             },
             exitTransition = {
+
                 val inicial = obtenerIndice(initialState.destination.route)
                 val destino = obtenerIndice(targetState.destination.route)
-                // Si el destino es una de las pantallas iniciales
-                if (inicial < 0 || destino < 0) {
+                // Si la pantalla inicial y la de destino son iguales, no hacemos nada
+                if(destino == inicial) {
+                    ExitTransition.None
+
+                    // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc), hacemos fadeOut
+                } else if (inicial < 0 || destino < 0) {
                     fadeOut(animationSpec = tween(100))
+
                     // Si no, hacemos transicion horizontal según la posición
                 } else {
                     if (destino > inicial) {
@@ -146,7 +159,7 @@ fun App() {
 
 @OptIn(ExperimentalMaterial3Api::class) // Está en fase de prueba
 @Composable
-fun TopBar(currentRoute: String?) {
+fun TopBar(currentRoute: String?, controller: () -> Unit = {}) {
     TopAppBar(
         {
             Text(
@@ -164,7 +177,7 @@ fun TopBar(currentRoute: String?) {
              */
             if (obtenerIndice(currentRoute) < -3) {
                 // Flecha para atrás de navegación
-                IconButton(onClick = { /* Añadir la navegación de volver atrás */}) {
+                IconButton(onClick = { controller() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver atrás",

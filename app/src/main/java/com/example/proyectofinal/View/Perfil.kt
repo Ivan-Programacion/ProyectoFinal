@@ -12,13 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -46,6 +50,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
 
     // 1. ESTADO PARA EL DIALOG
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     // Lógica del Dialog de Confirmación
     if (showConfirmDialog) {
@@ -55,6 +60,16 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                 /* Lógica de actualización aquí */
             },
             onDismiss = { showConfirmDialog = false }
+        )
+    }
+    // Logicca deñ Dialog de Cerrar Sesión
+    if (showLogoutDialog) {
+        CerrarSesionDialog(
+            onConfirm = {
+                showLogoutDialog = false
+                controller(StateNavigate.login.value)
+            },
+            onDismiss = { showLogoutDialog = false }
         )
     }
 
@@ -158,16 +173,31 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
         // --- 2. SECCIÓN DE CERRAR SESIÓN ---
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Cerrar sesión",
-                color = MaterialTheme.colorScheme.error,
-                fontWeight = FontWeight.Bold,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { controller(StateNavigate.login.value) }
                     .padding(vertical = 16.dp),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Salir",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clickable { }
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(8.dp)
+                )
+                Text(
+                    modifier = Modifier.clickable { showLogoutDialog = true },
+                    text = "Cerrar sesión",
+                    fontWeight = FontWeight.Bold,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -264,5 +294,68 @@ fun CampoPerfil(
                 disabledTextColor = Color.DarkGray,
             )
         )
+    }
+}
+
+@Composable
+fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "¿Cerrar sesión?",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "¿Estás seguro de que quieres salir de tu cuenta?",
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Botón Salir (Rojo/Error para indicar acción destructiva)
+                    Button(
+                        onClick = onConfirm,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Salir", style = MaterialTheme.typography.bodySmall)
+                    }
+                    // Botón Cancelar (Gris)
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Cancelar",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        }
     }
 }

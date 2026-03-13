@@ -1,6 +1,6 @@
 package com.example.proyectofinal.View
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,21 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ReceiptLong
-import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -43,43 +35,53 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectofinal.ViewModel.StateNavigate
 
 @Composable
-fun Perfil(paddingValues: PaddingValues = PaddingValues()) {
-    // Estados para los campos editables
-    // ESTO SE CAMBIARÁ POR UNA DATA CLASS CON LA API
+fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
     var nombre by remember { mutableStateOf("Juan") }
     var apellidos by remember { mutableStateOf("Pérez") }
     var telefono by remember { mutableStateOf("600000000") }
-    val email = "juan.perez@email.com" // Fijo siempre
+    val email = "juan.perez@email.com"
+
+    // 1. ESTADO PARA EL DIALOG
+    var showConfirmDialog by remember { mutableStateOf(false) }
+
+    // Lógica del Dialog de Confirmación
+    if (showConfirmDialog) {
+        ConfirmarCambiosDialog(
+            onConfirm = {
+                showConfirmDialog = false
+                /* Lógica de actualización aquí */
+            },
+            onDismiss = { showConfirmDialog = false }
+        )
+    }
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
+            .padding(paddingValues),
+        contentPadding = PaddingValues(bottom = 20.dp)
     ) {
+        // --- CARD DATOS PERFIL ---
         item {
             Card(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 12.dp),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp),
+                    modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(text = "Datos perfil", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    // --- AVATAR ---
-                    // MIRAR AQUÍ SI REALIZAR FOTO
+
+                    // AVATAR
                     Surface(
                         modifier = Modifier.size(100.dp),
                         shape = CircleShape,
@@ -87,7 +89,6 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues()) {
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                // Coge la primera letra del nombre
                                 text = nombre.take(1).uppercase(),
                                 style = MaterialTheme.typography.displayMedium,
                                 fontWeight = FontWeight.Bold,
@@ -96,62 +97,49 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues()) {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // --- FORMULARIO ---
                     CampoPerfil(label = "Nombre", value = nombre, onValueChange = { nombre = it })
                     CampoPerfil(
-                        label = "Apellidos", value = apellidos, onValueChange = { apellidos = it })
+                        label = "Apellidos",
+                        value = apellidos,
+                        onValueChange = { apellidos = it })
                     CampoPerfil(
-                        label = "Teléfono", value = telefono, onValueChange = { telefono = it })
-
-                    // Email deshabilitado
-                    CampoPerfil(
-                        label = "Email", value = email, onValueChange = {}, enabled = false
-                    )
+                        label = "Teléfono",
+                        value = telefono,
+                        onValueChange = { telefono = it })
+                    CampoPerfil(label = "Email", value = email, onValueChange = {}, enabled = false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // --- BOTÓN ACTUALIZAR ---
+                    // BOTÓN ACTUALIZAR (Ahora abre el Dialog)
                     Button(
-                        onClick = { /* Acción actualizar */ },
+                        onClick = { showConfirmDialog = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(55.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2D0C03) // Marrón oscuro
-                        )
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D0C03))
                     ) {
                         Text("Actualizar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                 }
             }
         }
-        item { Spacer(modifier = Modifier.height(8.dp)) }
+
+        // --- CARD DETALLES DE PAGO ---
         item {
             Card(
                 modifier = Modifier
-                    .fillMaxWidth() // Mejor que fillMaxSize si va dentro de un scroll
-                    .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 12.dp),
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(24.dp), // Un poco más de padding
-                ) {
-                    Text(
-                        text = "Detalles de pago",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(text = "Detalles de pago", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    // Información alineada
                     InfoPagoRow(label = "Último pago", value = "--€")
                     InfoPagoRow(label = "Tipo de pago", value = "--")
-
-                    // Fila especial para la fecha
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -163,14 +151,75 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues()) {
                             color = MaterialTheme.colorScheme.error
                         )
                     }
-                    // El texto se esconderá hasta que la fecha esté cercana
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                }
+            }
+        }
+
+        // --- 2. SECCIÓN DE CERRAR SESIÓN ---
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Cerrar sesión",
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { controller(StateNavigate.login.value) }
+                    .padding(vertical = 16.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun ConfirmarCambiosDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "¿Guardar cambios?",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Se van a modificar tus datos de perfil. ¿Estás seguro de que quieres continuar?",
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+                    // Botón Aceptar
+                    Button(
+                        onClick = onConfirm,
+                        modifier = Modifier.weight(1f),
+                        //colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D0C03)),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text("Aceptar", style = MaterialTheme.typography.bodySmall)
+                    }
+                    // Botón Cancelar
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = "Estado del próximo pago",
-                            color = MaterialTheme.colorScheme.secondary
+                            "Cancelar",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }

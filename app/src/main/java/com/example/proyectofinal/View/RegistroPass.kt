@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -88,13 +89,20 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Título alineado a la izquierda para mantener simetría
-                Text(
-                    text = "Crear cuenta",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.align(Alignment.Start)
-                )
-
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { controller(StateNavigate.registro.value) }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver atrás",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    // Título alineado a la izquierda para mantener simetría
+                    Text(
+                        text = "Crear cuenta",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
                 // --- CAMPO CONTRASEÑA ---
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(

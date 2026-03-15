@@ -159,7 +159,7 @@ fun App() {
 
 @OptIn(ExperimentalMaterial3Api::class) // Está en fase de prueba
 @Composable
-fun TopBar(currentRoute: String?, controller: () -> Unit = {}) {
+fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
     TopAppBar(
         {
             Text(
@@ -177,11 +177,11 @@ fun TopBar(currentRoute: String?, controller: () -> Unit = {}) {
              */
             if (obtenerIndice(currentRoute) < -3) {
                 // Flecha para atrás de navegación
-                IconButton(onClick = { controller() }) {
+                IconButton(onClick = { backNavigation() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver atrás",
-                        tint = Color(0xFF2D0C03) // Marrón oscuro de la identidad de tu App
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }

@@ -7,6 +7,7 @@ import com.example.proyectofinal.ui.theme.coloresCinturones
 // Función que cambia el titulo del TopBar según la pantalla en la que esté
 fun tituloTopBar(screen: String?): String {
     when (screen) {
+        StateNavigate.contenido.value -> return ScreenTitle.contenido.value
         StateNavigate.listaCinturones.value -> return ScreenTitle.listaCinturones.value
         StateNavigate.perfil.value -> return ScreenTitle.perfil.value
         StateNavigate.favoritos.value -> return ScreenTitle.favoritos.value
@@ -30,6 +31,7 @@ val belts = listOf(
 // Función que, dependiendo de la pantalla donde estemos, realizará una transición u otra al cambiar de pantalla
 fun obtenerIndice (ruta: String?): Int {
     return when (ruta) {
+        "contenido" -> -5
         "listaContenido" -> -4
         "registroPass" -> -3
         "registro" -> -2

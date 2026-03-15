@@ -46,6 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectofinal.Logic.obtenerIndice
 import com.example.proyectofinal.Logic.pantallasIniciales
 import com.example.proyectofinal.Logic.tituloTopBar
+import com.example.proyectofinal.View.Contenido
 import com.example.proyectofinal.View.Favoritos
 import com.example.proyectofinal.View.ListaCinturones
 import com.example.proyectofinal.View.ListaContenido
@@ -152,7 +153,8 @@ fun App() {
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) }
             composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
-            composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) }
+            composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
+            composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
         }
     }
 }

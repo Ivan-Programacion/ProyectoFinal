@@ -35,10 +35,11 @@ import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.provisionalContentFormBeltList
 import com.example.proyectofinal.Logic.provisionalContentSetBeltList
 import com.example.proyectofinal.Logic.provisionalContentTecBeltList
+import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
-fun ListaContenido(paddingValues: PaddingValues = PaddingValues()) {
+fun ListaContenido(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
     // Contenedor principal que usa el color del cinturón como fondo
     Box(
         modifier = Modifier
@@ -65,24 +66,42 @@ fun ListaContenido(paddingValues: PaddingValues = PaddingValues()) {
         ) {
             // SECCIÓN TÉCNICAS
             item {
-                ContenedorContenido(titulo = "Técnicas", items = provisionalContentTecBeltList)
+                ContenedorContenido(
+                    titulo = "Técnicas",
+                    items = provisionalContentTecBeltList
+                ) {
+                    // Añadimos la navegación al contenido de cada contenido
+                    controller(StateNavigate.contenido.value)
+                }
             }
 
             // SECCIÓN FORMA (KATA)
             item {
-                ContenedorContenido(titulo = "Forma (Kata)", items = provisionalContentFormBeltList)
+                ContenedorContenido(
+                    titulo = "Forma (Kata)",
+                    items = provisionalContentFormBeltList
+                ) {
+                    // Añadimos la navegación al contenido de cada contenido
+                    controller(StateNavigate.contenido.value)
+                }
             }
 
             // SECCIÓN SET
             item {
-                ContenedorContenido(titulo = "Set", items = provisionalContentSetBeltList)
+                ContenedorContenido(
+                    titulo = "Set",
+                    items = provisionalContentSetBeltList
+                ) {
+                    // Añadimos la navegación al contenido de cada contenido
+                    controller(StateNavigate.contenido.value)
+                }
             }
         }
     }
 }
 
 @Composable
-fun ContenedorContenido(titulo: String, items: List<String>) {
+fun ContenedorContenido(titulo: String, items: List<String>, controller: () -> Unit) {
     // Tarjeta clara que agrupa los elementos
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -104,20 +123,20 @@ fun ContenedorContenido(titulo: String, items: List<String>) {
 
             // Generamos una fila por cada elemento de la lista
             items.forEach { nombreItem ->
-                SubcontenedorContenido(nombre = nombreItem)
+                SubcontenedorContenido(nombre = nombreItem) { controller() }
             }
         }
     }
 }
 
 @Composable
-fun SubcontenedorContenido(nombre: String) {
+fun SubcontenedorContenido(nombre: String, controller: () -> Unit) {
     // Cada técnica individual dentro de la sección
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
-            .clickable { /* Navegar al detalle del contenido */ },
+            .clickable { controller() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
     ) {
@@ -153,6 +172,6 @@ fun SubcontenedorContenido(nombre: String) {
 @Composable
 fun ListaContenidopreview() {
     ProyectoFinalTheme {
-        ListaContenido()
+        ListaContenido() {}
     }
 }

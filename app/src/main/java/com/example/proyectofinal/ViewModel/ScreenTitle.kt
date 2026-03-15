@@ -4,5 +4,6 @@ enum class ScreenTitle(val value: String) {
     listaCinturones("Cinturones"),
     perfil("Perfil"),
     favoritos("Favoritos"),
-    listaContenido("Cinturón: Marrón")
+    listaContenido("Cinturón: Marrón"),
+    contenido("Cinturón: Marrón")
 }

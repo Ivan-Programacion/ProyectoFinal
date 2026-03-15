@@ -11,14 +11,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +47,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectofinal.Logic.belts
+import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.obtenerIndice
 import com.example.proyectofinal.Logic.pantallasIniciales
 import com.example.proyectofinal.Logic.tituloTopBar
@@ -172,10 +178,10 @@ fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
         navigationIcon = {
             // Si es una pantalla secundaría que proviene de una principal:
             /*
-            Funciíón "obtenerIndice(route)":
+            Función "obtenerIndice(route)":
             - Principales de 0 a 3
             - Inciales de -1 a -3
-            - Auxiliares de -4 paraa abajo
+            - Auxiliares de -4 para abajo
              */
             if (obtenerIndice(currentRoute) < -3) {
                 // Flecha para atrás de navegación
@@ -187,11 +193,8 @@ fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
                     )
                 }
             }
-        },
-        actions = {
-            // REALIZAR LOGICA PARA FAV
-            // REALIZAR LOGICA PARA VOLVER ATRÁS EN OTRAS PANTALLAS
-        })
+        }
+    )
 }
 
 @Composable

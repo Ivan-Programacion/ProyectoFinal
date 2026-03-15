@@ -28,7 +28,8 @@ val belts = listOf(
     "Negro" to coloresCinturones().Negro
 )
 
-// Función que, dependiendo de la pantalla donde estemos, realizará una transición u otra al cambiar de pantalla
+// Función que, dependiendo de la pantalla donde estemos, nos devolverá un valor con el cual utilizaremos
+// para lógica de transiciones de cambio entre pantallas o añadir iconos en el TopBar
 fun obtenerIndice (ruta: String?): Int {
     return when (ruta) {
         "contenido" -> -5

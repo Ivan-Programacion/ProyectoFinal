@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -112,13 +113,18 @@ fun AdminListaClientes(
                         Text(
                             text = "Gestionar exámenes",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D0C03)
                         )
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowRight,
-                            contentDescription = "Ir a gestionar exámenes",
-                            tint = Color(0xFF2D0C03)
-                        )
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color.White.copy(alpha = 0.3f),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowRight,
+                                contentDescription = "Ir a gestión de exámenes",
+                                modifier = Modifier.padding(4.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -194,10 +200,17 @@ fun AdminListaClientes(
                                     text = "${alumno.nombre} ${alumno.apellidos}",
                                     fontWeight = FontWeight.Bold,
                                 )
-                                Icon(
-                                    imageVector = Icons.Default.KeyboardArrowRight,
-                                    contentDescription = "Ver perfil de ${alumno.nombre}",
-                                )
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color.White.copy(alpha = 0.3f),
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowRight,
+                                        contentDescription = "Ver perfil de ${alumno.nombre}",
+                                        modifier = Modifier.padding(4.dp)
+                                    )
+                                }
                             }
                         }
                     }

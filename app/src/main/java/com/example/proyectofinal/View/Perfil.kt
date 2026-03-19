@@ -37,9 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectofinal.ViewModel.StateNavigate
+import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
 fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
@@ -84,7 +86,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 12.dp),
+                    .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -139,37 +141,6 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                 }
             }
         }
-
-        // --- CARD DETALLES DE PAGO ---
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Text(text = "Detalles de pago", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    InfoPagoRow(label = "Último pago", value = "--€")
-                    InfoPagoRow(label = "Tipo de pago", value = "--")
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = "Próximo pago")
-                        Text(
-                            text = "--",
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-            }
-        }
-
         // --- 2. SECCIÓN DE CERRAR SESIÓN ---
         item {
             Spacer(modifier = Modifier.height(16.dp))
@@ -357,5 +328,12 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 }
             }
         }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun Perfilpreview() {
+    ProyectoFinalTheme {
+        Perfil() {}
     }
 }

@@ -44,7 +44,7 @@ fun ListaCinturones(paddingValues: PaddingValues = PaddingValues(), controller: 
             modifier = Modifier
                 .fillMaxSize()
                 // Añadimos margen lateral y fondo para que "flote"
-                .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 12.dp),
+                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 16.dp),
             shape = RoundedCornerShape(24.dp), // Redondeado completo para look compacto
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -120,6 +120,6 @@ fun BeltItem(name: String, beltColor: Color, controller: () -> Unit) {
 @Composable
 fun ListaCinturonespreview() {
     ProyectoFinalTheme {
-        App()
+        ListaCinturones() {}
     }
 }

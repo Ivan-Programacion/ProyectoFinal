@@ -5,5 +5,7 @@ enum class ScreenTitle(val value: String) {
     perfil("Perfil"),
     favoritos("Favoritos"),
     listaContenido("Cinturón: Marrón"),
-    contenido("Cinturón: Marrón")
+    contenido("Cinturón: Marrón"),
+    adminListaClientes("Lista alumnos")
+
 }

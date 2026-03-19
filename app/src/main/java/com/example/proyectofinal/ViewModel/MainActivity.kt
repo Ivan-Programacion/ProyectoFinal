@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -52,6 +53,7 @@ import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.obtenerIndice
 import com.example.proyectofinal.Logic.pantallasIniciales
 import com.example.proyectofinal.Logic.tituloTopBar
+import com.example.proyectofinal.View.AdminListaClientes
 import com.example.proyectofinal.View.Contenido
 import com.example.proyectofinal.View.Favoritos
 import com.example.proyectofinal.View.ListaCinturones
@@ -93,7 +95,7 @@ fun App() {
             else Spacer(Modifier.padding(bottom = 104.dp))
         },
         bottomBar = {
-            // Si NO estamos navegando antes de entrar en la aplicación por las pantalals login, registro, etc
+            // Si NO estamos navegando antes de entrar en la aplicación por las pantallas login, registro, etc
             if (currentRoute !in pantallasIniciales) NavBar({
                 beforeRoute = it
                 controller.navigate(it)
@@ -161,9 +163,11 @@ fun App() {
             composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
+            composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class) // Está en fase de prueba
 @Composable
@@ -199,10 +203,29 @@ fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
 
 @Composable
 fun NavBar(controller: (route: String) -> Unit) {
+    // VARIABLE REMEMBER PARA PROBAR NAVEGACIÓN CON O SIN ADMIN
+    // Cambiar a mano por ahora
+    val isAdmin by remember { mutableStateOf(true) }
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         var state by remember { mutableStateOf(StateNavigate.listaCinturones) }
+        // Si es admin, muestra este item
+        if(isAdmin) {
+            NavigationBarItem(
+                selected = state == StateNavigate.adminListaClientes,
+                {
+                    state = StateNavigate.adminListaClientes
+                    controller("adminListaClientes")
+                },
+                icon = { Icon(Icons.Default.Book, contentDescription = "Gestion exámenes") },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.onSecondary
+                ),
+                label = { Text("Gestión") })
+    }
         // onClick de cada item --> se identifica la pantalla (state); después se cambia a dicha pantalla (controller([pantalla])
         NavigationBarItem(
             selected = state == StateNavigate.favoritos,

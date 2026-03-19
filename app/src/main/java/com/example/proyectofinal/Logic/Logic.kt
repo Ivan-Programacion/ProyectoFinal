@@ -12,6 +12,7 @@ fun tituloTopBar(screen: String?): String {
         StateNavigate.perfil.value -> return ScreenTitle.perfil.value
         StateNavigate.favoritos.value -> return ScreenTitle.favoritos.value
         StateNavigate.listaContenido.value -> return ScreenTitle.listaContenido.value
+        StateNavigate.adminListaClientes.value -> return ScreenTitle.adminListaClientes.value
     }
     return ""
 }
@@ -37,10 +38,11 @@ fun obtenerIndice (ruta: String?): Int {
         "registroPass" -> -3
         "registro" -> -2
         "login" -> -1
-        "favoritos" -> 0
-        "listaCinturones" -> 1
-        "perfil" -> 2
-        else -> 1 // Si es nulo, asumimos la central para evitar saltos raros
+        "adminListaClientes" -> 0
+        "favoritos" -> 1
+        "listaCinturones" -> 2
+        "perfil" -> 3
+        else -> 2 // Si es nulo, asumimos la central para evitar saltos raros
     }
 }
 

@@ -11,18 +11,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,9 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -48,11 +43,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectofinal.Logic.belts
-import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.obtenerIndice
 import com.example.proyectofinal.Logic.pantallasIniciales
 import com.example.proyectofinal.Logic.tituloTopBar
+import com.example.proyectofinal.View.AdminGestionExamen
 import com.example.proyectofinal.View.AdminListaClientes
 import com.example.proyectofinal.View.Contenido
 import com.example.proyectofinal.View.Favoritos
@@ -163,7 +157,8 @@ fun App() {
             composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
-            composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) }
+            composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) {controller.navigate(it)} }
+            composable(StateNavigate.adminGestionExamen.value) { AdminGestionExamen(innerPadding) }
         }
     }
 }

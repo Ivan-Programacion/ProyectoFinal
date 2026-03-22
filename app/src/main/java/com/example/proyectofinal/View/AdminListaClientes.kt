@@ -22,7 +22,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,12 +36,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.Logic.AlumnoEjemplo
+import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
 fun AdminListaClientes(
     paddingValues: PaddingValues = PaddingValues(),
+    controller: (String) -> Unit,
 ) {
+    //*********************** LOGICA DE PRUEBA *******************************//
     // ESTADOS
     var searchQuery by remember { mutableStateOf("") }
 
@@ -63,6 +65,7 @@ fun AdminListaClientes(
         it.nombre.contains(searchQuery, ignoreCase = true) ||
                 it.apellidos.contains(searchQuery, ignoreCase = true)
     }
+    //*********************** LOGICA DE PRUEBA *******************************//
 
     // CONTENEDOR PRINCIPAL
     Column(
@@ -97,7 +100,7 @@ fun AdminListaClientes(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { }, // Navegación
+                        .clickable { controller(StateNavigate.adminGestionExamen.value) }, // Navegación
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.onSecondary // Fondo sutil
@@ -224,6 +227,6 @@ fun AdminListaClientes(
 @Composable
 fun AdminListaClientespreview() {
     ProyectoFinalTheme {
-        AdminListaClientes()
+        AdminListaClientes {  }
     }
 }

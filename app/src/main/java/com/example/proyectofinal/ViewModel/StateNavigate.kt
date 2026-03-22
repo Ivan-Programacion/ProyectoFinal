@@ -9,6 +9,7 @@ enum class StateNavigate(val value: String) {
     favoritos("favoritos"),
     listaContenido("listaContenido"),
     contenido("contenido"),
-    adminListaClientes("adminListaClientes")
+    adminListaClientes("adminListaClientes"),
+    adminGestionExamen("adminGestionExamen")
 
 }

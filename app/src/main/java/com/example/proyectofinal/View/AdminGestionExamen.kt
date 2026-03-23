@@ -82,7 +82,8 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
     if (showCancelarDialog) {
         DialogAccionExamen(
             titulo = "Cancelar examen",
-            descripcion = "Esta acción eliminará todas las solicitudes actuales y cerrará el periodo de examen. Los alumnos serán notificados. Esta acción no se puede deshacer.",
+            descripcion = "Esta acción eliminará todas las solicitudes actuales y cerrará el periodo" +
+                    " de examen notificando a todos los alumnos afectados. ¿Estás seguro de querer cancelar el examen?",
             textoAceptar = "Cancelar examen",
             textoCancelar = "Seguir examen",
             colorAceptar = MaterialTheme.colorScheme.error,
@@ -100,7 +101,9 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
     if (showRealizarDialog) {
         DialogAccionExamen(
             titulo = "Realizar examen",
-            descripcion = "Estás a punto de abrir el periodo de examen. Los alumnos podrán empezar a enviar sus solicitudes. Puedes añadir una descripción o indicaciones generales a continuación:",
+            descripcion = "Estás a punto de abrir el periodo de examen. Los alumnos podrán empezar " +
+                    "a enviar sus solicitudes. Puedes añadir una descripción o indicaciones generales " +
+                    "a los alumnos a continuación:",
             textoAceptar = "Aceptar",
             textoCancelar = "Cancelar",
             colorAceptar = MaterialTheme.colorScheme.primary,
@@ -118,7 +121,10 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
     if (showAprobarDialog) {
         DialogAccionExamen(
             titulo = if (estadoExamen == EstadoExamen.SOLICITUDES) "Aceptar a todos" else "Aprobar a todos",
-            descripcion = "Se va a proceder a aplicar esta acción a toda la lista actual de alumnos mostrada. Puedes añadir una anotación general que se guardará en el registro:",
+            descripcion =
+                if (estadoExamen == EstadoExamen.SOLICITUDES)
+                    "Se van a aceptar todas las solicitudes pendientes de examen ¿Estás seguro de querer aceptar todas?"
+                else "Se va a proceder a APROBAR a todos los alumnos examinados. ¿Estás seguro de querer aprobar a todos?",
             textoAceptar = "Aceptar",
             textoCancelar = "Cancelar",
             colorAceptar = MaterialTheme.colorScheme.primary,
@@ -392,7 +398,7 @@ fun DialogAccionExamen(
                             .height(100.dp), // TextArea más grande
                         placeholder = {
                             Text(
-                                "Añadir notas (opcional)...",
+                                "Mensaje para alumnos (fecha examen, información) ...",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         },

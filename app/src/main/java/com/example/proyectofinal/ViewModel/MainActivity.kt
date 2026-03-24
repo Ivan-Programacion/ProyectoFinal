@@ -153,7 +153,7 @@ fun App() {
             composable(StateNavigate.registro.value) { RegistroInfo(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) {controller.navigate(it)} }
-            composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) }
+            composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }

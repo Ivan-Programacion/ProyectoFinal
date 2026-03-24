@@ -91,8 +91,8 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
             textoAceptar = "Cancelar examen",
             textoCancelar = "Seguir examen",
             colorAceptar = MaterialTheme.colorScheme.error,
-            colorCancelar = MaterialTheme.colorScheme.primary,
-            colorTextoCancelar = MaterialTheme.colorScheme.onPrimary,
+            colorCancelar = Color.LightGray,
+            colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
             onAceptar = {
                 showCancelarDialog = false
@@ -110,7 +110,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                     "a los alumnos a continuación:",
             textoAceptar = "Aceptar",
             textoCancelar = "Cancelar",
-            colorAceptar = MaterialTheme.colorScheme.primary,
+            colorAceptar = MaterialTheme.colorScheme.tertiary,
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = true,
@@ -133,7 +133,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                         "¿Estás seguro de querer aprobar a todos los alumnos?",
             textoAceptar = "Aceptar",
             textoCancelar = "Cancelar",
-            colorAceptar = MaterialTheme.colorScheme.primary,
+            colorAceptar = MaterialTheme.colorScheme.tertiary,
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
@@ -160,7 +160,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
             descripcion = descripcionText,
             textoAceptar = "Aceptar",
             textoCancelar = "Cancelar",
-            colorAceptar = MaterialTheme.colorScheme.primary,
+            colorAceptar = MaterialTheme.colorScheme.tertiary,
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
@@ -532,6 +532,7 @@ fun DialogAccionExamen(
                             textoAceptar,
                             color = Color.White,
                             textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -547,6 +548,7 @@ fun DialogAccionExamen(
                             textoCancelar,
                             color = colorTextoCancelar,
                             textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }

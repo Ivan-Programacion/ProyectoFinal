@@ -30,11 +30,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.Logic.belts
+import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import com.example.proyectofinal.ui.theme.coloresCinturones
 
 @Composable
-fun Favoritos(paddingValues: PaddingValues = PaddingValues()) {
+fun Favoritos(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
     // Datos ejemplos que luego vendrán de la API
     val tecnicasFavoritas = listOf(
         "Técnica 3" to coloresCinturones().Amarillo,
@@ -58,23 +59,23 @@ fun Favoritos(paddingValues: PaddingValues = PaddingValues()) {
             SeccionFavoritos(
                 titulo = "Técnicas",
                 items = tecnicasFavoritas
-            )
+            ) { controller(StateNavigate.contenido.value) }
         }
 
         // SECCIÓN FORMA (KATA)
         item {
             SeccionFavoritos(
                 titulo = "Forma (Kata)",
-                items = formasFavoritas
-            )
+                items = formasFavoritas,
+            ) { controller(StateNavigate.contenido.value) }
         }
 
         // SECCIÓN SET
         item {
             SeccionFavoritos(
                 titulo = "Set",
-                items = setsFavoritos
-            )
+                items = setsFavoritos,
+            ) { controller(StateNavigate.contenido.value) }
         }
     }
 }
@@ -83,7 +84,11 @@ fun Favoritos(paddingValues: PaddingValues = PaddingValues()) {
 // En el parametro esta puesto andropidx.compuse.ui.graphics.Color para poder acceder a la lista de colores de cinturones
 // Esto al final se hará con la api
 // Añadimos la lista de cinturones como Map para poder trabajar con el de forma temporal hasta hacer la api
-fun SeccionFavoritos(titulo: String, items: List<Pair<String, androidx.compose.ui.graphics.Color>>) {
+fun SeccionFavoritos(
+    titulo: String,
+    items: List<Pair<String, androidx.compose.ui.graphics.Color>>,
+    controller: () -> Unit
+) {
     val cinturonesMap = belts.toMap()
     Card(
         modifier = Modifier
@@ -114,8 +119,14 @@ fun SeccionFavoritos(titulo: String, items: List<Pair<String, androidx.compose.u
                     // Para añadir el nombre del cinturón (momentaneo hasta que tengamos la api)
                     // con .find para encontrar la priemra coincidencia
                     // Es como utilizar un forMap de Java (foreach y entryset)
-                    val nombreCinturon = cinturonesMap.entries.find { it.value == colorCinturon }?.key ?: "Desconocido"
-                    ItemFavorito(nombreTecnica = nombreTecnica, nombreCinturon = nombreCinturon , colorCinturon = colorCinturon)
+                    val nombreCinturon =
+                        cinturonesMap.entries.find { it.value == colorCinturon }?.key
+                            ?: "Desconocido"
+                    ItemFavorito(
+                        nombreTecnica = nombreTecnica,
+                        nombreCinturon = nombreCinturon,
+                        colorCinturon = colorCinturon
+                    ) { controller() }
                 }
             }
         }
@@ -123,12 +134,17 @@ fun SeccionFavoritos(titulo: String, items: List<Pair<String, androidx.compose.u
 }
 
 @Composable
-fun ItemFavorito(nombreTecnica: String, nombreCinturon: String, colorCinturon: Color) {
+fun ItemFavorito(
+    nombreTecnica: String,
+    nombreCinturon: String,
+    colorCinturon: Color,
+    controller: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
-            .clickable { /* Navegar al detalle del contenido */ },
+            .clickable { controller() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
     ) {
@@ -181,6 +197,6 @@ fun ItemFavorito(nombreTecnica: String, nombreCinturon: String, colorCinturon: C
 @Composable
 fun Favoritospreview() {
     ProyectoFinalTheme {
-        Favoritos()
+        Favoritos() {}
     }
 }

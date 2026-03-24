@@ -59,7 +59,6 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
         ConfirmarCambiosDialog(
             onConfirm = {
                 showConfirmDialog = false
-                /* Lógica de actualización aquí */
             },
             onDismiss = { showConfirmDialog = false }
         )
@@ -205,10 +204,14 @@ fun ConfirmarCambiosDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                     Button(
                         onClick = onConfirm,
                         modifier = Modifier.weight(1f),
-                        //colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D0C03)),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text("Aceptar", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            "Aceptar",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                     // Botón Cancelar
                     Button(
@@ -220,26 +223,13 @@ fun ConfirmarCambiosDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                         Text(
                             "Cancelar",
                             color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             }
         }
-    }
-}
-
-// Función auxiliar para no repetir código
-@Composable
-fun InfoPagoRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label)
-        Text(text = value)
     }
 }
 
@@ -310,7 +300,11 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Salir", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            "Salir",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                     // Botón Cancelar (Gris)
                     Button(
@@ -321,6 +315,7 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                     ) {
                         Text(
                             "Cancelar",
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -330,6 +325,7 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun Perfilpreview() {

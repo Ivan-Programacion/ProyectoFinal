@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.proyectofinal.Logic.EstadoExamen
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -53,6 +54,12 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
     // 1. ESTADO PARA EL DIALOG
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
+
+    // --- NUEVOS ESTADOS PARA SOLICITAR EXAMEN ---
+    // (Asegúrate de importar EstadoExamen de tu fichero LogicAdmin)
+    var estadoExamen by remember { mutableStateOf(EstadoExamen.SOLICITUDES) }
+    var solicitudEnviada by remember { mutableStateOf(false) }
+    var showSolicitarExamenDialog by remember { mutableStateOf(false) }
 
     // Lógica del Dialog de Confirmación
     if (showConfirmDialog) {
@@ -71,6 +78,16 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                 controller(StateNavigate.login.value)
             },
             onDismiss = { showLogoutDialog = false }
+        )
+    }
+    // Lógica del Dialog de Solicitar Examen
+    if (showSolicitarExamenDialog) {
+        SolicitarExamenDialog(
+            onConfirm = {
+                showSolicitarExamenDialog = false
+                solicitudEnviada = true // Cambiamos el estado al aceptar
+            },
+            onDismiss = { showSolicitarExamenDialog = false }
         )
     }
 
@@ -140,6 +157,72 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                 }
             }
         }
+        // --- CARD SOLICITAR EXAMEN ---
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, end = 12.dp, bottom = 16.dp), // Margen inferior para separarlo de Cerrar Sesión
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Solicitar examen",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+
+                    // Lógica para el mensaje informativo
+                    val mensajeInformativo = when {
+                        solicitudEnviada -> "Estás en un examen en proceso. Esperando aprobación."
+                        estadoExamen == EstadoExamen.SOLICITUDES -> "¡Examen el próximo domingo 21 de junio!"
+                        else -> "No hay proceso de examen en estos momentos."
+                    }
+
+                    // Card interior o recuadro para resaltar el mensaje del profesor
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.onSecondary // Fondo sutil
+                    ) {
+                        Text(
+                            text = mensajeInformativo,
+                            modifier = Modifier.padding(16.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+
+                    // Botón para acceder
+                    val botonHabilitado = estadoExamen == EstadoExamen.SOLICITUDES && !solicitudEnviada
+
+                    Button(
+                        onClick = { showSolicitarExamenDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(55.dp),
+                        enabled = botonHabilitado,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            disabledContainerColor = Color.LightGray
+                        )
+                    ) {
+                        Text(
+                            text = "Acceder al examen",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = if (botonHabilitado) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
         // --- 2. SECCIÓN DE CERRAR SESIÓN ---
         item {
             Spacer(modifier = Modifier.height(16.dp))
@@ -167,6 +250,66 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                     fontWeight = FontWeight.Bold,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "¿Solicitar acceso?",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Estás a punto de solicitar acceso al próximo examen. ¿Estás seguro de querer acceder al examen?",
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Botón Aceptar
+                    Button(
+                        onClick = onConfirm,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text(
+                            "Aceptar",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    // Botón Cancelar
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Cancelar",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             }
         }
     }

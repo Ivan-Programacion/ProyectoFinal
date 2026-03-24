@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -219,7 +220,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                     unselectedIconColor = MaterialTheme.colorScheme.primary,
                     indicatorColor = MaterialTheme.colorScheme.onSecondary
                 ),
-                label = { Text("Gestión") })
+                label = { Text("Gestión", fontWeight = FontWeight.Bold) })
     }
         // onClick de cada item --> se identifica la pantalla (state); después se cambia a dicha pantalla (controller([pantalla])
         NavigationBarItem(
@@ -234,7 +235,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Favoritos") })
+            label = { Text("Favoritos", fontWeight = FontWeight.Bold) })
         NavigationBarItem(
             state == StateNavigate.listaCinturones,
             {
@@ -248,7 +249,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Cinturones") })
+            label = { Text("Cinturones", fontWeight = FontWeight.Bold) })
         NavigationBarItem(
             state == StateNavigate.perfil,
             {
@@ -261,7 +262,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Perfil") })
+            label = { Text("Perfil", fontWeight = FontWeight.Bold) })
     }
 }
 

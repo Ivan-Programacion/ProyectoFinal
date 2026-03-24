@@ -18,11 +18,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,25 +47,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.proyectofinal.Logic.AlumnoExamen
+import com.example.proyectofinal.Logic.EstadoExamen
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
-
-// 1. DATA CLASS SIMULADA
-data class AlumnoExamen(
-    val id: Int,
-    val nombre: String,
-    val apellidos: String,
-    val cinturon: String
-)
-
-// ENUM PARA SIMULAR LOS ESTADOS DEL EXAMEN (Lógica provisional visual)
-enum class EstadoExamen { NO_INICIADO, SOLICITUDES, EXAMINADOS }
 
 @Composable
 fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
 
+//*********************** LOGICA DE PRUEBA *******************************//
     // --- ESTADOS PROVISIONALES ---
+    // Estados para los Dialogs Individuales
+    var showAprobarIndividualDialog by remember { mutableStateOf(false) }
+    var showRechazarIndividualDialog by remember { mutableStateOf(false) }
+
+    // Estado para guardar a qué alumno le hemos pulsado el botón
+    var alumnoSeleccionado by remember { mutableStateOf<AlumnoExamen?>(null) }
     var estadoExamen by remember { mutableStateOf(EstadoExamen.NO_INICIADO) }
     var searchQuery by remember { mutableStateOf("") }
+    // Estado para controlar si el menú desplegable está abierto o cerrado
+    var expandedMenuFiltro by remember { mutableStateOf(false) }
     var ordenAscendente by remember { mutableStateOf(true) }
 
     // Estados de los Dialogs
@@ -77,7 +81,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
             AlumnoExamen(3, "Carlos", "López", "Naranja")
         )
     }
-
+//*********************** LOGICA DE PRUEBA *******************************//
     // --- DIALOGS ---
     if (showCancelarDialog) {
         DialogAccionExamen(
@@ -120,11 +124,13 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
 
     if (showAprobarDialog) {
         DialogAccionExamen(
-            titulo = if (estadoExamen == EstadoExamen.SOLICITUDES) "Aceptar a todos" else "Aprobar a todos",
+            titulo = if (estadoExamen == EstadoExamen.SOLICITUDES) "Empezar examen" else "Terminar examen",
             descripcion =
                 if (estadoExamen == EstadoExamen.SOLICITUDES)
-                    "Se van a aceptar todas las solicitudes pendientes de examen ¿Estás seguro de querer aceptar todas?"
-                else "Se va a proceder a APROBAR a todos los alumnos examinados. ¿Estás seguro de querer aprobar a todos?",
+                    "Vas a proceder a empezar el examen. Esto hará que se acepten TODAS las solicitudes. " +
+                            "¿Estás seguro de querer aceptar todas las solicitudes?"
+                else "Se va proceder a terminar el examen. Esto hará que se APRUEBEN a todos los alumnos. " +
+                        "¿Estás seguro de querer aprobar a todos los alumnos?",
             textoAceptar = "Aceptar",
             textoCancelar = "Cancelar",
             colorAceptar = MaterialTheme.colorScheme.primary,
@@ -137,6 +143,66 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                 else EstadoExamen.NO_INICIADO
             },
             onCancelar = { showAprobarDialog = false }
+        )
+    }
+
+    // --- DIALOGS INDIVIDUALES ---
+    if (showAprobarIndividualDialog && alumnoSeleccionado != null) {
+        val accionText =
+            if (estadoExamen == EstadoExamen.SOLICITUDES) "Aceptar solicitud" else "Aprobar examen"
+        val descripcionText = if (estadoExamen == EstadoExamen.SOLICITUDES)
+            "¿Estás seguro de querer ACEPTAR la solicitud de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+        else
+            "¿Estás seguro de querer APROBAR el examen de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+
+        DialogAccionExamen(
+            titulo = accionText,
+            descripcion = descripcionText,
+            textoAceptar = "Aceptar",
+            textoCancelar = "Cancelar",
+            colorAceptar = MaterialTheme.colorScheme.primary,
+            colorCancelar = Color.LightGray,
+            colorTextoCancelar = MaterialTheme.colorScheme.primary,
+            mostrarTextArea = false,
+            onAceptar = {
+                // Aquí iría tu lógica real: viewModel.aprobarAlumno(alumnoSeleccionado.id)
+                showAprobarIndividualDialog = false
+                alumnoSeleccionado = null
+            },
+            onCancelar = {
+                showAprobarIndividualDialog = false
+                alumnoSeleccionado = null
+            }
+        )
+    }
+
+    if (showRechazarIndividualDialog && alumnoSeleccionado != null) {
+        val accionText =
+            if (estadoExamen == EstadoExamen.SOLICITUDES) "Rechazar solicitud" else "Suspender examen"
+        val descripcionText = if (estadoExamen == EstadoExamen.SOLICITUDES)
+            "¿Estás seguro de querer DENEGAR la solicitud de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+        else
+            "¿Estás seguro de querer SUSPENDER el examen de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+
+        DialogAccionExamen(
+            titulo = accionText,
+            descripcion = descripcionText,
+            textoAceptar =
+                if (estadoExamen == EstadoExamen.SOLICITUDES) "Denegar" else "Sí",
+            textoCancelar = "Cancelar",
+            colorAceptar = MaterialTheme.colorScheme.error, // Rojo porque es una acción destructiva/negativa
+            colorCancelar = Color.LightGray,
+            colorTextoCancelar = MaterialTheme.colorScheme.primary,
+            mostrarTextArea = false,
+            onAceptar = {
+                // Aquí irá lógica: viewModel.rechazarAlumno(alumnoSeleccionado.id)
+                showRechazarIndividualDialog = false
+                alumnoSeleccionado = null
+            },
+            onCancelar = {
+                showRechazarIndividualDialog = false
+                alumnoSeleccionado = null
+            }
         )
     }
 
@@ -191,8 +257,8 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                     // Botón Derecho: Realizar / Aceptar / Aprobar
                     val textoBtnDerecho = when (estadoExamen) {
                         EstadoExamen.NO_INICIADO -> "Realizar examen"
-                        EstadoExamen.SOLICITUDES -> "Aceptar a todos"
-                        EstadoExamen.EXAMINADOS -> "Aprobar a todos"
+                        EstadoExamen.SOLICITUDES -> "Empezar examen"
+                        EstadoExamen.EXAMINADOS -> "Terminar examen"
                     }
                     Button(
                         modifier = Modifier.fillMaxWidth(),
@@ -253,19 +319,54 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                         singleLine = true,
                     )
 
-                    // Botón Filtro (Alterna ascendente/descendente)
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(50.dp),
-                        onClick = { ordenAscendente = !ordenAscendente }
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = if (ordenAscendente) "Asc." else "Des.",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.bodySmall
+                    // Box actúa como ancla para que el DropdownMenu sepa dónde aparecer
+                    Box {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(50.dp),
+                            onClick = { expandedMenuFiltro = true }
+                        ) {
+                            Icon(
+                                // Puedes usar Icons.Default.Menu, Icons.Default.MoreVert o Icons.Default.FilterList
+                                imageVector = Icons.Default.FilterList,
+                                contentDescription = "Opciones de orden",
+                                tint = Color.White,
+                                modifier = Modifier.padding(12.dp) // Ajusta el tamaño del icono dentro del recuadro
+                            )
+                        }
+
+                        // El menú desplegable
+                        DropdownMenu(
+                            expanded = expandedMenuFiltro,
+                            onDismissRequest = {
+                                expandedMenuFiltro = false
+                            } // Se cierra al tocar fuera
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "De menor a mayor cinturón",
+                                        // Ponemos en negrita el que esté seleccionado actualmente
+                                        fontWeight = if (ordenAscendente) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                onClick = {
+                                    ordenAscendente = true
+                                    expandedMenuFiltro = false // Cerramos el menú tras elegir
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "De mayor a menor cinturon",
+                                        fontWeight = if (!ordenAscendente) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                onClick = {
+                                    ordenAscendente = false
+                                    expandedMenuFiltro = false
+                                }
                             )
                         }
                     }
@@ -307,36 +408,44 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                                             fontWeight = FontWeight.Bold,
                                         )
                                         Text(
-                                            text = "Cinturón: ${alumno.cinturon}",
+                                            text = alumno.cinturon,
                                             style = MaterialTheme.typography.bodySmall,
                                         )
                                     }
 
-                                    // Botones de Acción (Tick verde y X roja)
+                                    // Botones de Acción
                                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Surface(
                                             shape = RoundedCornerShape(8.dp),
-                                            color = Color(0xFFE8F5E9), // Fondo verde clarito
+                                            color = Color(0xFFC5E7FF), // Fondo azul claro
                                             modifier = Modifier.size(36.dp),
-                                            onClick = { /* Lógica Aprobar Individual */ }
+                                            onClick = {
+                                                alumnoSeleccionado = alumno // Guardamos quien es
+                                                showAprobarIndividualDialog =
+                                                    true // Mostramos el dialog
+                                            }
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Check,
                                                 contentDescription = "Aprobar",
-                                                tint = Color(0xFF4CAF50), // Verde
+                                                tint = MaterialTheme.colorScheme.tertiary,
                                                 modifier = Modifier.padding(6.dp)
                                             )
                                         }
                                         Surface(
                                             shape = RoundedCornerShape(8.dp),
-                                            color = Color(0xFFFFEBEE), // Fondo rojo clarito
+                                            color = MaterialTheme.colorScheme.surface,
                                             modifier = Modifier.size(36.dp),
-                                            onClick = { /* Lógica Rechazar Individual */ }
+                                            onClick = {
+                                                alumnoSeleccionado = alumno // Guardamos quién es
+                                                showRechazarIndividualDialog =
+                                                    true // Mostramos el dialog
+                                            }
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
                                                 contentDescription = "Rechazar",
-                                                tint = Color(0xFFF44336), // Rojo
+                                                tint = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.padding(6.dp)
                                             )
                                         }
@@ -398,7 +507,7 @@ fun DialogAccionExamen(
                             .height(100.dp), // TextArea más grande
                         placeholder = {
                             Text(
-                                "Mensaje para alumnos (fecha examen, información) ...",
+                                "Mensaje opcional para alumnos ...",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         },

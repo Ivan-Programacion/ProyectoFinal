@@ -162,7 +162,11 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp, end = 12.dp, bottom = 16.dp), // Margen inferior para separarlo de Cerrar Sesión
+                    .padding(
+                        start = 12.dp,
+                        end = 12.dp,
+                        bottom = 16.dp
+                    ), // Margen inferior para separarlo de Cerrar Sesión
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -181,7 +185,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
 
                     // Lógica para el mensaje informativo
                     val mensajeInformativo = when {
-                        solicitudEnviada -> "Estás en un examen en proceso. Esperando aprobación."
+                        solicitudEnviada -> "Esperando aprobación de solicitud..."
                         estadoExamen == EstadoExamen.SOLICITUDES -> "¡Examen el próximo domingo 21 de junio!"
                         else -> "No hay proceso de examen en estos momentos."
                     }
@@ -200,7 +204,8 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                     }
 
                     // Botón para acceder
-                    val botonHabilitado = estadoExamen == EstadoExamen.SOLICITUDES && !solicitudEnviada
+                    val botonHabilitado =
+                        estadoExamen == EstadoExamen.SOLICITUDES && !solicitudEnviada
 
                     Button(
                         onClick = { showSolicitarExamenDialog = true },
@@ -215,7 +220,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                     ) {
                         Text(
                             text = "Acceder al examen",
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = if(botonHabilitado) FontWeight.Bold else FontWeight.Normal,
                             fontSize = 18.sp,
                             color = if (botonHabilitado) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                         )
@@ -274,7 +279,8 @@ fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Estás a punto de solicitar acceso al próximo examen. ¿Estás seguro de querer acceder al examen?",
+                    text = "Estás a punto de solicitar acceso al próximo examen. ¿Estás seguro de " +
+                            "querer solicitar acceso al examen?",
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))

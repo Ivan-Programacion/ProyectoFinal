@@ -159,9 +159,9 @@ fun App() {
             composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
-            composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) {controller.navigate(it)} }
+            composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) { controller.navigate(it)} }
             composable(StateNavigate.adminGestionExamen.value) { AdminGestionExamen(innerPadding) }
-            composable(StateNavigate.adminPerfilCliente.value) { AdminPerfilCliente(innerPadding) {} }
+            composable(StateNavigate.adminPerfilCliente.value) { AdminPerfilCliente(innerPadding) { controller.navigate(it)} }
         }
     }
 }

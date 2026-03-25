@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.proyectofinal.Logic.AlumnoExamen
 import com.example.proyectofinal.Logic.EstadoExamen
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -477,7 +478,7 @@ fun DialogAccionExamen(
 ) {
     var comentario by remember { mutableStateOf("") }
 
-    androidx.compose.ui.window.Dialog(onDismissRequest = onCancelar) {
+    Dialog(onDismissRequest = onCancelar) {
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

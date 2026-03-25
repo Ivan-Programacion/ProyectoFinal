@@ -43,12 +43,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
 fun AdminPerfilCliente(
     paddingValues: PaddingValues = PaddingValues(),
-    controller: () -> Unit
+    controller: (String) -> Unit
 ) {
     // --- ESTADOS SIMULADOS (MOCKS) ---
     var nombre by remember { mutableStateOf("María") }
@@ -80,8 +81,8 @@ fun AdminPerfilCliente(
             nombreCompleto = "$nombre $apellidos",
             onConfirm = {
                 showEliminarDialog = false
-                // Aquí iría la lógica real de eliminar en BD
-                controller() // Regresa a la pantalla Admin: Lista clientes
+                // Aquí irá la lógica real de eliminar en BD
+                controller(StateNavigate.adminListaClientes.value)
             },
             onDismiss = { showEliminarDialog = false }
         )
@@ -392,7 +393,6 @@ fun EliminarAlumnoDialog(nombreCompleto: String, onConfirm: () -> Unit, onDismis
                     text = "¿Eliminar alumno?",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.error
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(

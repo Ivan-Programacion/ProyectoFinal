@@ -125,7 +125,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -
                 Text(
                     text = "¿Olvidaste la contraseña?",
                     color = MaterialTheme.colorScheme.tertiary, // Validaciones
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)

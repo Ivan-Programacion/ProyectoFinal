@@ -186,7 +186,7 @@ fun AdminListaClientes(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { },
+                                .clickable { controller(StateNavigate.adminPerfilCliente.value) },
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.onSecondary

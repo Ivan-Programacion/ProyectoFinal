@@ -49,6 +49,7 @@ import com.example.proyectofinal.Logic.pantallasIniciales
 import com.example.proyectofinal.Logic.tituloTopBar
 import com.example.proyectofinal.View.AdminGestionExamen
 import com.example.proyectofinal.View.AdminListaClientes
+import com.example.proyectofinal.View.AdminPerfilCliente
 import com.example.proyectofinal.View.Contenido
 import com.example.proyectofinal.View.Favoritos
 import com.example.proyectofinal.View.ListaCinturones
@@ -160,6 +161,7 @@ fun App() {
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
             composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.adminGestionExamen.value) { AdminGestionExamen(innerPadding) }
+            composable(StateNavigate.adminPerfilCliente.value) { AdminPerfilCliente(innerPadding) {} }
         }
     }
 }

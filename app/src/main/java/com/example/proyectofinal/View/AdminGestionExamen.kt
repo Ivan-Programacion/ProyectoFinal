@@ -388,6 +388,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(bottom = 8.dp)
                     ) {
+                        // ALUMNO
                         items(listaAlumnos) { alumno ->
                             Card(
                                 modifier = Modifier.fillMaxWidth(),

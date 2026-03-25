@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.proyectofinal.Logic.EstadoExamen
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -194,7 +195,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.onSecondary // Fondo sutil
+                        color = MaterialTheme.colorScheme.onSecondary
                     ) {
                         Text(
                             text = mensajeInformativo,
@@ -220,7 +221,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                     ) {
                         Text(
                             text = "Acceder al examen",
-                            fontWeight = if(botonHabilitado) FontWeight.Bold else FontWeight.Normal,
+                            fontWeight = if (botonHabilitado) FontWeight.Bold else FontWeight.Normal,
                             fontSize = 18.sp,
                             color = if (botonHabilitado) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
                         )
@@ -262,7 +263,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
 
 @Composable
 fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -323,7 +324,7 @@ fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 
 @Composable
 fun ConfirmarCambiosDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -400,8 +401,8 @@ fun CampoPerfil(
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                disabledContainerColor = Color(0xFFE9E9E9), // Gris claro para el email
-                disabledTextColor = Color.DarkGray,
+                disabledContainerColor = Color.LightGray,
+                disabledTextColor = MaterialTheme.colorScheme.primary
             )
         )
     }
@@ -409,7 +410,7 @@ fun CampoPerfil(
 
 @Composable
 fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+    Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

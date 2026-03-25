@@ -7,6 +7,7 @@ enum class ScreenTitle(val value: String) {
     listaContenido("Cinturón: Marrón"),
     contenido("Cinturón: Marrón"),
     adminListaClientes("Gestión"),
-    adminGestionExamen("Gestión examen")
+    adminGestionExamen("Gestión examen"),
+    adminPerfilCliente("Perfil alumno")
 
 }

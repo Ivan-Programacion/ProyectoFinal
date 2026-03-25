@@ -14,6 +14,7 @@ fun tituloTopBar(screen: String?): String {
         StateNavigate.listaContenido.value -> return ScreenTitle.listaContenido.value
         StateNavigate.adminListaClientes.value -> return ScreenTitle.adminListaClientes.value
         StateNavigate.adminGestionExamen.value -> return ScreenTitle.adminGestionExamen.value
+        StateNavigate.adminPerfilCliente.value -> return ScreenTitle.adminPerfilCliente.value
     }
     return ""
 }
@@ -34,6 +35,7 @@ val belts = listOf(
 // para lógica de transiciones de cambio entre pantallas o añadir iconos en el TopBar
 fun obtenerIndice (ruta: String?): Int {
     return when (ruta) {
+        "adminPerfilCliente" -> -7
         "adminGestionExamen" -> -6
         "contenido" -> -5
         "listaContenido" -> -4

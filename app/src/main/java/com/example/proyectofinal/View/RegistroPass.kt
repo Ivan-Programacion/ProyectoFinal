@@ -169,7 +169,7 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
 
                 // --- BOTÓN CREAR CUENTA ---
                 Button(
-                    onClick = { /* Lógica final de registro */ },
+                    onClick = { controller(StateNavigate.listaCinturones.value) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),

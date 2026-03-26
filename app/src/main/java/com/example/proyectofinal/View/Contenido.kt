@@ -137,7 +137,7 @@ fun Contenido(paddingValues: PaddingValues = PaddingValues()) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Video Placeholder",
+                            text = "Video no disponible",
                             style = MaterialTheme.typography.titleMedium,
                         )
                     }

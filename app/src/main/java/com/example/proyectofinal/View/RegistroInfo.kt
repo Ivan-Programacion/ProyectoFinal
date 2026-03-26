@@ -26,6 +26,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -58,6 +60,7 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
 fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+    // ********************************* LÓGICA PROVISIONA ********************************* //
     // Estados para el formulario provisional
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
@@ -69,6 +72,14 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
     var mes by remember { mutableStateOf("") }
     var anio by remember { mutableStateOf("") }
 
+    // Estados para la cuenta del menor
+    var esMenor by remember { mutableStateOf(false) }
+    var nombreMenor by remember { mutableStateOf("") }
+    var apellidosMenor by remember { mutableStateOf("") }
+    var diaMenor by remember { mutableStateOf("") }
+    var mesMenor by remember { mutableStateOf("") }
+    var anioMenor by remember { mutableStateOf("") }
+// ********************************* LÓGICA PROVISIONA ********************************* //
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -145,6 +156,89 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     value = telefono,
                     placeholder = "612345678"
                 ) { telefono = it }
+
+                // --- CHECKBOX MENOR DE EDAD ---
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { // Hacemos toda la fila clickable para mayor comodidad
+                            esMenor = !esMenor
+                            if (!esMenor) { // Si se desmarca, limpiamos los datos
+                                nombreMenor = ""
+                                apellidosMenor = ""
+                                diaMenor = ""
+                                mesMenor = ""
+                                anioMenor = ""
+                            }
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = esMenor,
+                        onCheckedChange = { checked ->
+                            esMenor = checked
+                            if (!checked) {
+                                nombreMenor = ""
+                                apellidosMenor = ""
+                                diaMenor = ""
+                                mesMenor = ""
+                                anioMenor = ""
+                            }
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.tertiary
+                        )
+                    )
+                    Text(
+                        text = "Esta cuenta es para un menor de 14 años",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                // --- CAMPOS CONDICIONALES DEL MENOR ---
+                if (esMenor) {
+                    FilaRegistro(
+                        label = "Nombre del niño/a",
+                        value = nombreMenor,
+                        placeholder = "Ej. Leo"
+                    ) { nombreMenor = it }
+
+                    FilaRegistro(
+                        label = "Apellidos niño/a",
+                        value = apellidosMenor,
+                        placeholder = "Ej. Pérez"
+                    ) { apellidosMenor = it }
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text("Fecha de nacimiento niño/a", fontWeight = FontWeight.Bold)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CampoFecha(
+                                label = "Día",
+                                opciones = dias,
+                                seleccionado = diaMenor,
+                                modifier = Modifier.weight(1f),
+                                onValueChange = { diaMenor = it }
+                            )
+                            CampoFecha(
+                                label = "Mes",
+                                opciones = meses,
+                                seleccionado = mesMenor,
+                                modifier = Modifier.weight(1.2f),
+                                onValueChange = { mesMenor = it }
+                            )
+                            CampoFecha(
+                                label = "Año",
+                                opciones = anios,
+                                seleccionado = anioMenor,
+                                modifier = Modifier.weight(1.3f),
+                                onValueChange = { anioMenor = it }
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 

@@ -145,7 +145,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // BOTÓN ACTUALIZAR (Ahora abre el Dialog)
+                    // BOTÓN ACTUALIZAR
                     Button(
                         onClick = { showConfirmDialog = true },
                         modifier = Modifier

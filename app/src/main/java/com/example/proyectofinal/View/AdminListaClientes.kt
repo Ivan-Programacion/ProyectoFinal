@@ -1,5 +1,8 @@
 package com.example.proyectofinal.View
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +43,7 @@ import com.example.proyectofinal.Logic.AlumnoEjemplo
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
+@SuppressLint("ContextCastToActivity")
 @Composable
 fun AdminListaClientes(
     paddingValues: PaddingValues = PaddingValues(),
@@ -67,6 +72,14 @@ fun AdminListaClientes(
     }
     //*********************** LOGICA DE PRUEBA *******************************//
 
+    // Para botón atrás del móvil
+    val context = LocalContext.current as? Activity
+
+    // Interceptamos el botón de atrás
+    BackHandler {
+        // Cerramos la aplicación por completo
+        context?.finish()
+    }
     // CONTENEDOR PRINCIPAL
     Column(
         modifier = Modifier
@@ -162,7 +175,7 @@ fun AdminListaClientes(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            "Buscar por nombre o apellidos...",
+                            "Buscar nombre o apellidos...",
                             style = MaterialTheme.typography.bodySmall
                         )
                     },

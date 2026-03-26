@@ -156,7 +156,7 @@ fun App() {
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) {controller.navigate(it)} }
-            composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding) { controller.navigate(it) } }
+            composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding, {controller.popBackStack()}) { controller.navigate(it) } }
             composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
             composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) { controller.navigate(it)} }
@@ -222,7 +222,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                     unselectedIconColor = MaterialTheme.colorScheme.primary,
                     indicatorColor = MaterialTheme.colorScheme.onSecondary
                 ),
-                label = { Text("Gestión", fontWeight = FontWeight.Bold) })
+                label = { Text("Gestión") })
     }
         // onClick de cada item --> se identifica la pantalla (state); después se cambia a dicha pantalla (controller([pantalla])
         NavigationBarItem(
@@ -237,7 +237,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Favoritos", fontWeight = FontWeight.Bold) })
+            label = { Text("Favoritos") })
         NavigationBarItem(
             state == StateNavigate.listaCinturones,
             {
@@ -251,7 +251,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Cinturones", fontWeight = FontWeight.Bold) })
+            label = { Text("Cinturones") })
         NavigationBarItem(
             state == StateNavigate.perfil,
             {
@@ -264,7 +264,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Perfil", fontWeight = FontWeight.Bold) })
+            label = { Text("Perfil") })
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.proyectofinal.View
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +45,9 @@ import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.App
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
+import androidx.activity.compose.BackHandler
+import android.app.Activity
+import androidx.compose.ui.platform.LocalContext
 
 
 /*
@@ -51,12 +55,21 @@ FALTA POR HACER:
 - En caso de que haya errores
 - Toast emergente para avisar
  */
+@SuppressLint("ContextCastToActivity")
 @Composable
 fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
     var userValue by remember { mutableStateOf("") }
     var passValue by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    // Para coger el contexto actual como una actividad y poder enlazarlo con el botón de "atras"
+    // del propio móvil
+    val context = LocalContext.current as? Activity
 
+    // Interceptamos el botón de atrás
+    BackHandler {
+        // Cerramos la aplicación por completo
+        context?.finish()
+    }
     Column(
         Modifier
             .padding(paddingValues)
@@ -109,7 +122,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -
                     modifier = Modifier.fillMaxWidth(),
                     value = passValue,
                     onValueChange = { passValue = it },
-                    placeholder = { Text("Introduce tu contraseña") },
+                    placeholder = { Text("Contraseña") },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,

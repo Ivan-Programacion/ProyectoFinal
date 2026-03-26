@@ -51,7 +51,7 @@ import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
-fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), onBack: () -> Unit ,controller: (String) -> Unit) {
     // Estados para las contraseñas
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
@@ -87,7 +87,7 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { controller(StateNavigate.registro.value) }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver atrás",
@@ -111,7 +111,7 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         value = password,
                         onValueChange = { password = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Introduce una contraseña") },
+                        placeholder = { Text("Contraseña") },
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -156,9 +156,9 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         onCheckedChange = { aceptoTerminos = it },
                         colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2D0C03))
                     )
-                    Text(text = "Acepto los ", style = MaterialTheme.typography.bodySmall)
+                    Text(text = "Aceptar ", style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = "Términos y Condiciones",
+                        text = "Términos Condiciones",
                         color = MaterialTheme.colorScheme.tertiary,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
@@ -309,6 +309,6 @@ fun FilaRegistroPassword(
 @Composable
 fun RegistroPasspreview() {
     ProyectoFinalTheme {
-        RegistroPass(controller = {})
+        RegistroPass(onBack = {} ,controller = {})
     }
 }

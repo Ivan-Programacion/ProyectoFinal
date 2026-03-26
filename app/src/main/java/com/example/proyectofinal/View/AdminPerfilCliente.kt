@@ -1,5 +1,6 @@
 package com.example.proyectofinal.View
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +25,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -43,8 +47,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.proyectofinal.Logic.anios
+import com.example.proyectofinal.Logic.dias
+import com.example.proyectofinal.Logic.mapBeltColor
+import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
+import kotlin.text.ifEmpty
 
 @Composable
 fun AdminPerfilCliente(
@@ -60,7 +69,7 @@ fun AdminPerfilCliente(
 
     // Estados para los desplegables de Fecha de Nacimiento
     var dia by remember { mutableStateOf("15") }
-    var mes by remember { mutableStateOf("08") }
+    var mes by remember { mutableStateOf("Agosto") }
     var anio by remember { mutableStateOf("1995") }
 
     // --- ESTADOS DE LOS DIALOGS ---
@@ -148,27 +157,27 @@ fun AdminPerfilCliente(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Box(modifier = Modifier.weight(1f)) {
-                                CampoDesplegableAdmin(
-                                    value = dia,
-                                    opciones = (1..31).map { it.toString().padStart(2, '0') },
-                                    onSelectionChange = { dia = it }
-                                )
-                            }
-                            Box(modifier = Modifier.weight(1f)) {
-                                CampoDesplegableAdmin(
-                                    value = mes,
-                                    opciones = (1..12).map { it.toString().padStart(2, '0') },
-                                    onSelectionChange = { mes = it }
-                                )
-                            }
-                            Box(modifier = Modifier.weight(1.5f)) {
-                                CampoDesplegableAdmin(
-                                    value = anio,
-                                    opciones = (1950..2024).map { it.toString() }.reversed(),
-                                    onSelectionChange = { anio = it }
-                                )
-                            }
+                            CampoDesplegableAdmin(
+                                label = dia,
+                                seleccionado = dia,
+                                modifier = Modifier.weight(1f),
+                                opciones = dias,
+                                onValueChange = { dia = it }
+                            )
+                            CampoDesplegableAdmin(
+                                label = mes,
+                                modifier = Modifier.weight(1f),
+                                seleccionado = mes,
+                                opciones = meses,
+                                onValueChange = { mes = it }
+                            )
+                            CampoDesplegableAdmin(
+                                label = anio,
+                                seleccionado = anio,
+                                modifier = Modifier.weight(1f),
+                                opciones = anios,
+                                onValueChange = { anio = it }
+                            )
                         }
                     }
 
@@ -192,17 +201,11 @@ fun AdminPerfilCliente(
                             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                         )
                         CampoDesplegableAdmin(
-                            value = cinturon,
-                            opciones = listOf(
-                                "Blanco",
-                                "Amarillo",
-                                "Naranja",
-                                "Verde",
-                                "Azul",
-                                "Marrón",
-                                "Negro"
-                            ),
-                            onSelectionChange = { cinturon = it }
+                            label = cinturon,
+                            opciones = mapBeltColor.keys.toList(),
+                            seleccionado = cinturon,
+                            modifier = Modifier.weight(1f),
+                            onValueChange = { cinturon = it }
                         )
                     }
 
@@ -263,48 +266,57 @@ fun CampoPerfilAdmin(
 }
 
 // --- COMPONENTE: CAMPO DESPLEGABLE REUTILIZABLE ---
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CampoDesplegableAdmin(
-    value: String,
+    label: String,
     opciones: List<String>,
-    onSelectionChange: (String) -> Unit
+    seleccionado: String,
+    modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = {},
-            readOnly = true,
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier
+    ) {
+        Row(
             modifier = Modifier
+                .menuAnchor() // Imprescindible para el menú
                 .fillMaxWidth()
-                .clickable { expanded = true }, // Abre el menú al tocar la caja
-            enabled = false, // Lo deshabilitamos visualmente para que actúe 100% como botón clickeable
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true,
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = "Desplegar",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                disabledBorderColor = MaterialTheme.colorScheme.outline,
-                disabledTrailingIconColor = MaterialTheme.colorScheme.primary,
-                disabledContainerColor = Color.Transparent
+                .height(45.dp) // Altura personalizada más baja
+                .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = seleccionado.ifEmpty { label },
+                maxLines = 1
             )
-        )
-        DropdownMenu(
+
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = Color.Gray
+            )
+        }
+
+        // Menu desplegable
+        ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(120.dp)
         ) {
             opciones.forEach { opcion ->
                 DropdownMenuItem(
-                    text = { Text(text = opcion) },
+                    text = { Text(opcion) },
                     onClick = {
-                        onSelectionChange(opcion)
+                        onValueChange(opcion)
                         expanded = false
                     }
                 )

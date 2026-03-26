@@ -9,16 +9,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -29,6 +33,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -72,7 +77,10 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
     var anioMenor by remember { mutableStateOf("") }
 // ********************************* LÓGICA PROVISIONA ********************************* //
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            // Añade espacio automático para no chocar con el reloj ni los gestos del sistema
+            .windowInsetsPadding(WindowInsets.systemBars),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -89,12 +97,19 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "Crear cuenta",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.align(Alignment.Start)
-                )
-
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { controller(StateNavigate.login.value) }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver atrás",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Text(
+                        text = "Crear cuenta",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
                 // --- CAMPOS DE TEXTO ---
                 FilaRegistro(label = "Nombre", value = nombre, placeholder = "Ej. Juan") {
                     nombre = it
@@ -331,7 +346,6 @@ fun CampoFecha(
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .width(120.dp)
-                .background(Color.White)
         ) {
             opciones.forEach { opcion ->
                 DropdownMenuItem(

@@ -288,7 +288,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                 val textoCondicion =
                     if (estadoExamen == EstadoExamen.EXAMINADOS) "Examinados" else "Solicitudes"
                 Text(
-                    text = "Lista de alumnos: $textoCondicion",
+                    text = textoCondicion,
                     style = MaterialTheme.typography.titleMedium,
                 )
 

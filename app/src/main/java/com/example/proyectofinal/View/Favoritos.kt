@@ -87,7 +87,7 @@ fun Favoritos(paddingValues: PaddingValues = PaddingValues(), controller: (Strin
 // Añadimos la lista de cinturones como Map para poder trabajar con el de forma temporal hasta hacer la api
 fun SeccionFavoritos(
     titulo: String,
-    items: List<Pair<String, androidx.compose.ui.graphics.Color>>,
+    items: List<Pair<String, Color>>,
     controller: () -> Unit
 ) {
     val cinturonesMap = belts.toMap()

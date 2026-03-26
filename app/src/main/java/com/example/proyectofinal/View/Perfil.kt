@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -200,7 +201,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                         Text(
                             text = mensajeInformativo,
                             modifier = Modifier.padding(16.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            textAlign = TextAlign.Center
                         )
                     }
 
@@ -254,7 +255,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
                     modifier = Modifier.clickable { showLogoutDialog = true },
                     text = "Cerrar sesión",
                     fontWeight = FontWeight.Bold,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -282,7 +283,7 @@ fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 Text(
                     text = "Estás a punto de solicitar acceso al próximo examen. ¿Estás seguro de " +
                             "querer solicitar acceso al examen?",
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
@@ -342,7 +343,7 @@ fun ConfirmarCambiosDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Se van a modificar tus datos de perfil. ¿Estás seguro de que quieres continuar?",
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
@@ -435,7 +436,7 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "¿Estás seguro de que quieres salir de tu cuenta?",
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(24.dp))

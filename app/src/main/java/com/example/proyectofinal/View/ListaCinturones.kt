@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.Logic.belts
-import com.example.proyectofinal.ViewModel.App
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 

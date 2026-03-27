@@ -160,7 +160,7 @@ fun App() {
             composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
             composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) { controller.navigate(it)} }
-            composable(StateNavigate.adminGestionExamen.value) { AdminGestionExamen(innerPadding) }
+            composable(StateNavigate.adminGestionExamen.value) { AdminGestionExamen(innerPadding) { controller.navigate(it)} }
             composable(StateNavigate.adminPerfilCliente.value) { AdminPerfilCliente(innerPadding) { controller.navigate(it)} }
         }
     }

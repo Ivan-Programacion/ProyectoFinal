@@ -1,5 +1,6 @@
 package com.example.proyectofinal.View
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,10 +46,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.proyectofinal.Logic.AlumnoExamen
 import com.example.proyectofinal.Logic.EstadoExamen
+import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
-fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
+fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
 
 //*********************** LOGICA DE PRUEBA *******************************//
     // --- ESTADOS PROVISIONALES ---
@@ -387,7 +389,8 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues()) {
                         // ALUMNO
                         items(listaAlumnos) { alumno ->
                             Card(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().clickable{ controller(
+                                    StateNavigate.adminPerfilCliente.value) },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
                             ) {
@@ -559,6 +562,6 @@ fun DialogAccionExamen(
 @Composable
 fun AdminGestionExamenpreview() {
     ProyectoFinalTheme {
-        AdminGestionExamen()
+        AdminGestionExamen(){}
     }
 }

@@ -71,7 +71,8 @@ fun ListaCinturones(paddingValues: PaddingValues = PaddingValues(), controller: 
                 verticalArrangement = Arrangement.spacedBy(12.dp) // Espacio más compacto entre cinturones
             ) {
                 items(belts) { (name, color) ->
-                    BeltItem(name, color) { controller(StateNavigate.listaContenido.value) }
+                    if (name != "Blanco")
+                        BeltItem(name, color) { controller(StateNavigate.listaContenido.value) }
                 }
             }
         }

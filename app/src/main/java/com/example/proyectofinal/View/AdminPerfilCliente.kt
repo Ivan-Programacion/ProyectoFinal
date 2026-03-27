@@ -204,7 +204,6 @@ fun AdminPerfilCliente(
                             label = cinturon,
                             opciones = mapBeltColor.keys.toList(),
                             seleccionado = cinturon,
-                            modifier = Modifier.weight(1f),
                             onValueChange = { cinturon = it }
                         )
                     }

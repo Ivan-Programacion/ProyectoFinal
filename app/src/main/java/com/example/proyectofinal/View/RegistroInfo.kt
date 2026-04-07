@@ -1,6 +1,5 @@
 package com.example.proyectofinal.View
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.Logic.anios
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.meses
+import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -67,6 +67,10 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
     var dia by remember { mutableStateOf("") }
     var mes by remember { mutableStateOf("") }
     var anio by remember { mutableStateOf("") }
+
+    // Remember de la lista de dias que cambiara en función del mes seleccionado
+    var dayList by remember { mutableStateOf(dias) }
+    var dayListMenor by remember { mutableStateOf(dias) }
 
     // Estados para la cuenta del menor
     var esMenor by remember { mutableStateOf(false) }
@@ -129,24 +133,33 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     ) {
                         CampoFecha(
                             label = "Día",
-                            opciones = dias,
+                            opciones = dayList,
                             seleccionado = dia,
                             modifier = Modifier.weight(1f),
-                            onValueChange = { dia = it }
+                            onValueChange = { opcion, index ->
+                                dia = opcion
+                            }
                         )
                         CampoFecha(
                             label = "Mes",
                             opciones = meses,
                             seleccionado = mes,
                             modifier = Modifier.weight(1.2f),
-                            onValueChange = { mes = it }
+                            onValueChange = { opcion, index ->
+                                val result = dayPerMonthFunction(index)
+                                mes = opcion
+                                if(result.first < dia.toInt()) {
+                                    dia = result.first.toString()
+                                }
+                                dayList = result.second
+                            }
                         )
                         CampoFecha(
                             label = "Año",
                             opciones = anios,
                             seleccionado = anio,
                             modifier = Modifier.weight(1.3f),
-                            onValueChange = { anio = it }
+                            onValueChange = { opcion, index -> anio = opcion }
                         )
                     }
                 }
@@ -226,21 +239,28 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                                 opciones = dias,
                                 seleccionado = diaMenor,
                                 modifier = Modifier.weight(1f),
-                                onValueChange = { diaMenor = it }
+                                onValueChange = { opcion, index -> diaMenor = opcion }
                             )
                             CampoFecha(
                                 label = "Mes",
-                                opciones = meses,
+                                opciones = dayListMenor,
                                 seleccionado = mesMenor,
                                 modifier = Modifier.weight(1.2f),
-                                onValueChange = { mesMenor = it }
+                                onValueChange = { opcion, index ->
+                                    val result = dayPerMonthFunction(index)
+                                    mesMenor = opcion
+                                    if(result.first < diaMenor.toInt()) {
+                                        diaMenor = result.first.toString()
+                                    }
+                                    dayListMenor = result.second
+                                }
                             )
                             CampoFecha(
                                 label = "Año",
                                 opciones = anios,
                                 seleccionado = anioMenor,
                                 modifier = Modifier.weight(1.3f),
-                                onValueChange = { anioMenor = it }
+                                onValueChange = { opcion, index -> anioMenor = opcion },
                             )
                         }
                     }
@@ -308,7 +328,7 @@ fun CampoFecha(
     opciones: List<String>,
     seleccionado: String,
     modifier: Modifier = Modifier,
-    onValueChange: (String) -> Unit
+    onValueChange: (String, Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -351,7 +371,11 @@ fun CampoFecha(
                 DropdownMenuItem(
                     text = { Text(opcion) },
                     onClick = {
-                        onValueChange(opcion)
+                        var index = 0
+                        if (label == "Mes") {
+                            index = opciones.indexOf(opcion) + 1
+                        }
+                        onValueChange(opcion, index)
                         expanded = false
                     }
                 )

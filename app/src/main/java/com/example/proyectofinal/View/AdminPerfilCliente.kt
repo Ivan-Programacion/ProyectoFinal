@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.proyectofinal.Logic.anios
+import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.meses
@@ -71,6 +72,9 @@ fun AdminPerfilCliente(
     var dia by remember { mutableStateOf("15") }
     var mes by remember { mutableStateOf("Agosto") }
     var anio by remember { mutableStateOf("1995") }
+
+    // Remember de la lista de dias que cambiara en función del mes seleccionado
+    var dayList by remember { mutableStateOf(dias) }
 
     // --- ESTADOS DE LOS DIALOGS ---
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -161,22 +165,29 @@ fun AdminPerfilCliente(
                                 label = dia,
                                 seleccionado = dia,
                                 modifier = Modifier.weight(1f),
-                                opciones = dias,
-                                onValueChange = { dia = it }
+                                opciones = dayList,
+                                onValueChange = { opcion, index -> dia = opcion }
                             )
                             CampoDesplegableAdmin(
                                 label = mes,
                                 modifier = Modifier.weight(1f),
                                 seleccionado = mes,
                                 opciones = meses,
-                                onValueChange = { mes = it }
+                                onValueChange = { opcion, index ->
+                                    val result = dayPerMonthFunction(index)
+                                    mes = opcion
+                                    if(result.first < dia.toInt()) {
+                                        dia = result.first.toString()
+                                    }
+                                    dayList = result.second
+                                }
                             )
                             CampoDesplegableAdmin(
                                 label = anio,
                                 seleccionado = anio,
                                 modifier = Modifier.weight(1f),
                                 opciones = anios,
-                                onValueChange = { anio = it }
+                                onValueChange = { opcion, index -> anio = opcion }
                             )
                         }
                     }
@@ -204,7 +215,7 @@ fun AdminPerfilCliente(
                             label = cinturon,
                             opciones = mapBeltColor.keys.toList(),
                             seleccionado = cinturon,
-                            onValueChange = { cinturon = it }
+                            onValueChange = { opcion, index -> cinturon = opcion }
                         )
                     }
 
@@ -272,7 +283,7 @@ fun CampoDesplegableAdmin(
     opciones: List<String>,
     seleccionado: String,
     modifier: Modifier = Modifier,
-    onValueChange: (String) -> Unit
+    onValueChange: (String, Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -315,7 +326,12 @@ fun CampoDesplegableAdmin(
                 DropdownMenuItem(
                     text = { Text(opcion) },
                     onClick = {
-                        onValueChange(opcion)
+                        var index = 0
+                        val prueba = label.toIntOrNull()
+                        if (prueba == null) {
+                            index = opciones.indexOf(opcion) + 1
+                        }
+                        onValueChange(opcion, index)
                         expanded = false
                     }
                 )

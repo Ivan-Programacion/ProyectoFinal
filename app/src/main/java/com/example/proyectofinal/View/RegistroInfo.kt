@@ -51,6 +51,8 @@ import com.example.proyectofinal.Logic.anios
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.Logic.dayPerMonthFunction
+import com.example.proyectofinal.Logic.listaCentros
+import com.example.proyectofinal.Logic.mapaProfesores
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -79,6 +81,13 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
     var diaMenor by remember { mutableStateOf("") }
     var mesMenor by remember { mutableStateOf("") }
     var anioMenor by remember { mutableStateOf("") }
+
+    // Datos provisionales de Centros y Profesores
+    var centroSeleccionado by remember { mutableStateOf("") }
+    // Usamos un Set (conjunto) porque un alumno no puede elegir dos veces al mismo profesor
+    var profesoresSeleccionados by remember { mutableStateOf(setOf<String>()) }
+    // Lista dinámica de profesores según el centro
+    val profesoresDisponibles = mapaProfesores[centroSeleccionado] ?: emptyList()
 // ********************************* LÓGICA PROVISIONA ********************************* //
     Box(
         modifier = Modifier
@@ -148,7 +157,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                             onValueChange = { opcion, index ->
                                 val result = dayPerMonthFunction(index)
                                 mes = opcion
-                                if(result.first < dia.toInt()) {
+                                if (result.first < dia.toInt()) {
                                     dia = result.first.toString()
                                 }
                                 dayList = result.second
@@ -175,6 +184,28 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     value = telefono,
                     placeholder = "612345678"
                 ) { telefono = it }
+
+                // --- SELECCIÓN DE CENTRO Y PROFESOR ---
+                CampoDesplegableUnico(
+                    label = "Centro Deportivo",
+                    opciones = listaCentros,
+                    seleccionado = centroSeleccionado,
+                    onValueChange = { nuevoCentro ->
+                        centroSeleccionado = nuevoCentro
+                        // ¡Importante! Si cambian de centro, borramos los profesores que hubieran elegido del centro anterior
+                        profesoresSeleccionados = emptySet()
+                    }
+                )
+
+                CampoDesplegableMultiple(
+                    label = "Profesor/es asignado/s",
+                    opciones = profesoresDisponibles,
+                    seleccionados = profesoresSeleccionados,
+                    enabled = centroSeleccionado.isNotEmpty(), // Solo habilitado si hay centro
+                    onSelectionChange = { nuevaSeleccion ->
+                        profesoresSeleccionados = nuevaSeleccion
+                    }
+                )
 
                 // --- CHECKBOX MENOR DE EDAD ---
                 Row(
@@ -249,7 +280,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                                 onValueChange = { opcion, index ->
                                     val result = dayPerMonthFunction(index)
                                     mesMenor = opcion
-                                    if(result.first < diaMenor.toInt()) {
+                                    if (result.first < diaMenor.toInt()) {
                                         diaMenor = result.first.toString()
                                     }
                                     dayListMenor = result.second
@@ -379,6 +410,140 @@ fun CampoFecha(
                         expanded = false
                     }
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CampoDesplegableUnico(
+    label: String,
+    opciones: List<String>,
+    seleccionado: String,
+    onValueChange: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            Row(
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+                    .height(55.dp) // Altura estándar para campos de texto
+                    .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = seleccionado.ifEmpty { "Selecciona un centro" })
+                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.Gray)
+            }
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                opciones.forEach { opcion ->
+                    DropdownMenuItem(
+                        text = { Text(opcion) },
+                        onClick = {
+                            onValueChange(opcion)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CampoDesplegableMultiple(
+    label: String,
+    opciones: List<String>,
+    seleccionados: Set<String>,
+    enabled: Boolean,
+    onSelectionChange: (Set<String>) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            // Solo abrimos el menú si está habilitado
+            onExpandedChange = { if (enabled) expanded = !expanded }
+        ) {
+            Row(
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+                    .height(55.dp)
+                    // Si está deshabilitado, lo ponemos gris clarito para dar feedback visual
+                    .border(
+                        1.dp,
+                        if (enabled) Color.Gray else Color.LightGray,
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val textoMostrar =
+                    if (seleccionados.isEmpty()) "Selecciona profesor/es" else seleccionados.joinToString(
+                        ", "
+                    )
+                Text(
+                    text = textoMostrar,
+                    maxLines = 1,
+                    color = if (!enabled) Color.LightGray else MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f) // Para que el texto largo no empuje a la flecha
+                )
+                Icon(
+                    Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = if (enabled) Color.Gray else Color.LightGray
+                )
+            }
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                opciones.forEach { opcion ->
+                    val isChecked = seleccionados.contains(opcion)
+                    DropdownMenuItem(
+                        text = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = isChecked,
+                                    onCheckedChange = null // Lo manejamos en el onClick del menú
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(opcion)
+                            }
+                        },
+                        onClick = {
+                            // Si ya estaba, lo quitamos. Si no estaba, lo añadimos.
+                            val nuevosSeleccionados = if (isChecked) {
+                                seleccionados - opcion
+                            } else {
+                                seleccionados + opcion
+                            }
+                            onSelectionChange(nuevosSeleccionados)
+                            // NO ponemos expanded = false para que puedan seguir seleccionando varios
+                        }
+                    )
+                }
             }
         }
     }

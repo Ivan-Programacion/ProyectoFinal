@@ -2,12 +2,27 @@ package com.example.proyectofinal.Logic
 
 // Listas de datos
 val dias = (1..31).map { it.toString() }
-val meses = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+val meses = listOf(
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+)
 val anios = (2026 downTo 1920).map { it.toString() }
 
-fun dayPerMonthFunction (indexMonth: Int): Pair<Int, List<String>> {
+// Función que calcula el día máximo de un mes según el mes indicado en indexMonth.
+// Devuelve el día máximo de ese mes y la lista de todos los días del mes
+fun dayPerMonthFunction(indexMonth: Int): Pair<Int, List<String>> {
     var maxDay = 31
-    if(indexMonth == 2) {
+    if (indexMonth == 2) {
         maxDay = 28
     } else if (indexMonth == 4 || indexMonth == 6 || indexMonth == 9 || indexMonth == 11) {
         maxDay = 30
@@ -16,3 +31,11 @@ fun dayPerMonthFunction (indexMonth: Int): Pair<Int, List<String>> {
     val result = Pair(maxDay, dayList)
     return result
 }
+
+// Datos ficticios de Centros y Profesores
+val listaCentros = listOf("Las Rozas", "Quintanar", "Pedro Muñoz")
+val mapaProfesores = mapOf(
+    "Las Rozas" to listOf("Ángel Ruiz", "Manuel Ruiz"),
+    "Pedro Muñoz" to listOf("Carlos López"),
+    "Quintanar" to listOf("Juan José Cantero")
+)

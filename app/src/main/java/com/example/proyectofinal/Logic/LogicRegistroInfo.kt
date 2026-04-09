@@ -1,5 +1,9 @@
 package com.example.proyectofinal.Logic
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.time.LocalDate
+
 // Listas de datos
 val dias = (1..31).map { it.toString() }
 val meses = listOf(
@@ -16,7 +20,15 @@ val meses = listOf(
     "Noviembre",
     "Diciembre"
 )
-val anios = (2026 downTo 1920).map { it.toString() }
+// Obtenemos el año actual
+@RequiresApi(Build.VERSION_CODES.O)
+val anioActual = LocalDate.now().year
+// Lista de años para mayores o igual de 14 años
+@RequiresApi(Build.VERSION_CODES.O)
+val anios = (anioActual - 14 downTo 1920).map { it.toString() }
+// Lista de años para menores de 14 años
+@RequiresApi(Build.VERSION_CODES.O)
+val aniosMenor = (anioActual downTo anioActual - 14).map { it.toString() }
 
 // Función que calcula el día máximo de un mes según el mes indicado en indexMonth.
 // Devuelve el día máximo de ese mes y la lista de todos los días del mes

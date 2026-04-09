@@ -1,5 +1,7 @@
 package com.example.proyectofinal.View
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.proyectofinal.Logic.anios
+import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.Logic.dayPerMonthFunction
@@ -56,6 +59,7 @@ import com.example.proyectofinal.Logic.mapaProfesores
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
     // ********************************* LÓGICA PROVISIONA ********************************* //
@@ -288,7 +292,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                             )
                             CampoFecha(
                                 label = "Año",
-                                opciones = anios,
+                                opciones = aniosMenor,
                                 seleccionado = anioMenor,
                                 modifier = Modifier.weight(1.3f),
                                 onValueChange = { opcion, index -> anioMenor = opcion },
@@ -549,6 +553,7 @@ fun CampoDesplegableMultiple(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun RegistroInfopreviw() {

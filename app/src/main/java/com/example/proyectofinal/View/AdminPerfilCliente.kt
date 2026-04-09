@@ -1,5 +1,7 @@
 package com.example.proyectofinal.View
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +25,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -48,14 +49,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.proyectofinal.Logic.anios
+import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.dias
+import com.example.proyectofinal.Logic.listaGimnasios
 import com.example.proyectofinal.Logic.mapBeltColor
+import com.example.proyectofinal.Logic.mapaProfesores
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import kotlin.text.ifEmpty
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AdminPerfilCliente(
     paddingValues: PaddingValues = PaddingValues(),
@@ -67,6 +72,20 @@ fun AdminPerfilCliente(
     var telefono by remember { mutableStateOf("611223344") }
     var email by remember { mutableStateOf("maria.gomez@email.com") }
     var cinturon by remember { mutableStateOf("Naranja") }
+
+    // --- ESTADOS DE CENTROS Y PROFESORES ---
+    var centroSeleccionado by remember { mutableStateOf("Las Rozas") } // Valor simulado
+    var profesoresSeleccionados by remember { mutableStateOf(setOf("Ángel Ruiz")) } // Valor simulado
+    val profesoresDisponibles = mapaProfesores[centroSeleccionado] ?: emptyList()
+
+    // --- ESTADOS DEL MENOR ---
+    var esMenor by remember { mutableStateOf(true) } // Valor simulado en true para probar
+    var nombreMenor by remember { mutableStateOf("Hugo") }
+    var apellidosMenor by remember { mutableStateOf("Gómez") }
+    var diaMenor by remember { mutableStateOf("10") }
+    var mesMenor by remember { mutableStateOf("Mayo") }
+    var anioMenor by remember { mutableStateOf("2015") }
+    var dayListMenor by remember { mutableStateOf(dias) }
 
     // Estados para los desplegables de Fecha de Nacimiento
     var dia by remember { mutableStateOf("15") }
@@ -204,6 +223,27 @@ fun AdminPerfilCliente(
                         enabled = false,
                         onValueChange = { email = it })
 
+                    // DESPLEGABLES CENTRO Y PROFESORES
+                    CampoDesplegableGimnasios(
+                        label = "Gimnasio",
+                        opciones = listaGimnasios,
+                        seleccionado = centroSeleccionado,
+                        onValueChange = { nuevoCentro ->
+                            centroSeleccionado = nuevoCentro
+                            profesoresSeleccionados = emptySet()
+                        }
+                    )
+
+                    CampoDesplegableProfesores(
+                        label = "Profesor/es asignado/s",
+                        opciones = profesoresDisponibles,
+                        seleccionados = profesoresSeleccionados,
+                        enabled = centroSeleccionado.isNotEmpty(),
+                        onSelectionChange = { nuevaSeleccion ->
+                            profesoresSeleccionados = nuevaSeleccion
+                        }
+                    )
+
                     // DESPLEGABLE CINTURÓN
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
@@ -217,6 +257,102 @@ fun AdminPerfilCliente(
                             seleccionado = cinturon,
                             onValueChange = { opcion, index -> cinturon = opcion }
                         )
+                    }
+
+                    // --- CHECKBOX MENOR DE EDAD ---
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                esMenor = !esMenor
+                                if (!esMenor) {
+                                    nombreMenor = ""
+                                    apellidosMenor = ""
+                                    diaMenor = ""
+                                    mesMenor = ""
+                                    anioMenor = ""
+                                }
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.Checkbox(
+                            checked = esMenor,
+                            onCheckedChange = { checked ->
+                                esMenor = checked
+                                if (!checked) {
+                                    nombreMenor = ""
+                                    apellidosMenor = ""
+                                    diaMenor = ""
+                                    mesMenor = ""
+                                    anioMenor = ""
+                                }
+                            },
+                            colors = androidx.compose.material3.CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.tertiary
+                            )
+                        )
+                        Text(
+                            text = "El alumno es menor de 14 años",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
+                    // --- CAMPOS CONDICIONALES DEL MENOR ---
+                    if (esMenor) {
+                        // Usamos tu componente CampoPerfilAdmin para mantener el diseño
+                        CampoPerfilAdmin(
+                            label = "Nombre del niño/a",
+                            value = nombreMenor,
+                            onValueChange = { nombreMenor = it }
+                        )
+
+                        CampoPerfilAdmin(
+                            label = "Apellidos niño/a",
+                            value = apellidosMenor,
+                            onValueChange = { apellidosMenor = it }
+                        )
+
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = "Fecha de nacimiento niño/a",
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                // Usamos tu componente CampoDesplegableAdmin
+                                CampoDesplegableAdmin(
+                                    label = diaMenor.ifEmpty { "Día" },
+                                    seleccionado = diaMenor,
+                                    modifier = Modifier.weight(1f),
+                                    opciones = dayListMenor,
+                                    onValueChange = { opcion, _ -> diaMenor = opcion }
+                                )
+                                CampoDesplegableAdmin(
+                                    label = mesMenor.ifEmpty { "Mes" },
+                                    seleccionado = mesMenor,
+                                    modifier = Modifier.weight(1f),
+                                    opciones = meses,
+                                    onValueChange = { opcion, index ->
+                                        val result = dayPerMonthFunction(index)
+                                        mesMenor = opcion
+                                        if (diaMenor.isNotEmpty() && result.first < diaMenor.toInt()) {
+                                            diaMenor = result.first.toString()
+                                        }
+                                        dayListMenor = result.second
+                                    }
+                                )
+                                CampoDesplegableAdmin(
+                                    label = anioMenor.ifEmpty { "Año" },
+                                    seleccionado = anioMenor,
+                                    modifier = Modifier.weight(1f),
+                                    opciones = aniosMenor,
+                                    onValueChange = { opcion, _ -> anioMenor = opcion }
+                                )
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -464,6 +600,7 @@ fun EliminarAlumnoDialog(nombreCompleto: String, onConfirm: () -> Unit, onDismis
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun AdminPerfilClientePreview() {

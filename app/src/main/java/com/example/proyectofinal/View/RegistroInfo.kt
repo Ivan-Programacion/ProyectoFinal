@@ -54,7 +54,7 @@ import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.Logic.dayPerMonthFunction
-import com.example.proyectofinal.Logic.listaCentros
+import com.example.proyectofinal.Logic.listaGimnasios
 import com.example.proyectofinal.Logic.mapaProfesores
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -190,9 +190,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 ) { telefono = it }
 
                 // --- SELECCIÓN DE CENTRO Y PROFESOR ---
-                CampoDesplegableUnico(
-                    label = "Centro Deportivo",
-                    opciones = listaCentros,
+                CampoDesplegableGimnasios(
+                    label = "Gimnasio",
+                    opciones = listaGimnasios,
                     seleccionado = centroSeleccionado,
                     onValueChange = { nuevoCentro ->
                         centroSeleccionado = nuevoCentro
@@ -201,7 +201,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     }
                 )
 
-                CampoDesplegableMultiple(
+                CampoDesplegableProfesores(
                     label = "Profesor/es asignado/s",
                     opciones = profesoresDisponibles,
                     seleccionados = profesoresSeleccionados,
@@ -421,7 +421,7 @@ fun CampoFecha(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CampoDesplegableUnico(
+fun CampoDesplegableGimnasios(
     label: String,
     opciones: List<String>,
     seleccionado: String,
@@ -470,7 +470,7 @@ fun CampoDesplegableUnico(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CampoDesplegableMultiple(
+fun CampoDesplegableProfesores(
     label: String,
     opciones: List<String>,
     seleccionados: Set<String>,

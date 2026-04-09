@@ -45,7 +45,7 @@ fun dayPerMonthFunction(indexMonth: Int): Pair<Int, List<String>> {
 }
 
 // Datos ficticios de Centros y Profesores
-val listaCentros = listOf("Las Rozas", "Quintanar", "Pedro Muñoz")
+val listaGimnasios = listOf("Las Rozas", "Quintanar", "Pedro Muñoz")
 val mapaProfesores = mapOf(
     "Las Rozas" to listOf("Ángel Ruiz", "Manuel Ruiz"),
     "Pedro Muñoz" to listOf("Carlos López"),

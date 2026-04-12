@@ -27,7 +27,9 @@ val belts = listOf(
     "Púrpura" to coloresCinturones().Purpura,
     "Azul" to coloresCinturones().Azul,
     "Verde" to coloresCinturones().Verde,
-    "Marrón" to coloresCinturones().Marron,
+    "Marrón III" to coloresCinturones().Marron,
+    "Marrón II" to coloresCinturones().Marron,
+    "Marrón I" to coloresCinturones().Marron,
     "Negro" to coloresCinturones().Negro
 )
 

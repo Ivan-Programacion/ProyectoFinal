@@ -48,7 +48,7 @@ fun ListaContenido(paddingValues: PaddingValues = PaddingValues(), controller: (
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        mapBeltColor.getValue("Marrón"), // Color cinturón
+                        mapBeltColor.getValue("Marrón III"), // Color cinturón
                         MaterialTheme.colorScheme.background // Color de fondo predeterminado
                     ),
                     startY = 0f,

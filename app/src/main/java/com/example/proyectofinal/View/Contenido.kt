@@ -59,7 +59,7 @@ fun Contenido(paddingValues: PaddingValues = PaddingValues()) {
         Card(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp), // Margen exterior para que se vea el fondo
+                .padding(16.dp),
             shape = RoundedCornerShape(28.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,

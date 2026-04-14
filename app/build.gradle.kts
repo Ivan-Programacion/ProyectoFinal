@@ -70,5 +70,11 @@ dependencies {
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation(libs.firebase.analytics)
+    // Firebase Authentication (Para el Login y Registro)
+    implementation(libs.firebase.auth)
+// Cloud Firestore (Para tu base de datos NoSQL y tus Repositorios)
+    implementation(libs.firebase.firestore)
+    // Para que Firebase entienda bien las corrutinas de Kotlin
+    implementation(libs.kotlinx.coroutines.play.services)
 
 }

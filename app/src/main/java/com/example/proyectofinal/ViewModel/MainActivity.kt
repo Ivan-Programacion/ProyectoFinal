@@ -61,24 +61,35 @@ import com.example.proyectofinal.View.Perfil
 import com.example.proyectofinal.View.RegistroInfo
 import com.example.proyectofinal.View.RegistroPass
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
+import com.example.proyectofinal.Repository.AuthRepositoryImpl
+import com.example.proyectofinal.Repository.AuthRepository
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Para la pantalal de carga
+        // Para la pantalla de carga
         val splasScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // Comprobación de token para login automático o no
+        val authRepository: AuthRepository = AuthRepositoryImpl()
+        val startDestination = if (authRepository.getCurrentUserUid() != null) {
+            "listaCinturones"
+        } else {
+            "login"
+        }
+        
         setContent {
             ProyectoFinalTheme(dynamicColor = false) {
-                App()
+                App(startDestination = startDestination)
             }
         }
     }
 }
-
+// RequieresApi -> Necesario en la app para que funcione las fechas
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun App() {
+fun App(startDestination: String = "login") {
     // controller --> para poder navegar entre pantallas (remember)
     val controller = rememberNavController()
     // para saber en que pantalla estamos exactamente
@@ -106,7 +117,7 @@ fun App() {
     ) { innerPadding ->
         NavHost(
             controller,
-            startDestination = "login",
+            startDestination = startDestination,
             enterTransition = {
                 // Las pasamos a la función para obtener su índice
                 val inicial = obtenerIndice(initialState.destination.route)
@@ -271,6 +282,7 @@ fun NavBar(controller: (route: String) -> Unit) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {

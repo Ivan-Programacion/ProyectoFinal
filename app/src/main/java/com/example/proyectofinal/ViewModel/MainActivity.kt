@@ -30,9 +30,12 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +68,9 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import com.example.proyectofinal.Repository.AuthRepository
 import com.example.proyectofinal.Repository.AuthRepositoryImpl
 import com.example.proyectofinal.Repository.UserRepositoryImpl
+import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModelFactory
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -109,7 +114,21 @@ fun App(startDestination: String = "login") {
     val currentRoute = controller.currentBackStackEntryAsState().value?.destination?.route
     // AÑADIR ESTO PARA LAS TRANSICIONES
     var beforeRoute by remember { mutableStateOf("listaCinturones") }
+    // Para snackbarHost --> utilizado para los mensajes de errores
+    val snackbarHostState = remember { SnackbarHostState() }
+    val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(authUiState) {
+        if (authUiState is AuthUiState.Error) {
+            if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registro.value || currentRoute == StateNavigate.registroPass.value) {
+                snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
+                authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
+            }
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             // Si NO estamos navegando antes de entrar en la aplicación por las pantalals login, registro, etc
             // controller.popBackStack() --> Para volver atrás en caso de que la pantalla tenga flecha hacia atrás
@@ -178,7 +197,7 @@ fun App(startDestination: String = "login") {
                 }
             }
         ) {
-            composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate(it) } }
+            composable(StateNavigate.login.value) { Login(innerPadding, viewModel = authViewModel) { controller.navigate(it) } }
             composable(StateNavigate.registro.value) { RegistroInfo(innerPadding, viewModel = authViewModel) { controller.navigate(it) } }
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) {controller.navigate(it)} }

@@ -29,6 +29,11 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    // Resetea el estado a Idle (para no repetir errores al volver a pantallas)
+    fun resetUiState() {
+        _uiState.value = AuthUiState.Idle
+    }
+
     // Datos del usuarios en StateFlow
     val nombre = MutableStateFlow("")
     val apellidos = MutableStateFlow("")

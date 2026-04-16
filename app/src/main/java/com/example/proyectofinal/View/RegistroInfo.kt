@@ -58,6 +58,7 @@ import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.listaGimnasios
 import com.example.proyectofinal.Logic.mapaProfesores
+import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -120,7 +121,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver atrás",
                             tint = MaterialTheme.colorScheme.primary
-                        )
+                    )
                     }
                     Text(
                         text = "Crear cuenta",
@@ -151,7 +152,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                             modifier = Modifier.weight(1f),
                             onValueChange = { opcion, index ->
                                 viewModel.dia.value = opcion
-                            }
+                        }
                         )
                         CampoFecha(
                             label = "Mes",
@@ -165,7 +166,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                                     viewModel.dia.value = result.first.toString()
                                 }
                                 dayList = result.second
-                            }
+                        }
                         )
                         CampoFecha(
                             label = "Año",
@@ -240,7 +241,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                         },
                         colors = CheckboxDefaults.colors(
                             checkedColor = MaterialTheme.colorScheme.tertiary
-                        )
+                    )
                     )
                     Text(
                         text = "Esta cuenta es para un menor de 14 años",

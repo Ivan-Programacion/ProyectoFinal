@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,8 +42,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.App
+import com.example.proyectofinal.ViewModel.AuthUiState
+import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import androidx.activity.compose.BackHandler
@@ -57,13 +62,22 @@ FALTA POR HACER:
  */
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
     var userValue by remember { mutableStateOf("") }
     var passValue by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     // Para coger el contexto actual como una actividad y poder enlazarlo con el botón de "atras"
     // del propio móvil
     val context = LocalContext.current as? Activity
+
+    // Para poder ver el estado de la petición de login y saber si pasar o no a la siguiene pantalla
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(uiState) {
+        if (uiState is AuthUiState.Success) {
+            // Si el login es un éxito, navegamos
+            controller(StateNavigate.listaCinturones.value)
+        }
+    }
 
     // Interceptamos el botón de atrás
     BackHandler {
@@ -149,7 +163,10 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), controller: (String) -
                 Spacer(Modifier.height(24.dp))
 
                 Button(
-                    onClick = { controller(StateNavigate.listaCinturones.value) },
+                    onClick = {
+                        viewModel.loginUser(userValue, passValue)
+                        // controller(StateNavigate.listaCinturones.value)
+                              },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),

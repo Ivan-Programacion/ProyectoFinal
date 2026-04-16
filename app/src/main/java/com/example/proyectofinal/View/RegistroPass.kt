@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,25 +48,42 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.ViewModel.AuthUiState
+import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
-fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), onBack: () -> Unit ,controller: (String) -> Unit) {
+fun RegistroPass(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: AuthViewModel = viewModel(),
+    onBack: () -> Unit,
+    controller: (String) -> Unit
+) {
     // Estados para las contraseñas
-    var password by remember { mutableStateOf("") }
-    var repeatPassword by remember { mutableStateOf("") }
-    var aceptoTerminos by remember { mutableStateOf(false) }
+    val password by viewModel.registroPassword.collectAsStateWithLifecycle()
+    val repeatPassword by viewModel.registroRepeatPassword.collectAsStateWithLifecycle()
+    val aceptoTerminos by viewModel.registroAceptoTerminos.collectAsStateWithLifecycle()
 
-    var passwordVisible by remember { mutableStateOf(false) }
-    var repeatPasswordVisible by remember { mutableStateOf(false) }
+    val passwordVisible by viewModel.registroPasswordVisible.collectAsStateWithLifecycle()
+    val repeatPasswordVisible by viewModel.registroRepeatPasswordVisible.collectAsStateWithLifecycle()
+
+    // Para poder ver el estado de la petición de registro y saber si pasar o no a la siguiene pantalla
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(uiState) {
+        if (uiState is AuthUiState.Success) {
+            controller(StateNavigate.listaCinturones.value)
+        }
+    }
 
     // ESTADO PARA EL DIALOG
-    var showDialog by remember { mutableStateOf(false) }
+    val showDialog by viewModel.showDialogTerminos.collectAsStateWithLifecycle()
 
     // Lógica del Dialog
     if (showDialog) {
-        TerminosCondiciones(onDismiss = { showDialog = false })
+        TerminosCondiciones(onDismiss = { viewModel.showDialogTerminos.value = false })
     }
     Box(
         modifier = Modifier
@@ -109,7 +127,7 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), onBack: () -> U
                     )
                     OutlinedTextField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = { viewModel.registroPassword.value = it },
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text("Contraseña") },
                         shape = RoundedCornerShape(12.dp),
@@ -119,7 +137,9 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), onBack: () -> U
                         trailingIcon = {
                             val image =
                                 if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            IconButton(onClick = {
+                                viewModel.registroPasswordVisible.value = !passwordVisible
+                            }) {
                                 Icon(
                                     imageVector = image,
                                     contentDescription = "Toggle password visibility"
@@ -141,8 +161,10 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), onBack: () -> U
                     value = repeatPassword,
                     placeholder = "Repite la contraseña",
                     isVisible = repeatPasswordVisible,
-                    onToggleVisibility = { repeatPasswordVisible = !repeatPasswordVisible },
-                ) { repeatPassword = it }
+                    onToggleVisibility = {
+                        viewModel.registroRepeatPasswordVisible.value = !repeatPasswordVisible
+                    },
+                ) { viewModel.registroRepeatPassword.value = it }
 
                 // --- CHECKBOX TÉRMINOS Y CONDICIONES ---
                 Row(
@@ -153,7 +175,7 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), onBack: () -> U
                 ) {
                     Checkbox(
                         checked = aceptoTerminos,
-                        onCheckedChange = { aceptoTerminos = it },
+                        onCheckedChange = { viewModel.registroAceptoTerminos.value = it },
                         colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2D0C03))
                     )
                     Text(text = "Aceptar ", style = MaterialTheme.typography.bodySmall)
@@ -163,13 +185,15 @@ fun RegistroPass(paddingValues: PaddingValues = PaddingValues(), onBack: () -> U
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
                         // Si quiere ver los terminos, salta el Dialog
-                        modifier = Modifier.clickable { showDialog = true }
+                        modifier = Modifier.clickable { viewModel.showDialogTerminos.value = true }
                     )
                 }
 
                 // --- BOTÓN CREAR CUENTA ---
                 Button(
-                    onClick = { controller(StateNavigate.listaCinturones.value) },
+                    onClick = {
+                        viewModel.registerWithCurrentForm()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),
@@ -309,6 +333,6 @@ fun FilaRegistroPassword(
 @Composable
 fun RegistroPasspreview() {
     ProyectoFinalTheme {
-        RegistroPass(onBack = {} ,controller = {})
+        RegistroPass(onBack = {}, controller = {})
     }
 }

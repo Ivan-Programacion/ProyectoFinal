@@ -145,12 +145,12 @@ fun App(startDestination: String = "login") {
                     contentColor = MaterialTheme.colorScheme.error,
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Row (
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text= snackbarData.visuals.message,
+                            text = snackbarData.visuals.message,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -244,7 +244,12 @@ fun App(startDestination: String = "login") {
                     )
                 }
             }
-            composable(StateNavigate.perfil.value) { Perfil(innerPadding) { controller.navigate(it) } }
+            composable(StateNavigate.perfil.value) {
+                Perfil(
+                    innerPadding,
+                    viewModel = authViewModel
+                ) { controller.navigate(it) }
+            }
             composable(StateNavigate.favoritos.value) {
                 Favoritos(innerPadding) {
                     controller.navigate(
@@ -255,6 +260,7 @@ fun App(startDestination: String = "login") {
             composable(StateNavigate.registroPass.value) {
                 RegistroPass(
                     innerPadding,
+                    viewModel = authViewModel,
                     { controller.popBackStack() }) { controller.navigate(it) }
             }
             composable(StateNavigate.listaContenido.value) {

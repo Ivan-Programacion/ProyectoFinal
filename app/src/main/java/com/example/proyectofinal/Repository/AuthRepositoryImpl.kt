@@ -9,14 +9,32 @@ class AuthRepositoryImpl(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : AuthRepository {
 
-    override suspend fun register(email: String, password: String): String? {
+    override suspend fun register(
+        email: String,
+        password: String,
+        repeatPassword: String,
+        message: (String) -> Unit
+    ): String? {
         return try {
+            val isValidPassword =
+                password.length >= 8 && password.any { it.isLetter() } && password.any { it.isDigit() }
+            if (password != repeatPassword || !isValidPassword) throw IllegalArgumentException()
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             result.user?.uid
+        } catch (e: ConnectException) {
+            e.printStackTrace()
+            message("Error de conexión. Inténtelo más tarde")
+            null
         } catch (e: FirebaseAuthException) {
+            message("Las contraseñas no coinciden o no es válida")
+            e.printStackTrace()
+            null
+        } catch (e: IllegalArgumentException) {
+            message("Las contraseñas no coinciden o no es válida")
             e.printStackTrace()
             null
         } catch (e: Exception) {
+            message("Otra cosa")
             e.printStackTrace()
             null
         }
@@ -32,11 +50,15 @@ class AuthRepositoryImpl(
             true
         } catch (e: ConnectException) {
             e.printStackTrace()
-            message("No se pudo conectar con el servidor. Inténtelo más tarde")
+            message("Error de conexión. Inténtelo más tarde")
             false
         } catch (e: FirebaseAuthException) {
             e.printStackTrace()
-            message("Error del servidor. Inténtelo más tarde")
+            message("Usuario o contraseña no válidos")
+            false
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+            message("Usuario o contraseña no válidos")
             false
         } catch (e: Exception) {
             e.printStackTrace()
@@ -53,4 +75,3 @@ class AuthRepositoryImpl(
         auth.signOut()
     }
 }
-

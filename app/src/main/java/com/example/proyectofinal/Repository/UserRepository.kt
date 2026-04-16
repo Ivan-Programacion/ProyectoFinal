@@ -1,10 +1,14 @@
 package com.example.proyectofinal.Repository
 
 import com.example.proyectofinal.Model.User
+import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     // Obtiene un usuario por su ID. Devuelve el User, o null si falla o no existe.
     suspend fun getUser(userId: String): User?
+
+    // Obtiene un usuario en tiempo real (Stream)
+    fun getUserStream(userId: String): Flow<User?>
 
     // Obtiene todos los usuarios
     suspend fun getAllUsers(): List<User>

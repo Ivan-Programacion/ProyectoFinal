@@ -52,6 +52,8 @@ import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import androidx.activity.compose.BackHandler
 import android.app.Activity
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.ui.platform.LocalContext
 
 
@@ -63,9 +65,9 @@ FALTA POR HACER:
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
-    var userValue by remember { mutableStateOf("") }
-    var passValue by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    val userValue by viewModel.loginEmail.collectAsStateWithLifecycle()
+    val passValue by viewModel.loginPassword.collectAsStateWithLifecycle()
+    val passwordVisible by viewModel.loginPasswordVisible.collectAsStateWithLifecycle()
     // Para coger el contexto actual como una actividad y poder enlazarlo con el botón de "atras"
     // del propio móvil
     val context = LocalContext.current as? Activity
@@ -118,7 +120,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = userValue,
-                    onValueChange = { userValue = it },
+                    onValueChange = { viewModel.loginEmail.value = it },
                     placeholder = { Text("ej. carlos@gmail.com") },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
@@ -135,7 +137,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = passValue,
-                    onValueChange = { passValue = it },
+                    onValueChange = { viewModel.loginPassword.value = it },
                     placeholder = { Text("Contraseña") },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
@@ -144,7 +146,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
                     trailingIcon = {
                         val image =
                             if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        IconButton(onClick = { viewModel.loginPasswordVisible.value = !passwordVisible }) {
                             Icon(imageVector = image, contentDescription = null)
                         }
                     },
@@ -193,6 +195,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun Loginpreview() {

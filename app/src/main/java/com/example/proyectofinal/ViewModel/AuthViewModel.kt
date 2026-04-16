@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 sealed class AuthUiState {
     object Idle : AuthUiState()
@@ -29,12 +32,35 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    // Estado local para conocer el UUID autenticado (si lo hay)
+    private val currentUserUid = MutableStateFlow(authRepository.getCurrentUserUid())
+
+    // Stream en vivo del usuario logueado en base a su UID. Si no hay, null.
+    // Usamos flatMapLatest para volver a escuchar en Firestore si el UID cambia.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentUserState: StateFlow<User?> = currentUserUid.flatMapLatest { uid ->
+        if (uid != null) {
+            userRepository.getUserStream(uid)
+        } else {
+            flowOf(null)
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
     // Resetea el estado a Idle (para no repetir errores al volver a pantallas)
     fun resetUiState() {
         _uiState.value = AuthUiState.Idle
     }
 
-    // Datos del usuarios en StateFlow
+    // Login States
+    val loginEmail = MutableStateFlow("")
+    val loginPassword = MutableStateFlow("")
+    val loginPasswordVisible = MutableStateFlow(false)
+
+    // Registro Info State
     val nombre = MutableStateFlow("")
     val apellidos = MutableStateFlow("")
     val email = MutableStateFlow("")
@@ -54,6 +80,14 @@ class AuthViewModel(
     val centroSeleccionado = MutableStateFlow("")
     val profesoresSeleccionados = MutableStateFlow<Set<String>>(emptySet())
 
+    // Registro Pass States
+    val registroPassword = MutableStateFlow("")
+    val registroRepeatPassword = MutableStateFlow("")
+    val registroAceptoTerminos = MutableStateFlow(false)
+    val registroPasswordVisible = MutableStateFlow(false)
+    val registroRepeatPasswordVisible = MutableStateFlow(false)
+    val showDialogTerminos = MutableStateFlow(false)
+
     // Verificación de email mínima
     private fun isValidEmail(emailStr: String): Boolean {
         return emailStr.contains("@") && emailStr.contains(".")
@@ -61,8 +95,21 @@ class AuthViewModel(
 
     // Comprobación de botón "Siguiente" enabled en RegistroInfo
     val isNextButtonEnabled: StateFlow<Boolean> = combine(
-        nombre, apellidos, email, telefono, dia, mes, anio, centroSeleccionado, profesoresSeleccionados,
-        esMenor, nombreMenor, apellidosMenor, diaMenor, mesMenor, anioMenor
+        nombre,
+        apellidos,
+        email,
+        telefono,
+        dia,
+        mes,
+        anio,
+        centroSeleccionado,
+        profesoresSeleccionados,
+        esMenor,
+        nombreMenor,
+        apellidosMenor,
+        diaMenor,
+        mesMenor,
+        anioMenor
     ) { args ->
         val nombreStr = args[0] as String
         val apellidosStr = args[1] as String
@@ -80,7 +127,7 @@ class AuthViewModel(
         val mesMenorStr = args[13] as String
         val anioMenorStr = args[14] as String
 
-        val mainFieldsValid = nombreStr.isNotBlank() && apellidosStr.isNotBlank() && 
+        val mainFieldsValid = nombreStr.isNotBlank() && apellidosStr.isNotBlank() &&
                 telefonoStr.isNotBlank() && diaStr.isNotBlank() && mesStr.isNotBlank() && anioStr.isNotBlank() &&
                 centroStr.isNotBlank() && profeSet.isNotEmpty() && isValidEmail(emailStr)
 
@@ -100,22 +147,59 @@ class AuthViewModel(
     fun registerUser(user: User, password: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            
-            val uid = authRepository.register(user.email, password)
+            var errorMessage = ""
+            val uid = authRepository.register(
+                user.email,
+                password,
+                registroRepeatPassword.value
+            ) { errorMessage = it }
             if (uid != null) {
                 // Al ser data class, clonamos el objeto con su nuevo UID
                 val userWithId = user.copy(id = uid)
-                
+
                 val createdInFirestore = userRepository.createUser(userWithId)
                 if (createdInFirestore) {
+                    currentUserUid.value = uid // Actualizamos el estado del uid actual
                     _uiState.value = AuthUiState.Success
                 } else {
-                    _uiState.value = AuthUiState.Error("Fallo al guardar el usuario en la base de datos.")
+                    _uiState.value =
+                        AuthUiState.Error("Error al guardar los datos del usuario. Intentalo más tarde")
                 }
             } else {
-                _uiState.value = AuthUiState.Error("Fallo al registrar usuario en Firebase Auth.")
+                _uiState.value = AuthUiState.Error(errorMessage)
             }
         }
+    }
+
+    // Construye el modelo User con los estados actuales y llama al registro
+    fun registerWithCurrentForm() {
+        // Para guardar la fecha en formato yyyy-mm-dd
+        val dateStr = "${anio.value}-${mes.value.padStart(2, '0')}-${dia.value.padStart(2, '0')}"
+        val minorDateStr = if (esMenor.value) {
+            "${anioMenor.value}-${mesMenor.value.padStart(2, '0')}-${
+                diaMenor.value.padStart(
+                    2,
+                    '0'
+                )
+            }"
+        } else null
+
+        val newUser = User(
+            email = email.value,
+            role = "STUDENT",
+            centerId = centroSeleccionado.value,
+            teacherIds = profesoresSeleccionados.value.toList(),
+            name = if (esMenor.value) nombreMenor.value else nombre.value,
+            lastName = if (esMenor.value) apellidosMenor.value else apellidos.value,
+            birthDate = if (esMenor.value) minorDateStr!! else dateStr,
+            phone = telefono.value,
+            isMinor = esMenor.value,
+            tutorName = if (esMenor.value) nombre.value else null,
+            tutorLastName = if (esMenor.value) apellidos.value else null,
+            tutorBirthDate = if (esMenor.value) dateStr else null
+        )
+
+        registerUser(newUser, registroPassword.value)
     }
 
     fun loginUser(email: String, password: String) {
@@ -124,13 +208,20 @@ class AuthViewModel(
             var errorMessage = ""
             val loginSuccess = authRepository.login(email, password) { errorMessage = it }
             if (loginSuccess) {
+                currentUserUid.value = authRepository.getCurrentUserUid() // Actualizamos al nuevo logueado
                 _uiState.value = AuthUiState.Success
             } else {
                 _uiState.value = AuthUiState.Error(errorMessage)
             }
         }
     }
+
+    fun logoutUser() {
+        authRepository.logout()
+        currentUserUid.value = null
+    }
 }
+
 /*
 Al requerir dependencias por constructor en nuestro AuthViewModel (AuthRepository y UserRepository),
 es necesario crear una ViewModelProvider.Factory para instanciar el ViewModel en Compose,

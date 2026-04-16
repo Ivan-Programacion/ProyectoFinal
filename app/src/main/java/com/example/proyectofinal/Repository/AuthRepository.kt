@@ -2,7 +2,7 @@ package com.example.proyectofinal.Repository
 
 interface AuthRepository {
     // Registra al usuario y devuelve su UID único de Firebase si tiene éxito. Si falla, devuelve null.
-    suspend fun register(email: String, password: String): String?
+    suspend fun register(email: String, password: String, repeatPassword: String, message: (String) -> Unit): String?
 
     // Intenta iniciar sesión y devuelve true si es correcto.
     suspend fun login(email: String, password: String, message: (String) -> Unit): Boolean

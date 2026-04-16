@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -47,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -187,7 +189,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                 FilaRegistro(
                     label = "Teléfono",
                     value = telefono,
-                    placeholder = "612345678"
+                    placeholder = "ej. 612345678"
                 ) { viewModel.telefono.value = it }
 
                 // --- SELECCIÓN DE CENTRO Y PROFESOR ---
@@ -346,14 +348,26 @@ fun FilaRegistro(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(placeholder) },
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true
-        )
+        if(label == "Teléfono") {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(placeholder) },
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        } else {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(placeholder) },
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true
+            )
+        }
     }
 }
 

@@ -46,13 +46,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.EstadoExamen
+import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
     var nombre by remember { mutableStateOf("Juan") }
     var apellidos by remember { mutableStateOf("Pérez") }
     var telefono by remember { mutableStateOf("600000000") }
@@ -82,6 +84,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), controller: (String) 
         CerrarSesionDialog(
             onConfirm = {
                 showLogoutDialog = false
+                viewModel.logoutUser()
                 controller(StateNavigate.login.value)
             },
             onDismiss = { showLogoutDialog = false }

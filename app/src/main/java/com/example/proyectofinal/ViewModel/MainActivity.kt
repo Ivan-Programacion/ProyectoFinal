@@ -13,8 +13,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -42,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -135,15 +140,20 @@ fun App(startDestination: String = "login") {
             // Definimos el estilo del SnackbarHost
             SnackbarHost(hostState = snackbarHostState) { snackbarData ->
                 Snackbar(
-                    modifier = Modifier.padding(16.dp), // ESTE ES EL TRUCO: Añadimos margen exterior
+                    modifier = Modifier.padding(16.dp), // Añadimos margen exterior
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.error,
-                    shape = RoundedCornerShape(12.dp) // Opcional: para que tenga las esquinitas redondas como el resto de la app
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(
-                        text= snackbarData.visuals.message,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text= snackbarData.visuals.message,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
         },

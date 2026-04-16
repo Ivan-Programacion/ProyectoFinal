@@ -121,12 +121,12 @@ class AuthViewModel(
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            
-            val loginSuccess = authRepository.login(email, password)
+            var errorMessage = ""
+            val loginSuccess = authRepository.login(email, password) { errorMessage = it }
             if (loginSuccess) {
                 _uiState.value = AuthUiState.Success
             } else {
-                _uiState.value = AuthUiState.Error("Credenciales incorrectas o fallo al iniciar sesión.")
+                _uiState.value = AuthUiState.Error(errorMessage)
             }
         }
     }

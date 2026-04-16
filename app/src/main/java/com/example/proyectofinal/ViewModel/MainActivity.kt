@@ -38,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,8 +62,11 @@ import com.example.proyectofinal.View.Perfil
 import com.example.proyectofinal.View.RegistroInfo
 import com.example.proyectofinal.View.RegistroPass
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
-import com.example.proyectofinal.Repository.AuthRepositoryImpl
 import com.example.proyectofinal.Repository.AuthRepository
+import com.example.proyectofinal.Repository.AuthRepositoryImpl
+import com.example.proyectofinal.Repository.UserRepositoryImpl
+import com.example.proyectofinal.ViewModel.AuthViewModelFactory
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -78,7 +82,7 @@ class MainActivity : ComponentActivity() {
         } else {
             "login"
         }
-        
+
         setContent {
             ProyectoFinalTheme(dynamicColor = false) {
                 App(startDestination = startDestination)
@@ -90,6 +94,15 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun App(startDestination: String = "login") {
+    // Creamos la factoría y el ViewModel para poder usar AuthRepository y UserRepository
+    val context = LocalContext.current
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(
+            authRepository = AuthRepositoryImpl(),
+            userRepository = UserRepositoryImpl()
+        )
+    )
+
     // controller --> para poder navegar entre pantallas (remember)
     val controller = rememberNavController()
     // para saber en que pantalla estamos exactamente
@@ -166,7 +179,7 @@ fun App(startDestination: String = "login") {
             }
         ) {
             composable(StateNavigate.login.value) { Login(innerPadding) { controller.navigate(it) } }
-            composable(StateNavigate.registro.value) { RegistroInfo(innerPadding) { controller.navigate(it) } }
+            composable(StateNavigate.registro.value) { RegistroInfo(innerPadding, viewModel = authViewModel) { controller.navigate(it) } }
             composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) { controller.navigate(it) } }
             composable(StateNavigate.perfil.value) { Perfil(innerPadding) {controller.navigate(it)} }
             composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) {controller.navigate(it)} }

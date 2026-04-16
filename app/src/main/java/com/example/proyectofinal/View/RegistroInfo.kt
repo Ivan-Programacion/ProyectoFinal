@@ -49,6 +49,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.anios
 import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dias
@@ -56,43 +58,41 @@ import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.listaGimnasios
 import com.example.proyectofinal.Logic.mapaProfesores
+import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
-    // ********************************* LÓGICA PROVISIONA ********************************* //
-    // Estados para el formulario provisional
-    var nombre by remember { mutableStateOf("") }
-    var apellidos by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
+fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
+    // Observar estados del viewModel
+    val nombre by viewModel.nombre.collectAsStateWithLifecycle()
+    val apellidos by viewModel.apellidos.collectAsStateWithLifecycle()
+    val email by viewModel.email.collectAsStateWithLifecycle()
+    val telefono by viewModel.telefono.collectAsStateWithLifecycle()
 
-    // Estados para la fecha de nacimiento
-    var dia by remember { mutableStateOf("") }
-    var mes by remember { mutableStateOf("") }
-    var anio by remember { mutableStateOf("") }
+    val dia by viewModel.dia.collectAsStateWithLifecycle()
+    val mes by viewModel.mes.collectAsStateWithLifecycle()
+    val anio by viewModel.anio.collectAsStateWithLifecycle()
 
     // Remember de la lista de dias que cambiara en función del mes seleccionado
     var dayList by remember { mutableStateOf(dias) }
     var dayListMenor by remember { mutableStateOf(dias) }
 
-    // Estados para la cuenta del menor
-    var esMenor by remember { mutableStateOf(false) }
-    var nombreMenor by remember { mutableStateOf("") }
-    var apellidosMenor by remember { mutableStateOf("") }
-    var diaMenor by remember { mutableStateOf("") }
-    var mesMenor by remember { mutableStateOf("") }
-    var anioMenor by remember { mutableStateOf("") }
+    val esMenor by viewModel.esMenor.collectAsStateWithLifecycle()
+    val nombreMenor by viewModel.nombreMenor.collectAsStateWithLifecycle()
+    val apellidosMenor by viewModel.apellidosMenor.collectAsStateWithLifecycle()
+    val diaMenor by viewModel.diaMenor.collectAsStateWithLifecycle()
+    val mesMenor by viewModel.mesMenor.collectAsStateWithLifecycle()
+    val anioMenor by viewModel.anioMenor.collectAsStateWithLifecycle()
 
-    // Datos provisionales de Centros y Profesores
-    var centroSeleccionado by remember { mutableStateOf("") }
-    // Usamos un Set (conjunto) porque un alumno no puede elegir dos veces al mismo profesor
-    var profesoresSeleccionados by remember { mutableStateOf(setOf<String>()) }
-    // Lista dinámica de profesores según el centro
+    val centroSeleccionado by viewModel.centroSeleccionado.collectAsStateWithLifecycle()
+    val profesoresSeleccionados by viewModel.profesoresSeleccionados.collectAsStateWithLifecycle()
+
+    val isNextButtonEnabled by viewModel.isNextButtonEnabled.collectAsStateWithLifecycle()
+
     val profesoresDisponibles = mapaProfesores[centroSeleccionado] ?: emptyList()
-// ********************************* LÓGICA PROVISIONA ********************************* //
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -129,13 +129,13 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 }
                 // --- CAMPOS DE TEXTO ---
                 FilaRegistro(label = "Nombre", value = nombre, placeholder = "Ej. Juan") {
-                    nombre = it
+                    viewModel.nombre.value = it
                 }
                 FilaRegistro(
                     label = "Apellidos",
                     value = apellidos,
                     placeholder = "Ej. Pérez"
-                ) { apellidos = it }
+                ) { viewModel.apellidos.value = it }
 
                 // --- FECHA DE NACIMIENTO ---
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -150,7 +150,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                             seleccionado = dia,
                             modifier = Modifier.weight(1f),
                             onValueChange = { opcion, index ->
-                                dia = opcion
+                                viewModel.dia.value = opcion
                             }
                         )
                         CampoFecha(
@@ -160,9 +160,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                             modifier = Modifier.weight(1.2f),
                             onValueChange = { opcion, index ->
                                 val result = dayPerMonthFunction(index)
-                                mes = opcion
-                                if (result.first < dia.toInt()) {
-                                    dia = result.first.toString()
+                                viewModel.mes.value = opcion
+                                if (dia.isNotEmpty() && result.first < dia.toInt()) {
+                                    viewModel.dia.value = result.first.toString()
                                 }
                                 dayList = result.second
                             }
@@ -172,7 +172,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                             opciones = anios,
                             seleccionado = anio,
                             modifier = Modifier.weight(1.3f),
-                            onValueChange = { opcion, index -> anio = opcion }
+                            onValueChange = { opcion, index -> viewModel.anio.value = opcion }
                         )
                     }
                 }
@@ -182,12 +182,12 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     label = "Email",
                     value = email,
                     placeholder = "ej. correo@dominio.com"
-                ) { email = it }
+                ) { viewModel.email.value = it }
                 FilaRegistro(
                     label = "Teléfono",
                     value = telefono,
                     placeholder = "612345678"
-                ) { telefono = it }
+                ) { viewModel.telefono.value = it }
 
                 // --- SELECCIÓN DE CENTRO Y PROFESOR ---
                 CampoDesplegableGimnasios(
@@ -195,9 +195,8 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     opciones = listaGimnasios,
                     seleccionado = centroSeleccionado,
                     onValueChange = { nuevoCentro ->
-                        centroSeleccionado = nuevoCentro
-                        // ¡Importante! Si cambian de centro, borramos los profesores que hubieran elegido del centro anterior
-                        profesoresSeleccionados = emptySet()
+                        viewModel.centroSeleccionado.value = nuevoCentro
+                        viewModel.profesoresSeleccionados.value = emptySet()
                     }
                 )
 
@@ -207,7 +206,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     seleccionados = profesoresSeleccionados,
                     enabled = centroSeleccionado.isNotEmpty(), // Solo habilitado si hay centro
                     onSelectionChange = { nuevaSeleccion ->
-                        profesoresSeleccionados = nuevaSeleccion
+                        viewModel.profesoresSeleccionados.value = nuevaSeleccion
                     }
                 )
 
@@ -216,13 +215,13 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { // Hacemos toda la fila clickable para mayor comodidad
-                            esMenor = !esMenor
-                            if (!esMenor) { // Si se desmarca, limpiamos los datos
-                                nombreMenor = ""
-                                apellidosMenor = ""
-                                diaMenor = ""
-                                mesMenor = ""
-                                anioMenor = ""
+                            viewModel.esMenor.value = !esMenor
+                            if (!viewModel.esMenor.value) { // Si se desmarca, limpiamos los datos
+                                viewModel.nombreMenor.value = ""
+                                viewModel.apellidosMenor.value = ""
+                                viewModel.diaMenor.value = ""
+                                viewModel.mesMenor.value = ""
+                                viewModel.anioMenor.value = ""
                             }
                         },
                     verticalAlignment = Alignment.CenterVertically
@@ -230,13 +229,13 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                     Checkbox(
                         checked = esMenor,
                         onCheckedChange = { checked ->
-                            esMenor = checked
+                            viewModel.esMenor.value = checked
                             if (!checked) {
-                                nombreMenor = ""
-                                apellidosMenor = ""
-                                diaMenor = ""
-                                mesMenor = ""
-                                anioMenor = ""
+                                viewModel.nombreMenor.value = ""
+                                viewModel.apellidosMenor.value = ""
+                                viewModel.diaMenor.value = ""
+                                viewModel.mesMenor.value = ""
+                                viewModel.anioMenor.value = ""
                             }
                         },
                         colors = CheckboxDefaults.colors(
@@ -255,13 +254,13 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                         label = "Nombre del niño/a",
                         value = nombreMenor,
                         placeholder = "Ej. Leo"
-                    ) { nombreMenor = it }
+                    ) { viewModel.nombreMenor.value = it }
 
                     FilaRegistro(
                         label = "Apellidos niño/a",
                         value = apellidosMenor,
                         placeholder = "Ej. Pérez"
-                    ) { apellidosMenor = it }
+                    ) { viewModel.apellidosMenor.value = it }
 
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text("Fecha de nacimiento niño/a", fontWeight = FontWeight.Bold)
@@ -274,7 +273,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                                 opciones = dias,
                                 seleccionado = diaMenor,
                                 modifier = Modifier.weight(1f),
-                                onValueChange = { opcion, index -> diaMenor = opcion }
+                                onValueChange = { opcion, index -> viewModel.diaMenor.value = opcion }
                             )
                             CampoFecha(
                                 label = "Mes",
@@ -283,9 +282,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                                 modifier = Modifier.weight(1.2f),
                                 onValueChange = { opcion, index ->
                                     val result = dayPerMonthFunction(index)
-                                    mesMenor = opcion
-                                    if (result.first < diaMenor.toInt()) {
-                                        diaMenor = result.first.toString()
+                                    viewModel.mesMenor.value = opcion
+                                    if (diaMenor.isNotEmpty() && result.first < diaMenor.toInt()) {
+                                        viewModel.diaMenor.value = result.first.toString()
                                     }
                                     dayListMenor = result.second
                                 }
@@ -295,7 +294,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                                 opciones = aniosMenor,
                                 seleccionado = anioMenor,
                                 modifier = Modifier.weight(1.3f),
-                                onValueChange = { opcion, index -> anioMenor = opcion },
+                                onValueChange = { opcion, index -> viewModel.anioMenor.value = opcion },
                             )
                         }
                     }
@@ -306,6 +305,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), controller: (St
                 // --- BOTÓN SIGUIENTE ---
                 Button(
                     onClick = { controller(StateNavigate.registroPass.value) },
+                    enabled = isNextButtonEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp),

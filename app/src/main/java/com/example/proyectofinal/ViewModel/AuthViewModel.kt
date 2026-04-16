@@ -1,6 +1,7 @@
 package com.example.proyectofinal.ViewModel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.Repository.AuthRepository
@@ -8,6 +9,9 @@ import com.example.proyectofinal.Repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 sealed class AuthUiState {
@@ -24,6 +28,69 @@ class AuthViewModel(
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+
+    // Datos del usuarios en StateFlow
+    val nombre = MutableStateFlow("")
+    val apellidos = MutableStateFlow("")
+    val email = MutableStateFlow("")
+    val telefono = MutableStateFlow("")
+
+    val dia = MutableStateFlow("")
+    val mes = MutableStateFlow("")
+    val anio = MutableStateFlow("")
+
+    val esMenor = MutableStateFlow(false)
+    val nombreMenor = MutableStateFlow("")
+    val apellidosMenor = MutableStateFlow("")
+    val diaMenor = MutableStateFlow("")
+    val mesMenor = MutableStateFlow("")
+    val anioMenor = MutableStateFlow("")
+
+    val centroSeleccionado = MutableStateFlow("")
+    val profesoresSeleccionados = MutableStateFlow<Set<String>>(emptySet())
+
+    // Verificación de email mínima
+    private fun isValidEmail(emailStr: String): Boolean {
+        return emailStr.contains("@") && emailStr.contains(".")
+    }
+
+    // Comprobación de botón "Siguiente" enabled en RegistroInfo
+    val isNextButtonEnabled: StateFlow<Boolean> = combine(
+        nombre, apellidos, email, telefono, dia, mes, anio, centroSeleccionado, profesoresSeleccionados,
+        esMenor, nombreMenor, apellidosMenor, diaMenor, mesMenor, anioMenor
+    ) { args ->
+        val nombreStr = args[0] as String
+        val apellidosStr = args[1] as String
+        val emailStr = args[2] as String
+        val telefonoStr = args[3] as String
+        val diaStr = args[4] as String
+        val mesStr = args[5] as String
+        val anioStr = args[6] as String
+        val centroStr = args[7] as String
+        val profeSet = args[8] as Set<*>
+        val isMenor = args[9] as Boolean
+        val nombreMenorStr = args[10] as String
+        val apellidosMenorStr = args[11] as String
+        val diaMenorStr = args[12] as String
+        val mesMenorStr = args[13] as String
+        val anioMenorStr = args[14] as String
+
+        val mainFieldsValid = nombreStr.isNotBlank() && apellidosStr.isNotBlank() && 
+                telefonoStr.isNotBlank() && diaStr.isNotBlank() && mesStr.isNotBlank() && anioStr.isNotBlank() &&
+                centroStr.isNotBlank() && profeSet.isNotEmpty() && isValidEmail(emailStr)
+
+        // Comprobación con la lógica del checkbox de menor
+        if (!isMenor) {
+            mainFieldsValid
+        } else {
+            mainFieldsValid && nombreMenorStr.isNotBlank() && apellidosMenorStr.isNotBlank() &&
+                    diaMenorStr.isNotBlank() && mesMenorStr.isNotBlank() && anioMenorStr.isNotBlank()
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
 
     fun registerUser(user: User, password: String) {
         viewModelScope.launch {
@@ -57,5 +124,22 @@ class AuthViewModel(
                 _uiState.value = AuthUiState.Error("Credenciales incorrectas o fallo al iniciar sesión.")
             }
         }
+    }
+}
+/*
+Al requerir dependencias por constructor en nuestro AuthViewModel (AuthRepository y UserRepository),
+es necesario crear una ViewModelProvider.Factory para instanciar el ViewModel en Compose,
+ya que de lo contrario no sabe de dónde obtener esas instancias.
+ */
+class AuthViewModelFactory(
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AuthViewModel(authRepository, userRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

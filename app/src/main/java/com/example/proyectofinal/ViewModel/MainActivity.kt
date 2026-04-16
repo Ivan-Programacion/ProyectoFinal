@@ -16,6 +16,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
@@ -30,6 +31,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -95,6 +97,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 // RequieresApi -> Necesario en la app para que funcione las fechas
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -120,7 +123,7 @@ fun App(startDestination: String = "login") {
 
     LaunchedEffect(authUiState) {
         if (authUiState is AuthUiState.Error) {
-            if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registro.value || currentRoute == StateNavigate.registroPass.value) {
+            if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registroPass.value) {
                 snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
                 authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
             }
@@ -128,7 +131,22 @@ fun App(startDestination: String = "login") {
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = {
+            // Definimos el estilo del SnackbarHost
+            SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+                Snackbar(
+                    modifier = Modifier.padding(16.dp), // ESTE ES EL TRUCO: Añadimos margen exterior
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.error,
+                    shape = RoundedCornerShape(12.dp) // Opcional: para que tenga las esquinitas redondas como el resto de la app
+                ) {
+                    Text(
+                        text= snackbarData.visuals.message,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        },
         topBar = {
             // Si NO estamos navegando antes de entrar en la aplicación por las pantalals login, registro, etc
             // controller.popBackStack() --> Para volver atrás en caso de que la pantalla tenga flecha hacia atrás
@@ -155,10 +173,10 @@ fun App(startDestination: String = "login") {
                 val inicial = obtenerIndice(initialState.destination.route)
                 val destino = obtenerIndice(targetState.destination.route)
                 // Si la pantalla inicial y la de destino son iguales, no hacemos nada
-                if(destino == inicial) {
+                if (destino == inicial) {
                     EnterTransition.None
 
-                // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc), hacemos fadeIn
+                    // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc), hacemos fadeIn
                 } else if (destino < 0 || inicial < 0) {
                     fadeIn(animationSpec = tween(100))
 
@@ -178,7 +196,7 @@ fun App(startDestination: String = "login") {
                 val inicial = obtenerIndice(initialState.destination.route)
                 val destino = obtenerIndice(targetState.destination.route)
                 // Si la pantalla inicial y la de destino son iguales, no hacemos nada
-                if(destino == inicial) {
+                if (destino == inicial) {
                     ExitTransition.None
 
                     // Si las pantallas son las correspondientes a antes de iniciar sesión (login, registro, olvido contraseña, etc), hacemos fadeOut
@@ -197,17 +215,67 @@ fun App(startDestination: String = "login") {
                 }
             }
         ) {
-            composable(StateNavigate.login.value) { Login(innerPadding, viewModel = authViewModel) { controller.navigate(it) } }
-            composable(StateNavigate.registro.value) { RegistroInfo(innerPadding, viewModel = authViewModel) { controller.navigate(it) } }
-            composable(StateNavigate.listaCinturones.value) { ListaCinturones(innerPadding) { controller.navigate(it) } }
-            composable(StateNavigate.perfil.value) { Perfil(innerPadding) {controller.navigate(it)} }
-            composable(StateNavigate.favoritos.value) { Favoritos(innerPadding) {controller.navigate(it)} }
-            composable(StateNavigate.registroPass.value) { RegistroPass(innerPadding, {controller.popBackStack()}) { controller.navigate(it) } }
-            composable(StateNavigate.listaContenido.value) { ListaContenido(innerPadding) {controller.navigate(it)} }
+            composable(StateNavigate.login.value) {
+                Login(
+                    innerPadding,
+                    viewModel = authViewModel
+                ) { controller.navigate(it) }
+            }
+            composable(StateNavigate.registro.value) {
+                RegistroInfo(
+                    innerPadding,
+                    viewModel = authViewModel
+                ) { controller.navigate(it) }
+            }
+            composable(StateNavigate.listaCinturones.value) {
+                ListaCinturones(innerPadding) {
+                    controller.navigate(
+                        it
+                    )
+                }
+            }
+            composable(StateNavigate.perfil.value) { Perfil(innerPadding) { controller.navigate(it) } }
+            composable(StateNavigate.favoritos.value) {
+                Favoritos(innerPadding) {
+                    controller.navigate(
+                        it
+                    )
+                }
+            }
+            composable(StateNavigate.registroPass.value) {
+                RegistroPass(
+                    innerPadding,
+                    { controller.popBackStack() }) { controller.navigate(it) }
+            }
+            composable(StateNavigate.listaContenido.value) {
+                ListaContenido(innerPadding) {
+                    controller.navigate(
+                        it
+                    )
+                }
+            }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
-            composable(StateNavigate.adminListaClientes.value) { AdminListaClientes(innerPadding) { controller.navigate(it)} }
-            composable(StateNavigate.adminGestionExamen.value) { AdminGestionExamen(innerPadding) { controller.navigate(it)} }
-            composable(StateNavigate.adminPerfilCliente.value) { AdminPerfilCliente(innerPadding) { controller.navigate(it)} }
+            composable(StateNavigate.adminListaClientes.value) {
+                AdminListaClientes(innerPadding) {
+                    controller.navigate(
+                        it
+                    )
+                }
+            }
+            composable(StateNavigate.adminGestionExamen.value) {
+                AdminGestionExamen(innerPadding) {
+                    controller.navigate(
+                        it
+                    )
+                }
+            }
+            composable(StateNavigate.adminPerfilCliente.value) {
+                AdminPerfilCliente(innerPadding) {
+                    controller.navigate(
+                        it
+                    )
+                }
+            }
         }
     }
 }
@@ -255,7 +323,7 @@ fun NavBar(controller: (route: String) -> Unit) {
     ) {
         var state by remember { mutableStateOf(StateNavigate.listaCinturones) }
         // Si es admin, muestra este item
-        if(isAdmin) {
+        if (isAdmin) {
             NavigationBarItem(
                 selected = state == StateNavigate.adminListaClientes,
                 {
@@ -269,7 +337,7 @@ fun NavBar(controller: (route: String) -> Unit) {
                     indicatorColor = MaterialTheme.colorScheme.onSecondary
                 ),
                 label = { Text("Gestión") })
-    }
+        }
         // onClick de cada item --> se identifica la pantalla (state); después se cambia a dicha pantalla (controller([pantalla])
         NavigationBarItem(
             selected = state == StateNavigate.favoritos,

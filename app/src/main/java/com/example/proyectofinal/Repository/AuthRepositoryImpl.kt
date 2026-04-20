@@ -25,9 +25,13 @@ class AuthRepositoryImpl(
             if (password != repeatPassword || !isValidPassword) throw IllegalArgumentException()
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             result.user?.uid
+        } catch (e: FirebaseNetworkException) {
+            e.printStackTrace()
+            message("Error de conexión. No se pudo registrar el usuario")
+            null
         } catch (e: ConnectException) {
             e.printStackTrace()
-            message("Error de conexión. Inténtelo más tarde")
+            message("Error de conexión. No se pudo registrar el usuario")
             null
         } catch (e: FirebaseAuthException) {
             message("Las contraseñas no coinciden o no es válida")

@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeoutOrNull
 
 class UserRepositoryImpl(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
@@ -74,8 +75,13 @@ class UserRepositoryImpl(
 
     override suspend fun updateUser(user: User): Boolean {
         return try {
-            userCollection.document(user.id).set(user).await()
-            true
+            // Firestore espera infinitamente si no hay internet al hacer .await(). 
+            // Por ello, le ponemos un límite de 5 segundos. Si en 5s no se ha conectado, consideramos fallo de red.
+            val result = withTimeoutOrNull(5000) {
+                userCollection.document(user.id).set(user).await()
+                true
+            }
+            result ?: false
         } catch (e: Exception) {
             e.printStackTrace()
             false

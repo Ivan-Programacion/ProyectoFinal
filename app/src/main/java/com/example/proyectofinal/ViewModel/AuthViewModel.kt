@@ -20,7 +20,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 sealed class AuthUiState {
     object Idle : AuthUiState()
     object Loading : AuthUiState()
-    object Success : AuthUiState()
+    data class Success(val message: String = "") : AuthUiState()
     data class Error(val message: String) : AuthUiState()
 }
 
@@ -160,7 +160,7 @@ class AuthViewModel(
                 val createdInFirestore = userRepository.createUser(userWithId)
                 if (createdInFirestore) {
                     currentUserUid.value = uid // Actualizamos el estado del uid actual
-                    _uiState.value = AuthUiState.Success
+                    _uiState.value = AuthUiState.Success()
                 } else {
                     _uiState.value =
                         AuthUiState.Error("Error al guardar los datos del usuario. Intentalo más tarde")
@@ -209,7 +209,7 @@ class AuthViewModel(
             val loginSuccess = authRepository.login(email, password) { errorMessage = it }
             if (loginSuccess) {
                 currentUserUid.value = authRepository.getCurrentUserUid() // Actualizamos al nuevo logueado
-                _uiState.value = AuthUiState.Success
+                _uiState.value = AuthUiState.Success()
             } else {
                 _uiState.value = AuthUiState.Error(errorMessage)
             }
@@ -225,7 +225,12 @@ class AuthViewModel(
                     lastName = lastName,
                     phone = phone
                 )
-                userRepository.updateUser(updatedUser)
+                val success = userRepository.updateUser(updatedUser)
+                if (success) {
+                    _uiState.value = AuthUiState.Success("Datos actualizados correctamente")
+                } else {
+                    _uiState.value = AuthUiState.Error("Error de conexión. No se pudieron actualizar los datos")
+                }
             }
         }
     }

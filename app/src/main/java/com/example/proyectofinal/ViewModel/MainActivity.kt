@@ -133,17 +133,33 @@ fun App(startDestination: String = "login") {
     val currentRoute = controller.currentBackStackEntryAsState().value?.destination?.route
     // AÑADIR ESTO PARA LAS TRANSICIONES
     var beforeRoute by remember { mutableStateOf("listaCinturones") }
-    // Para snackbarHost --> utilizado para los mensajes de errores
+    // Para snackbarHost --> utilizado para los mensajes de errores y éxitos
     val snackbarHostState = remember { SnackbarHostState() }
+    // Guardamos si el snackbar mostrado es de error o no para darle estilo
+    var isErrorSnackbar by remember { mutableStateOf(true) }
+    
     val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
     val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
 
     LaunchedEffect(authUiState) {
-        if (authUiState is AuthUiState.Error) {
-            if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registroPass.value) {
-                snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
-                authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
+        when (authUiState) {
+            is AuthUiState.Error -> {
+                isErrorSnackbar = true
+                if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registroPass.value || currentRoute == StateNavigate.perfil.value) {
+                    snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
+                    authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
+                }
             }
+            is AuthUiState.Success -> {
+                val message = (authUiState as AuthUiState.Success).message
+                // Solo lo enseñamos si hay mensaje y estamos en el perfil
+                if (message.isNotEmpty() && currentRoute == StateNavigate.perfil.value) {
+                    isErrorSnackbar = false
+                    snackbarHostState.showSnackbar(message)
+                    authViewModel.resetUiState()
+                }
+            }
+            else -> {}
         }
     }
 
@@ -154,7 +170,8 @@ fun App(startDestination: String = "login") {
                 Snackbar(
                     modifier = Modifier.padding(16.dp), // Añadimos margen exterior
                     containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.error,
+                    // Si es error se pone rojo, si no (éxito), se usa color tertiary
+                    contentColor = if (isErrorSnackbar) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(

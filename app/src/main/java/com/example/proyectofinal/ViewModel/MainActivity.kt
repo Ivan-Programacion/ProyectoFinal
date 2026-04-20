@@ -125,6 +125,7 @@ fun App(startDestination: String = "login") {
     // Para snackbarHost --> utilizado para los mensajes de errores
     val snackbarHostState = remember { SnackbarHostState() }
     val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
+    val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
 
     LaunchedEffect(authUiState) {
         if (authUiState is AuthUiState.Error) {
@@ -166,10 +167,13 @@ fun App(startDestination: String = "login") {
         },
         bottomBar = {
             // Si NO estamos navegando antes de entrar en la aplicación por las pantallas login, registro, etc
-            if (currentRoute !in pantallasIniciales) NavBar({
-                beforeRoute = it
-                controller.navigate(it)
-            })
+            if (currentRoute !in pantallasIniciales) NavBar(
+                controller = {
+                    beforeRoute = it
+                    controller.navigate(it)
+                },
+                isAdmin = currentUser?.role == "TEACHER" || currentUser?.role == "SUPERADMIN"
+            )
             // Si lo estamos, no añadimos el NavBar
             else Spacer(Modifier.padding(bottom = 104.dp))
         },
@@ -330,10 +334,7 @@ fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
 }
 
 @Composable
-fun NavBar(controller: (route: String) -> Unit) {
-    // VARIABLE REMEMBER PARA PROBAR NAVEGACIÓN CON O SIN ADMIN
-    // Cambiar a mano por ahora
-    val isAdmin by remember { mutableStateOf(true) }
+fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
     ) {

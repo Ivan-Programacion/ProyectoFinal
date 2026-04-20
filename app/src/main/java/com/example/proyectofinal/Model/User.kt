@@ -11,7 +11,7 @@ data class User(
     val lastName: String = "",
     val birthDate: String = "", // Formato "YYYY-MM-DD"
     val phone: String = "",
-    val beltId: String = "", // -------------------- REVISAR ID BELT
+    val beltId: String = "white",
     val isMinor: Boolean = false,
 
     // Datos del tutor (Opcionales, por eso llevan "?" y valor por defecto null)

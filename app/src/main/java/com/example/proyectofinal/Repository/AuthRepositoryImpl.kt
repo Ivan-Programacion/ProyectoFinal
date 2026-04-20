@@ -1,5 +1,6 @@
 package com.example.proyectofinal.Repository
 
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import kotlinx.coroutines.tasks.await
@@ -48,6 +49,10 @@ class AuthRepositoryImpl(
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
             true
+        } catch (e: FirebaseNetworkException) {
+            e.printStackTrace()
+            message("Error de conexión. Inténtelo más tarde")
+            false
         } catch (e: ConnectException) {
             e.printStackTrace()
             message("Error de conexión. Inténtelo más tarde")

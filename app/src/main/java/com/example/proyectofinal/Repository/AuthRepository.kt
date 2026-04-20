@@ -1,5 +1,7 @@
 package com.example.proyectofinal.Repository
 
+import kotlinx.coroutines.flow.Flow
+
 interface AuthRepository {
     // Registra al usuario y devuelve su UID único de Firebase si tiene éxito. Si falla, devuelve null.
     suspend fun register(email: String, password: String, repeatPassword: String, message: (String) -> Unit): String?
@@ -12,4 +14,7 @@ interface AuthRepository {
 
     // Cierra la sesión de Firebase Auth.
     fun logout()
+
+    // Emite el UID actual cada vez que cambia el estado de la sesión
+    fun getAuthStateStream(): Flow<String?>
 }

@@ -6,6 +6,9 @@ import com.example.proyectofinal.Model.Content
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class ContentRepositoryImpl(
@@ -38,6 +41,22 @@ class ContentRepositoryImpl(
             e.printStackTrace()
             emptyList()
         }
+    }
+
+    override fun getBeltsStream(): Flow<List<Belt>> = callbackFlow {
+        val listener = contentCollections(belts)
+            .orderBy("order", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val beltList = snapshot.toObjects(Belt::class.java)
+                    trySend(beltList)
+                }
+            }
+        awaitClose { listener.remove() }
     }
 
     override suspend fun getContentByBelt(beltId: String, collectionName: String): List<Content> {

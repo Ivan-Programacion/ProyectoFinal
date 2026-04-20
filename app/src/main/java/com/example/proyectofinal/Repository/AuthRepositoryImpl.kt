@@ -3,6 +3,9 @@ package com.example.proyectofinal.Repository
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.net.ConnectException
 
@@ -78,5 +81,13 @@ class AuthRepositoryImpl(
 
     override fun logout() {
         auth.signOut()
+    }
+
+    override fun getAuthStateStream(): Flow<String?> = callbackFlow {
+        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            trySend(firebaseAuth.currentUser?.uid)
+        }
+        auth.addAuthStateListener(authStateListener)
+        awaitClose { auth.removeAuthStateListener(authStateListener) }
     }
 }

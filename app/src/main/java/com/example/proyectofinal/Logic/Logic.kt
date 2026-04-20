@@ -21,16 +21,16 @@ fun tituloTopBar(screen: String?): String {
 
 // Lista de los colores pertenecientes a cada cinturón
 val belts = listOf(
-    "Blanco" to coloresCinturones().Blanco,
-    "Amarillo" to coloresCinturones().Amarillo,
-    "Naranja" to coloresCinturones().Naranja,
-    "Púrpura" to coloresCinturones().Purpura,
-    "Azul" to coloresCinturones().Azul,
-    "Verde" to coloresCinturones().Verde,
-    "Marrón III" to coloresCinturones().Marron,
-    "Marrón II" to coloresCinturones().Marron,
-    "Marrón I" to coloresCinturones().Marron,
-    "Negro" to coloresCinturones().Negro
+    "white" to coloresCinturones().Blanco,
+    "yellow" to coloresCinturones().Amarillo,
+    "orange" to coloresCinturones().Naranja,
+    "purple" to coloresCinturones().Purpura,
+    "blue" to coloresCinturones().Azul,
+    "green" to coloresCinturones().Verde,
+    "brown3" to coloresCinturones().Marron,
+    "brown2" to coloresCinturones().Marron,
+    "brown1" to coloresCinturones().Marron,
+    "black" to coloresCinturones().Negro
 )
 
 // Función que, dependiendo de la pantalla donde estemos, nos devolverá un valor con el cual utilizaremos

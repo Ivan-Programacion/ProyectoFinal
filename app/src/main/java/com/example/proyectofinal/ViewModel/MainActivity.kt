@@ -75,8 +75,11 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import com.example.proyectofinal.Repository.AuthRepository
 import com.example.proyectofinal.Repository.AuthRepositoryImpl
 import com.example.proyectofinal.Repository.UserRepositoryImpl
+import com.example.proyectofinal.Repository.ContentRepositoryImpl
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModelFactory
+import com.example.proyectofinal.ViewModel.BeltsViewModel
+import com.example.proyectofinal.ViewModel.BeltsViewModelFactory
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -113,6 +116,14 @@ fun App(startDestination: String = "login") {
         factory = AuthViewModelFactory(
             authRepository = AuthRepositoryImpl(),
             userRepository = UserRepositoryImpl()
+        )
+    )
+
+    val beltsViewModel: BeltsViewModel = viewModel(
+        factory = BeltsViewModelFactory(
+            authRepository = AuthRepositoryImpl(),
+            userRepository = UserRepositoryImpl(),
+            contentRepository = ContentRepositoryImpl()
         )
     )
 
@@ -242,7 +253,10 @@ fun App(startDestination: String = "login") {
                 ) { controller.navigate(it) }
             }
             composable(StateNavigate.listaCinturones.value) {
-                ListaCinturones(innerPadding) {
+                ListaCinturones(
+                    paddingValues = innerPadding,
+                    viewModel = beltsViewModel
+                ) {
                     controller.navigate(
                         it
                     )

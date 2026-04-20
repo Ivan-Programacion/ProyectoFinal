@@ -47,7 +47,7 @@ fun Contenido(paddingValues: PaddingValues = PaddingValues()) {
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        mapBeltColor.getValue("Marrón III"), // Mismo color dinámico arriba
+                        mapBeltColor.getValue("brown3"), // Mismo color dinámico arriba
                         MaterialTheme.colorScheme.background // Tu color base abajo
                     ),
                     startY = 0f,

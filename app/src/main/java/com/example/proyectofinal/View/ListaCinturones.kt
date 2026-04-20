@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,15 +33,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.belts
+import com.example.proyectofinal.Logic.mapBeltColor
+import com.example.proyectofinal.ViewModel.BeltsViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
+import java.util.Locale
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun ListaCinturones(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+fun ListaCinturones(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: BeltsViewModel = viewModel(),
+    controller: (String) -> Unit
+) {
     // Para botón atrás del móvil
     val context = LocalContext.current as? Activity
+// Sacamos la lista de cinturones reactiva (cambiará si algo cambia)
+    val beltsState by viewModel.beltsUiState.collectAsStateWithLifecycle()
 
     // Interceptamos el botón de atrás
     BackHandler {
@@ -70,9 +82,25 @@ fun ListaCinturones(paddingValues: PaddingValues = PaddingValues(), controller: 
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp) // Espacio más compacto entre cinturones
             ) {
-                items(belts) { (name, color) ->
-                    if (name != "Blanco")
-                        BeltItem(name, color) { controller(StateNavigate.listaContenido.value) }
+                items(beltsState) { beltState ->
+                    // Lógica para obtener el nombre del UI dependiendo del locale (i18n)
+                    val locale = Locale.getDefault().language
+                    // Con el idioma local, nos traemos el nombre del cinturon correspondiente
+                    val beltName = beltState.belt.name[locale]
+
+                    // Comprobamos con el ID de belts
+                    if (beltState.belt.id != "white") {
+                        BeltItem(
+                            id = beltState.belt.id,
+                            name = beltName,
+                            beltColor = mapBeltColor[beltState.belt.id] ?: Color.White,
+                            isEnabled = beltState.isEnabled
+                        ) {
+                            if (beltState.isEnabled) {
+                                controller(StateNavigate.listaContenido.value)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -80,23 +108,33 @@ fun ListaCinturones(paddingValues: PaddingValues = PaddingValues(), controller: 
 }
 
 @Composable
-fun BeltItem(name: String, beltColor: Color, controller: () -> Unit) {
+fun BeltItem(
+    id: String,
+    name: String?,
+    beltColor: Color,
+    isEnabled: Boolean = true,
+    controller: () -> Unit,
+) {
     // Determinamos el color del texto para que siempre sea legible
     val textColor: Color
-    if (name != "Blanco" && name != "Amarillo")
+    if (id != "white" && id != "yellow")
         textColor = MaterialTheme.colorScheme.onPrimary
     else
         textColor = MaterialTheme.colorScheme.primary
+
+    // Reducimos la opacidad si el nivel no está desbloqueado
+    val backgroundColor = if (isEnabled) beltColor else beltColor.copy(alpha = 0.4f)
+    val contentColor = if (isEnabled) textColor else textColor.copy(alpha = 0.4f)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(90.dp)
             // HABRA QUE VER EN LÓGICA BACKEND CÓMO PASAR EL CINTURÓN AQUÍ
-            .clickable { controller() },
+            .clickable(enabled = isEnabled) { controller() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = beltColor),
-        elevation = CardDefaults.cardElevation(4.dp)
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(if (isEnabled) 4.dp else 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -105,25 +143,31 @@ fun BeltItem(name: String, beltColor: Color, controller: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = textColor
-            )
+            if (name != null) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = contentColor
+                )
+            }
 
             // Pequeño botón de flecha dentro de la subcard
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = Color.White.copy(alpha = 0.3f),
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = textColor,
-                    modifier = Modifier.padding(4.dp)
-                )
+            if (isEnabled) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color.White.copy(alpha = 0.3f),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = contentColor,
+                        modifier = Modifier.padding(4.dp)
+                    )
+                }
+            } else {
+                // Opcional: mostrar un icono de candado si está disabled
             }
         }
     }
@@ -133,6 +177,6 @@ fun BeltItem(name: String, beltColor: Color, controller: () -> Unit) {
 @Composable
 fun ListaCinturonespreview() {
     ProyectoFinalTheme {
-        ListaCinturones() {}
+        ListaCinturones(controller = {})
     }
 }

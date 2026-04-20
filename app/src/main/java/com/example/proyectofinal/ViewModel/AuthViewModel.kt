@@ -216,6 +216,21 @@ class AuthViewModel(
         }
     }
 
+    fun updateUserProfile(name: String, lastName: String, phone: String) {
+        viewModelScope.launch {
+            val currentUser = currentUserState.value
+            if (currentUser != null) {
+                val updatedUser = currentUser.copy(
+                    name = name,
+                    lastName = lastName,
+                    phone = phone
+                )
+                userRepository.updateUser(updatedUser)
+            }
+        }
+    }
+
+    // Funciones de Logout
     fun logoutUser() {
         authRepository.logout()
         currentUserUid.value = null

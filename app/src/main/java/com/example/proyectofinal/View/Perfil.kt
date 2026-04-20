@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.EstadoExamen
 import com.example.proyectofinal.ViewModel.AuthViewModel
@@ -55,10 +56,16 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
-    var nombre by remember { mutableStateOf("Juan") }
-    var apellidos by remember { mutableStateOf("Pérez") }
-    var telefono by remember { mutableStateOf("600000000") }
-    val email = "juan.perez@email.com"
+    // 1. Recolectamos el usuario real (Reactivo)
+    val currentUser by viewModel.currentUserState.collectAsStateWithLifecycle()
+
+    // 2. Inicializamos los campos con los datos del usuario real
+    // Utilizamos `remember(currentUser)` para que, si el flujo de base de datos se actualiza (ej. tras arrancar o modificar),
+    // también rellene los campos de texto locales con los datos de Firebase.
+    var nombre by remember(currentUser) { mutableStateOf(currentUser?.name ?: "") }
+    var apellidos by remember(currentUser) { mutableStateOf(currentUser?.lastName ?: "") }
+    var telefono by remember(currentUser) { mutableStateOf(currentUser?.phone ?: "") }
+    val email = currentUser?.email ?: ""
 
     // 1. ESTADO PARA EL DIALOG
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -74,6 +81,8 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
     if (showConfirmDialog) {
         ConfirmarCambiosDialog(
             onConfirm = {
+                // Ejecutamos la lógica de actualización en Firebase
+                viewModel.updateUserProfile(nombre, apellidos, telefono)
                 showConfirmDialog = false
             },
             onDismiss = { showConfirmDialog = false }
@@ -139,7 +148,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                text = nombre.take(1).uppercase(),
+                                text = if (nombre.isNotEmpty()) nombre.take(1).uppercase() else "?",
                                 style = MaterialTheme.typography.displayMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary

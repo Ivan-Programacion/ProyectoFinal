@@ -223,6 +223,31 @@ fun RegistroPass(
 
 @Composable
 fun TerminosCondiciones(onDismiss: () -> Unit) {
+    val termsText = "1. NATURALEZA DEL PROYECTO\n\n" +
+            "Esta aplicación, Arkenpo App, ha sido desarrollada exclusivamente con fines educativos " +
+            "y como parte del Trabajo Final del Ciclo Superior de Desarrollode Aplicaciones Multiplataforma. " +
+            "No tiene fines comerciales ni carácter de empresa constituida. El contenido y las funcionalidades " +
+            "son una simulación de un entorno real de gestión de escuelas de artes marciales.\n\n" +
+            "2. USO DE LOS DATOS\n\n" +
+            "Toda la información personal recopilada (nombre, email, teléfono, datos de menores) será utilizada " +
+            "estrictamente para el funcionamiento interno de la aplicación en el marco del proyecto académico. " +
+            "Nos comprometemos a:\n" +
+            "- No ceder ni vender tus datos a terceros.\n" +
+            "- Utilizar la información únicamente para la evaluación de las capacidades técnicas del software.\n" +
+            "- Eliminar la base de datos una vez finalizada la etapa de evaluación del proyecto si así se requiere.\n\n" +
+            "3. PROTECCIÓN DE DATOS Y FIREBASE\n\n" +
+            "Los datos son almacenados en la infraestructura de Google Firebase, cumpliendo con los estándares de " +
+            "seguridad de dicha plataforma. Sin embargo, al ser una versión de desarrollo (Beta), el usuario reconoce " +
+            "que no se garantiza la seguridad infalible contra brechas de datos de nivel profesional. Se recomienda no " +
+            "utilizar contraseñas que el usuario emplee en servicios sensibles (banca, correo personal principal, etc.).\n\n" +
+            "4. REQUSITO DE EDAD\n\n" +
+            "Al aceptar estos términos, confirmas que tienes al menos 14 años de edad (o 13 según la legislación " +
+            "aplicable) o que, en su defecto, estás realizando este registro bajo la supervisión directa de un " +
+            "tutor legal. En el caso de registrar a un menor de 14 años, el usuario garantiza que posee la patria " +
+            "potestad o tutoría legal necesaria para ceder dichos datos con fines educativos.\n\n" +
+            "5. LIMITACIONES DE RESPONSABILIDAD\n\n" +
+            "Dado que es un software en desarrollo, el autor no se hace responsable de fallos técnicos, pérdida " +
+            "de datos o malentendidos derivados del contenido pedagógico mostrado en la aplicación."
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -270,27 +295,10 @@ fun TerminosCondiciones(onDismiss: () -> Unit) {
 
                 // --- CUERPO DEL TEXTO ---
                 Text(
-                    text = "Este es un texto de ejemplo para mostrar cómo se verían los términos y " +
-                            "condiciones en un modal flotante sobre la pantalla de Contraseña. " +
-                            "Aquí se incluirá toda la información legal completa.\n\nEl usuario " +
-                            "podrá leer, hacer scroll y cerrar el modal sin salir de la pantalla " +
-                            "principal de registro, manteniendo los datos ya introducidos.",
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = termsText,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Texto adicional para probar el scroll
-                Text(
-                    text = "Al aceptar estos términos, el usuario confirma que es mayor de edad y " +
-                            "que los datos proporcionados son verídicos. Esta aplicación se reserva " +
-                            "el derecho de modificar estas condiciones en cualquier momento previo aviso.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

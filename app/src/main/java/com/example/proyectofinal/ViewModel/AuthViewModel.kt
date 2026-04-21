@@ -3,6 +3,7 @@ package com.example.proyectofinal.ViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.Repository.AuthRepository
 import com.example.proyectofinal.Repository.UserRepository
@@ -34,6 +35,20 @@ class AuthViewModel(
 
     // Estado local para conocer el UUID autenticado (si lo hay)
     private val currentUserUid = MutableStateFlow(authRepository.getCurrentUserUid())
+
+    // Listas dinámicas para Centros y Profesores
+    private val _listaCentros = MutableStateFlow<List<Center>>(emptyList())
+    val listaCentros: StateFlow<List<Center>> = _listaCentros.asStateFlow()
+
+    private val _profesoresDisponibles = MutableStateFlow<List<User>>(emptyList())
+    val profesoresDisponibles: StateFlow<List<User>> = _profesoresDisponibles.asStateFlow()
+
+    init {
+        // Cargar los centros al inicializar el ViewModel
+        viewModelScope.launch {
+            _listaCentros.value = userRepository.getCenters()
+        }
+    }
 
     // Stream en vivo del usuario logueado en base a su UID. Si no hay, null.
     // Usamos flatMapLatest para volver a escuchar en Firestore si el UID cambia.
@@ -77,8 +92,20 @@ class AuthViewModel(
     val mesMenor = MutableStateFlow("")
     val anioMenor = MutableStateFlow("")
 
-    val centroSeleccionado = MutableStateFlow("")
-    val profesoresSeleccionados = MutableStateFlow<Set<String>>(emptySet())
+    val centroSeleccionado = MutableStateFlow("") // Guarda el ID del Centro
+    val profesoresSeleccionados = MutableStateFlow<Set<String>>(emptySet()) // Guarda IDs de profesores
+
+    fun onCenterSelected(centerId: String) {
+        centroSeleccionado.value = centerId
+        profesoresSeleccionados.value = emptySet() // Limpiamos selección previa
+        viewModelScope.launch {
+            if (centerId.isNotBlank()) {
+                _profesoresDisponibles.value = userRepository.getTeachersByCenter(centerId)
+            } else {
+                _profesoresDisponibles.value = emptyList()
+            }
+        }
+    }
 
     // Registro Pass States
     val registroPassword = MutableStateFlow("")

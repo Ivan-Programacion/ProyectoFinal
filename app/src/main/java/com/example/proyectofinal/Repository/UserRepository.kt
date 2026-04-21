@@ -1,5 +1,6 @@
 package com.example.proyectofinal.Repository
 
+import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
 import kotlinx.coroutines.flow.Flow
 
@@ -21,4 +22,10 @@ interface UserRepository {
 
     // Eliminar un usuario por ID
     suspend fun deleteUser(userId: String): Boolean
+
+    // Obtener todos los centros disponibles
+    suspend fun getCenters(): List<Center>
+
+    // Obtener los profesores de un centro específico
+    suspend fun getTeachersByCenter(centerId: String): List<User>
 }

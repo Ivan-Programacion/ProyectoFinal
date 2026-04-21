@@ -58,8 +58,8 @@ import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.Logic.dayPerMonthFunction
-import com.example.proyectofinal.Logic.listaGimnasios
-import com.example.proyectofinal.Logic.mapaProfesores
+import com.example.proyectofinal.Model.Center
+import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -92,9 +92,10 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
     val centroSeleccionado by viewModel.centroSeleccionado.collectAsStateWithLifecycle()
     val profesoresSeleccionados by viewModel.profesoresSeleccionados.collectAsStateWithLifecycle()
 
-    val isNextButtonEnabled by viewModel.isNextButtonEnabled.collectAsStateWithLifecycle()
+    val listaCentros by viewModel.listaCentros.collectAsStateWithLifecycle()
+    val profesoresDisponibles by viewModel.profesoresDisponibles.collectAsStateWithLifecycle()
 
-    val profesoresDisponibles = mapaProfesores[centroSeleccionado] ?: emptyList()
+    val isNextButtonEnabled by viewModel.isNextButtonEnabled.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
@@ -195,18 +196,17 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                 // --- SELECCIÓN DE CENTRO Y PROFESOR ---
                 CampoDesplegableGimnasios(
                     label = "Gimnasio",
-                    opciones = listaGimnasios,
-                    seleccionado = centroSeleccionado,
-                    onValueChange = { nuevoCentro ->
-                        viewModel.centroSeleccionado.value = nuevoCentro
-                        viewModel.profesoresSeleccionados.value = emptySet()
+                    opciones = listaCentros,
+                    seleccionadoId = centroSeleccionado,
+                    onValueChange = { nuevoCentroId ->
+                        viewModel.onCenterSelected(nuevoCentroId)
                     }
                 )
 
                 CampoDesplegableProfesores(
                     label = "Profesor/es asignado/s",
                     opciones = profesoresDisponibles,
-                    seleccionados = profesoresSeleccionados,
+                    seleccionadosIds = profesoresSeleccionados,
                     enabled = centroSeleccionado.isNotEmpty(), // Solo habilitado si hay centro
                     onSelectionChange = { nuevaSeleccion ->
                         viewModel.profesoresSeleccionados.value = nuevaSeleccion
@@ -280,7 +280,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                             )
                             CampoFecha(
                                 label = "Mes",
-                                opciones = dayListMenor,
+                                opciones = meses,
                                 seleccionado = mesMenor,
                                 modifier = Modifier.weight(1.2f),
                                 onValueChange = { opcion, index ->
@@ -438,11 +438,13 @@ fun CampoFecha(
 @Composable
 fun CampoDesplegableGimnasios(
     label: String,
-    opciones: List<String>,
-    seleccionado: String,
+    opciones: List<Center>,
+    seleccionadoId: String,
     onValueChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val nombreSeleccionado = opciones.find { it.id == seleccionadoId }?.name ?: ""
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(text = label, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
@@ -461,7 +463,7 @@ fun CampoDesplegableGimnasios(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = seleccionado.ifEmpty { "Selecciona un centro" })
+                Text(text = nombreSeleccionado.ifEmpty { "Selecciona un centro" })
                 Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.Gray)
             }
 
@@ -471,9 +473,9 @@ fun CampoDesplegableGimnasios(
             ) {
                 opciones.forEach { opcion ->
                     DropdownMenuItem(
-                        text = { Text(opcion) },
+                        text = { Text(opcion.name) },
                         onClick = {
-                            onValueChange(opcion)
+                            onValueChange(opcion.id)
                             expanded = false
                         }
                     )
@@ -487,8 +489,8 @@ fun CampoDesplegableGimnasios(
 @Composable
 fun CampoDesplegableProfesores(
     label: String,
-    opciones: List<String>,
-    seleccionados: Set<String>,
+    opciones: List<User>,
+    seleccionadosIds: Set<String>,
     enabled: Boolean,
     onSelectionChange: (Set<String>) -> Unit
 ) {
@@ -517,8 +519,9 @@ fun CampoDesplegableProfesores(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                val nombresSeleccionados = opciones.filter { seleccionadosIds.contains(it.id) }.map { "${it.name} ${it.lastName}" }
                 val textoMostrar =
-                    if (seleccionados.isEmpty()) "Selecciona profesor/es" else seleccionados.joinToString(
+                    if (nombresSeleccionados.isEmpty()) "Selecciona profesor/es" else nombresSeleccionados.joinToString(
                         ", "
                     )
                 Text(
@@ -539,7 +542,7 @@ fun CampoDesplegableProfesores(
                 onDismissRequest = { expanded = false }
             ) {
                 opciones.forEach { opcion ->
-                    val isChecked = seleccionados.contains(opcion)
+                    val isChecked = seleccionadosIds.contains(opcion.id)
                     DropdownMenuItem(
                         text = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -548,15 +551,15 @@ fun CampoDesplegableProfesores(
                                     onCheckedChange = null // Lo manejamos en el onClick del menú
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(opcion)
+                                Text("${opcion.name} ${opcion.lastName}")
                             }
                         },
                         onClick = {
                             // Si ya estaba, lo quitamos. Si no estaba, lo añadimos.
                             val nuevosSeleccionados = if (isChecked) {
-                                seleccionados - opcion
+                                seleccionadosIds - opcion.id
                             } else {
-                                seleccionados + opcion
+                                seleccionadosIds + opcion.id
                             }
                             onSelectionChange(nuevosSeleccionados)
                             // NO ponemos expanded = false para que puedan seguir seleccionando varios

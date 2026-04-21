@@ -223,7 +223,8 @@ fun AdminPerfilCliente(
                         enabled = false,
                         onValueChange = { email = it })
 
-                    // DESPLEGABLES CENTRO Y PROFESORES
+                    // DESPLEGABLES CENTRO Y PROFESORES --- QUITAR PARA HACER LOGICA
+                    /*
                     CampoDesplegableGimnasios(
                         label = "Gimnasio",
                         opciones = listaGimnasios,
@@ -243,6 +244,7 @@ fun AdminPerfilCliente(
                             profesoresSeleccionados = nuevaSeleccion
                         }
                     )
+                    */
 
                     // DESPLEGABLE CINTURÓN
                     Column(modifier = Modifier.fillMaxWidth()) {

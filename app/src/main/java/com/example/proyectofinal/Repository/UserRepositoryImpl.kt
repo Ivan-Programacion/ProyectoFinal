@@ -1,5 +1,6 @@
 package com.example.proyectofinal.Repository
 
+import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
@@ -95,6 +96,30 @@ class UserRepositoryImpl(
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    override suspend fun getCenters(): List<Center> {
+        return try {
+            val snapshot = db.collection("centers").get().await()
+            snapshot.toObjects(Center::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    override suspend fun getTeachersByCenter(centerId: String): List<User> {
+        return try {
+            val snapshot = userCollection
+                .whereEqualTo("role", "TEACHER")
+                .whereEqualTo("centerId", centerId)
+                .get()
+                .await()
+            snapshot.toObjects(User::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
         }
     }
 }

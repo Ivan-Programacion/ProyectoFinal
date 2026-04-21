@@ -562,7 +562,6 @@ fun CampoDesplegableProfesores(
                                 seleccionadosIds + opcion.id
                             }
                             onSelectionChange(nuevosSeleccionados)
-                            // NO ponemos expanded = false para que puedan seguir seleccionando varios
                         }
                     )
                 }

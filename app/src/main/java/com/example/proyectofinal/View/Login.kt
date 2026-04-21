@@ -64,7 +64,11 @@ FALTA POR HACER:
  */
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
+fun Login(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: AuthViewModel = viewModel(),
+    controller: (String) -> Unit
+) {
     val userValue by viewModel.loginEmail.collectAsStateWithLifecycle()
     val passValue by viewModel.loginPassword.collectAsStateWithLifecycle()
     val passwordVisible by viewModel.loginPasswordVisible.collectAsStateWithLifecycle()
@@ -149,7 +153,9 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
                     trailingIcon = {
                         val image =
                             if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                        IconButton(onClick = { viewModel.loginPasswordVisible.value = !passwordVisible }) {
+                        IconButton(onClick = {
+                            viewModel.loginPasswordVisible.value = !passwordVisible
+                        }) {
                             Icon(imageVector = image, contentDescription = null)
                         }
                     },
@@ -170,8 +176,7 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
                 Button(
                     onClick = {
                         viewModel.loginUser(userValue, passValue)
-                        // controller(StateNavigate.listaCinturones.value)
-                              },
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -187,12 +192,23 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
         ) {
             Text(
                 "¿No tienes cuenta? ",
-                modifier = Modifier.clickable { controller(StateNavigate.registro.value) } // Para crear cuenta
+                modifier = Modifier.clickable {
+                    viewModel.checkConnectionAndNavigate {
+                        controller(StateNavigate.registro.value)
+                    }
+                    viewModel.resetUiState()
+                } // Para crear cuenta probando conexión primero
             )
             Text(
                 "Crear cuenta",
                 fontWeight = FontWeight.Bold, // Bold para que se vea
-                modifier = Modifier.clickable { controller(StateNavigate.registro.value) } // Para crear cuenta
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.clickable {
+                    viewModel.checkConnectionAndNavigate {
+                        controller(StateNavigate.registro.value)
+                    }
+                    viewModel.resetUiState()
+                } // Para crear cuenta probando conexión primero
             )
         }
     }

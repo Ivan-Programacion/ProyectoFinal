@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.withTimeoutOrNull
 
 sealed class AuthUiState {
     object Idle : AuthUiState()
@@ -68,6 +69,29 @@ class AuthViewModel(
     // Resetea el estado a Idle (para no repetir errores al volver a pantallas)
     fun resetUiState() {
         _uiState.value = AuthUiState.Idle
+    }
+
+    // Función para probar la conexión antes de navegar a Registro
+    fun checkConnectionAndNavigate(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            try {
+                // Intenta realizar una lectura con un timeout para comprobar conexión a internet/Firebase
+                val result = withTimeoutOrNull(3000) {
+                    userRepository.getCenters()
+                }
+                // Si la respuesta no es null y la lista NO está vacía (tenemos centros), hay conexión
+                if (result != null && result.isNotEmpty()) { 
+                    _uiState.value = AuthUiState.Idle
+                    onSuccess()
+                } else {
+                    _uiState.value = AuthUiState.Error("Error de conexión. Inténtalo más tarde")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiState.value = AuthUiState.Error("Error de conexión. Inténtalo más tarde")
+            }
+        }
     }
 
     // Login States

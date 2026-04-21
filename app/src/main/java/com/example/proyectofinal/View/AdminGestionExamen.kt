@@ -60,7 +60,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
 
     // Estado para guardar a qué alumno le hemos pulsado el botón
     var alumnoSeleccionado by remember { mutableStateOf<AlumnoExamen?>(null) }
-    var estadoExamen by remember { mutableStateOf(EstadoExamen.NO_INICIADO) }
+    var estadoExamen by remember { mutableStateOf(EstadoExamen.CLOSED) }
     var searchQuery by remember { mutableStateOf("") }
     // Estado para controlar si el menú desplegable está abierto o cerrado
     var expandedMenuFiltro by remember { mutableStateOf(false) }
@@ -94,7 +94,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             mostrarTextArea = false,
             onAceptar = {
                 showCancelarDialog = false
-                estadoExamen = EstadoExamen.NO_INICIADO
+                estadoExamen = EstadoExamen.CLOSED
             },
             onCancelar = { showCancelarDialog = false }
         )
@@ -114,7 +114,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             mostrarTextArea = true,
             onAceptar = {
                 showRealizarDialog = false
-                estadoExamen = EstadoExamen.SOLICITUDES
+                estadoExamen = EstadoExamen.OPEN_REQUESTS
             },
             onCancelar = { showRealizarDialog = false }
         )
@@ -122,9 +122,9 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
 
     if (showAprobarDialog) {
         DialogAccionExamen(
-            titulo = if (estadoExamen == EstadoExamen.SOLICITUDES) "Empezar examen" else "Terminar examen",
+            titulo = if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Empezar examen" else "Terminar examen",
             descripcion =
-                if (estadoExamen == EstadoExamen.SOLICITUDES)
+                if (estadoExamen == EstadoExamen.OPEN_REQUESTS)
                     "Vas a proceder a empezar el examen. Esto hará que se acepten TODAS las solicitudes. " +
                             "¿Estás seguro de querer aceptar todas las solicitudes?"
                 else "Se va proceder a terminar el examen. Esto hará que se APRUEBEN a todos los alumnos. " +
@@ -137,8 +137,8 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             mostrarTextArea = false,
             onAceptar = {
                 showAprobarDialog = false
-                estadoExamen = if (estadoExamen == EstadoExamen.SOLICITUDES) EstadoExamen.EXAMINADOS
-                else EstadoExamen.NO_INICIADO
+                estadoExamen = if (estadoExamen == EstadoExamen.OPEN_REQUESTS) EstadoExamen.IN_PROGRESS
+                else EstadoExamen.CLOSED
             },
             onCancelar = { showAprobarDialog = false }
         )
@@ -147,8 +147,8 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
     // --- DIALOGS INDIVIDUALES ---
     if (showAprobarIndividualDialog && alumnoSeleccionado != null) {
         val accionText =
-            if (estadoExamen == EstadoExamen.SOLICITUDES) "Aceptar solicitud" else "Aprobar examen"
-        val descripcionText = if (estadoExamen == EstadoExamen.SOLICITUDES)
+            if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Aceptar solicitud" else "Aprobar examen"
+        val descripcionText = if (estadoExamen == EstadoExamen.OPEN_REQUESTS)
             "¿Estás seguro de querer ACEPTAR la solicitud de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
         else
             "¿Estás seguro de querer APROBAR el examen de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
@@ -176,8 +176,8 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
 
     if (showRechazarIndividualDialog && alumnoSeleccionado != null) {
         val accionText =
-            if (estadoExamen == EstadoExamen.SOLICITUDES) "Rechazar solicitud" else "Suspender examen"
-        val descripcionText = if (estadoExamen == EstadoExamen.SOLICITUDES)
+            if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Rechazar solicitud" else "Suspender examen"
+        val descripcionText = if (estadoExamen == EstadoExamen.OPEN_REQUESTS)
             "¿Estás seguro de querer DENEGAR la solicitud de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
         else
             "¿Estás seguro de querer SUSPENDER el examen de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
@@ -186,7 +186,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             titulo = accionText,
             descripcion = descripcionText,
             textoAceptar =
-                if (estadoExamen == EstadoExamen.SOLICITUDES) "Denegar" else "Sí",
+                if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Denegar" else "Sí",
             textoCancelar = "Cancelar",
             colorAceptar = MaterialTheme.colorScheme.error, // Rojo porque es una acción destructiva/negativa
             colorCancelar = Color.LightGray,
@@ -239,7 +239,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { showCancelarDialog = true },
-                        enabled = estadoExamen != EstadoExamen.NO_INICIADO,
+                        enabled = estadoExamen != EstadoExamen.CLOSED,
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error,
@@ -248,20 +248,20 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                     ) {
                         Text(
                             "Cancelar examen",
-                            color = if (estadoExamen != EstadoExamen.NO_INICIADO) Color.White else Color.DarkGray,
+                            color = if (estadoExamen != EstadoExamen.CLOSED) Color.White else Color.DarkGray,
                         )
                     }
 
                     // Botón Derecho: Realizar / Aceptar / Aprobar
                     val textoBtnDerecho = when (estadoExamen) {
-                        EstadoExamen.NO_INICIADO -> "Realizar examen"
-                        EstadoExamen.SOLICITUDES -> "Empezar examen"
-                        EstadoExamen.EXAMINADOS -> "Terminar examen"
+                        EstadoExamen.CLOSED -> "Realizar examen"
+                        EstadoExamen.OPEN_REQUESTS -> "Empezar examen"
+                        EstadoExamen.IN_PROGRESS -> "Terminar examen"
                     }
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            if (estadoExamen == EstadoExamen.NO_INICIADO) showRealizarDialog = true
+                            if (estadoExamen == EstadoExamen.CLOSED) showRealizarDialog = true
                             else showAprobarDialog = true
                         },
                         shape = RoundedCornerShape(12.dp)
@@ -288,7 +288,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             ) {
                 // Título condicional
                 val textoCondicion =
-                    if (estadoExamen == EstadoExamen.EXAMINADOS) "Examinados" else "Solicitudes"
+                    if (estadoExamen == EstadoExamen.IN_PROGRESS) "Examinados" else "Solicitudes"
                 Text(
                     text = textoCondicion,
                     style = MaterialTheme.typography.titleMedium,
@@ -373,7 +373,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Lista de alumnos
-                if (listaAlumnos.isEmpty() || estadoExamen == EstadoExamen.NO_INICIADO) {
+                if (listaAlumnos.isEmpty() || estadoExamen == EstadoExamen.CLOSED) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = "La lista está vacía",

@@ -74,6 +74,7 @@ fun RegistroPass(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
+            viewModel.resetUiState()
             controller(StateNavigate.listaCinturones.value)
         }
     }

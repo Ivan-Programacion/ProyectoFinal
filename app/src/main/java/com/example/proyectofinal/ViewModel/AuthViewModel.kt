@@ -186,7 +186,6 @@ class AuthViewModel(
 
         val newUser = User(
             email = email.value,
-            role = "STUDENT",
             centerId = centroSeleccionado.value,
             teacherIds = profesoresSeleccionados.value.toList(),
             name = if (esMenor.value) nombreMenor.value else nombre.value,

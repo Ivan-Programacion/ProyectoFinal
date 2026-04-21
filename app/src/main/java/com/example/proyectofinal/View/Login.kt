@@ -77,6 +77,9 @@ fun Login(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMod
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
             // Si el login es un éxito, navegamos
+            viewModel.loginEmail.value = ""
+            viewModel.loginPassword.value = ""
+            viewModel.resetUiState()
             controller(StateNavigate.listaCinturones.value)
         }
     }

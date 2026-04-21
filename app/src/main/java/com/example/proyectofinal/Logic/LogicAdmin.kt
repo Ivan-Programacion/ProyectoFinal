@@ -6,7 +6,7 @@ package com.example.proyectofinal.Logic
 data class AlumnoEjemplo(val id: Int, val nombre: String, val apellidos: String)
 
 // ENUM PARA SIMULAR LOS ESTADOS DEL EXAMEN (Lógica provisional visual)
-enum class EstadoExamen { NO_INICIADO, SOLICITUDES, EXAMINADOS }
+enum class EstadoExamen { CLOSED, OPEN_REQUESTS, IN_PROGRESS }
 
 // 1. DATA CLASS SIMULADA
 data class AlumnoExamen(

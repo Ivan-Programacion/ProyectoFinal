@@ -67,13 +67,12 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
     var telefono by remember(currentUser) { mutableStateOf(currentUser?.phone ?: "") }
     val email = currentUser?.email ?: ""
 
-    // 1. ESTADO PARA EL DIALOG
+    // ESTADO PARA EL DIALOG
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     // --- NUEVOS ESTADOS PARA SOLICITAR EXAMEN ---
-    // (Asegúrate de importar EstadoExamen de tu fichero LogicAdmin)
-    var estadoExamen by remember { mutableStateOf(EstadoExamen.SOLICITUDES) }
+    var estadoExamen by remember { mutableStateOf(EstadoExamen.OPEN_REQUESTS) }
     var solicitudEnviada by remember { mutableStateOf(false) }
     var showSolicitarExamenDialog by remember { mutableStateOf(false) }
 
@@ -94,6 +93,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
             onConfirm = {
                 showLogoutDialog = false
                 viewModel.logoutUser()
+                viewModel.resetUiState()
                 controller(StateNavigate.login.value)
             },
             onDismiss = { showLogoutDialog = false }
@@ -212,7 +212,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
                     // Lógica para el mensaje informativo
                     val mensajeInformativo = when {
                         solicitudEnviada -> "Esperando aprobación de solicitud..."
-                        estadoExamen == EstadoExamen.SOLICITUDES -> "¡Examen el próximo domingo 21 de junio!"
+                        estadoExamen == EstadoExamen.OPEN_REQUESTS -> "¡Examen el próximo domingo 21 de junio!"
                         else -> "No hay proceso de examen en estos momentos."
                     }
 
@@ -231,7 +231,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
 
                     // Botón para acceder
                     val botonHabilitado =
-                        estadoExamen == EstadoExamen.SOLICITUDES && !solicitudEnviada
+                        estadoExamen == EstadoExamen.OPEN_REQUESTS && !solicitudEnviada
 
                     Button(
                         onClick = { showSolicitarExamenDialog = true },

@@ -80,6 +80,8 @@ import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModelFactory
 import com.example.proyectofinal.ViewModel.BeltsViewModel
 import com.example.proyectofinal.ViewModel.BeltsViewModelFactory
+import com.example.proyectofinal.ViewModel.AdminListaClientesViewModel
+import com.example.proyectofinal.ViewModel.AdminListaClientesViewModelFactory
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -110,7 +112,8 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun App(startDestination: String = "login") {
-    // Creamos la factoría y el ViewModel para poder usar AuthRepository y UserRepository
+    // Creamos la factoría y el ViewModel para poder usar AuthRepository y UserRepository en cada
+    // uno de los ViewModel que utilicemos
     val context = LocalContext.current
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
@@ -124,6 +127,13 @@ fun App(startDestination: String = "login") {
             authRepository = AuthRepositoryImpl(),
             userRepository = UserRepositoryImpl(),
             contentRepository = ContentRepositoryImpl()
+        )
+    )
+
+    val adminListaClientesViewModel: AdminListaClientesViewModel = viewModel(
+        factory = AdminListaClientesViewModelFactory(
+            authRepository = AuthRepositoryImpl(),
+            userRepository = UserRepositoryImpl()
         )
     )
 
@@ -307,7 +317,10 @@ fun App(startDestination: String = "login") {
             }
             composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
             composable(StateNavigate.adminListaClientes.value) {
-                AdminListaClientes(innerPadding) {
+                AdminListaClientes(
+                    innerPadding,
+                    viewModel = adminListaClientesViewModel
+                ) {
                     controller.navigate(
                         it
                     )

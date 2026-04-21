@@ -28,4 +28,7 @@ interface UserRepository {
 
     // Obtener los profesores de un centro específico
     suspend fun getTeachersByCenter(centerId: String): List<User>
+
+    // Obtener los alumnos asignados a un profesor en tiempo real
+    fun getStudentsByTeacherStream(teacherId: String): Flow<List<User>>
 }

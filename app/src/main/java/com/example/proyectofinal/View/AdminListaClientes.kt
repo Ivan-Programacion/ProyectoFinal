@@ -39,7 +39,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.AlumnoEjemplo
+import com.example.proyectofinal.ViewModel.AdminListaClientesViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -47,30 +50,12 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 @Composable
 fun AdminListaClientes(
     paddingValues: PaddingValues = PaddingValues(),
+    viewModel: AdminListaClientesViewModel = viewModel(),
     controller: (String) -> Unit,
 ) {
-    //*********************** LOGICA DE PRUEBA *******************************//
-    // ESTADOS
-    var searchQuery by remember { mutableStateOf("") }
-
-    // DATOS DE PRUEBA
-    val listaAlumnos = remember {
-        listOf(
-            AlumnoEjemplo(1, "Juan", "Pérez"),
-            AlumnoEjemplo(2, "María", "Gómez"),
-            AlumnoEjemplo(3, "Carlos", "López"),
-            AlumnoEjemplo(4, "Ana", "Martínez"),
-            AlumnoEjemplo(5, "Luis", "García"),
-            AlumnoEjemplo(6, "Elena", "Rodríguez")
-        )
-    }
-
-    // LÓGICA DE FILTRADO
-    val alumnosFiltrados = listaAlumnos.filter {
-        it.nombre.contains(searchQuery, ignoreCase = true) ||
-                it.apellidos.contains(searchQuery, ignoreCase = true)
-    }
-    //*********************** LOGICA DE PRUEBA *******************************//
+    // ESTADOS DEL VIEWMODEL RECOLECTADOS (REACTIVOS)
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val alumnosFiltrados by viewModel.filteredStudents.collectAsStateWithLifecycle()
 
     // Para botón atrás del móvil
     val context = LocalContext.current as? Activity
@@ -171,7 +156,7 @@ fun AdminListaClientes(
                 // Buscador (TextArea)
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                    onValueChange = { viewModel.onSearchQueryChanged(it) },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
@@ -213,7 +198,7 @@ fun AdminListaClientes(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "${alumno.nombre} ${alumno.apellidos}",
+                                    text = "${alumno.name} ${alumno.lastName}",
                                     fontWeight = FontWeight.Bold,
                                 )
                                 Surface(
@@ -223,7 +208,7 @@ fun AdminListaClientes(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.KeyboardArrowRight,
-                                        contentDescription = "Ver perfil de ${alumno.nombre}",
+                                        contentDescription = "Ver perfil de ${alumno.name}",
                                         modifier = Modifier.padding(4.dp)
                                     )
                                 }

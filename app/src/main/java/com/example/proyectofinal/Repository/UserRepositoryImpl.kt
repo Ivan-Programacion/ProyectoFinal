@@ -123,4 +123,21 @@ class UserRepositoryImpl(
             emptyList()
         }
     }
+
+    override fun getStudentsByTeacherStream(teacherId: String): Flow<List<User>> = callbackFlow {
+        val subscription = userCollection
+            .whereEqualTo("clientApproved", true)
+            .whereArrayContains("teacherIds", teacherId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val users = snapshot.toObjects(User::class.java)
+                    trySend(users)
+                }
+            }
+        awaitClose { subscription.remove() }
+    }
 }

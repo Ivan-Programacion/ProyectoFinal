@@ -56,7 +56,7 @@ fun AdminListaClientes(
     // ESTADOS DEL VIEWMODEL RECOLECTADOS (REACTIVOS)
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val alumnosFiltrados by viewModel.filteredStudents.collectAsStateWithLifecycle()
-
+    println("ALUMNOS FILTRADOS -> $alumnosFiltrados")
     // Para botón atrás del móvil
     val context = LocalContext.current as? Activity
 

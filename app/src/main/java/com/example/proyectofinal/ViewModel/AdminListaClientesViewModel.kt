@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import java.text.Normalizer
 
@@ -19,8 +21,6 @@ class AdminListaClientesViewModel(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-
-    private val currentTeacherId = authRepository.getCurrentUserUid() ?: ""
 
     // Estado del buscador
     private val _searchQuery = MutableStateFlow("")
@@ -30,19 +30,27 @@ class AdminListaClientesViewModel(
         _searchQuery.value = query
     }
 
-    // Función de extensión (utilidad privada) para normalizar strings de búsqueda
+    // Función de extensión para normalizar strings de búsqueda
     private fun String.normalize(): String {
-        // Separa los caracteres de las tildes/diacríticos y los elimina
         val normalized = Normalizer.normalize(this, Normalizer.Form.NFD)
         return "\\p{InCombiningDiacriticalMarks}+".toRegex().replace(normalized, "").lowercase()
     }
 
-    // Usamos el Flow nativo del repositorio de alumnos del profesor y lo combinamos con la query
+    // Ahora filteredStudents reacciona tanto al cambio de usuario como a la búsqueda
     @OptIn(ExperimentalCoroutinesApi::class)
-    val filteredStudents: StateFlow<List<User>> = userRepository.getStudentsByTeacherStream(currentTeacherId)
+    val filteredStudents: StateFlow<List<User>> = authRepository.getAuthStateStream()
+        .flatMapLatest { uid ->
+            if (uid == null) {
+                // Si no hay usuario, devolvemos una lista vacía
+                flowOf(emptyList())
+            } else {
+                // Si hay usuario, obtenemos sus alumnos en tiempo real
+                userRepository.getStudentsByTeacherStream(uid)
+            }
+        }
         .combine(_searchQuery) { students, query ->
             if (query.isBlank()) {
-                students // Sin query, devolvemos todos
+                students
             } else {
                 val queryNormalized = query.normalize()
                 students.filter { student ->
@@ -53,11 +61,10 @@ class AdminListaClientesViewModel(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList() // Estado inicial cargando la lista (vacía primero)
+            initialValue = emptyList()
         )
 }
 
-// Factoría para pasar las instancias requeridas en Compose Mvvm
 class AdminListaClientesViewModelFactory(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository
@@ -70,4 +77,3 @@ class AdminListaClientesViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-

@@ -25,6 +25,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -48,52 +50,51 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.anios
 import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.dias
-import com.example.proyectofinal.Logic.listaGimnasios
 import com.example.proyectofinal.Logic.mapBeltColor
-import com.example.proyectofinal.Logic.mapaProfesores
 import com.example.proyectofinal.Logic.meses
+import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
-import kotlin.text.ifEmpty
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AdminPerfilCliente(
     paddingValues: PaddingValues = PaddingValues(),
+    viewModel: AdminPerfilClienteViewModel = viewModel(),
     controller: (String) -> Unit
 ) {
-    // --- ESTADOS SIMULADOS (MOCKS) ---
-    var nombre by remember { mutableStateOf("María") }
-    var apellidos by remember { mutableStateOf("Gómez") }
-    var telefono by remember { mutableStateOf("611223344") }
-    var email by remember { mutableStateOf("maria.gomez@email.com") }
-    var cinturon by remember { mutableStateOf("Naranja") }
+    // --- ESTADOS DEL VIEWMODEL ---
+    val nombre by viewModel.nombre.collectAsStateWithLifecycle()
+    val apellidos by viewModel.apellidos.collectAsStateWithLifecycle()
+    val telefono by viewModel.telefono.collectAsStateWithLifecycle()
+    val email by viewModel.email.collectAsStateWithLifecycle()
+    val beltId by viewModel.cinturon.collectAsStateWithLifecycle()
 
-    // --- ESTADOS DE CENTROS Y PROFESORES ---
-    var centroSeleccionado by remember { mutableStateOf("Las Rozas") } // Valor simulado
-    var profesoresSeleccionados by remember { mutableStateOf(setOf("Ángel Ruiz")) } // Valor simulado
-    val profesoresDisponibles = mapaProfesores[centroSeleccionado] ?: emptyList()
+    val dia by viewModel.dia.collectAsStateWithLifecycle()
+    val mes by viewModel.mes.collectAsStateWithLifecycle()
+    val anio by viewModel.anio.collectAsStateWithLifecycle()
 
-    // --- ESTADOS DEL MENOR ---
-    var esMenor by remember { mutableStateOf(true) } // Valor simulado en true para probar
-    var nombreMenor by remember { mutableStateOf("Hugo") }
-    var apellidosMenor by remember { mutableStateOf("Gómez") }
-    var diaMenor by remember { mutableStateOf("10") }
-    var mesMenor by remember { mutableStateOf("Mayo") }
-    var anioMenor by remember { mutableStateOf("2015") }
-    var dayListMenor by remember { mutableStateOf(dias) }
+    val esMenor by viewModel.esMenor.collectAsStateWithLifecycle()
+    val nombreMenor by viewModel.nombreMenor.collectAsStateWithLifecycle()
+    val apellidosMenor by viewModel.apellidosMenor.collectAsStateWithLifecycle()
+    val diaMenor by viewModel.diaMenor.collectAsStateWithLifecycle()
+    val mesMenor by viewModel.mesMenor.collectAsStateWithLifecycle()
+    val anioMenor by viewModel.anioMenor.collectAsStateWithLifecycle()
 
-    // Estados para los desplegables de Fecha de Nacimiento
-    var dia by remember { mutableStateOf("15") }
-    var mes by remember { mutableStateOf("Agosto") }
-    var anio by remember { mutableStateOf("1995") }
+    val centroSeleccionado by viewModel.centroSeleccionado.collectAsStateWithLifecycle()
+    val profesoresSeleccionados by viewModel.profesoresSeleccionados.collectAsStateWithLifecycle()
+    val listaCentros by viewModel.listaCentros.collectAsStateWithLifecycle()
+    val profesoresDisponibles by viewModel.profesoresDisponibles.collectAsStateWithLifecycle()
 
-    // Remember de la lista de dias que cambiara en función del mes seleccionado
+    // Estados locales para la lógica de días de la UI
     var dayList by remember { mutableStateOf(dias) }
+    var dayListMenor by remember { mutableStateOf(dias) }
 
     // --- ESTADOS DE LOS DIALOGS ---
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -103,7 +104,12 @@ fun AdminPerfilCliente(
     if (showConfirmDialog) {
         ConfirmarCambiosDialogAdmin(
             nombreCompleto = "$nombre $apellidos",
-            onConfirm = { showConfirmDialog = false },
+            onConfirm = {
+                viewModel.updateStudent {
+                    showConfirmDialog = false
+                    controller(StateNavigate.adminListaClientes.value)
+                }
+            },
             onDismiss = { showConfirmDialog = false }
         )
     }
@@ -112,9 +118,10 @@ fun AdminPerfilCliente(
         EliminarAlumnoDialog(
             nombreCompleto = "$nombre $apellidos",
             onConfirm = {
-                showEliminarDialog = false
-                // Aquí irá la lógica real de eliminar en BD
-                controller(StateNavigate.adminListaClientes.value)
+                viewModel.deleteStudent {
+                    showEliminarDialog = false
+                    controller(StateNavigate.adminListaClientes.value)
+                }
             },
             onDismiss = { showEliminarDialog = false }
         )
@@ -139,9 +146,9 @@ fun AdminPerfilCliente(
                 Column(
                     modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp) // SpaceEvenly aproximado con espaciado constante
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = "Datos perfil", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "Datos perfil adulto/tutor", style = MaterialTheme.typography.titleMedium)
 
                     // AVATAR
                     Surface(
@@ -163,11 +170,11 @@ fun AdminPerfilCliente(
                     CampoPerfilAdmin(
                         label = "Nombre",
                         value = nombre,
-                        onValueChange = { nombre = it })
+                        onValueChange = { viewModel.nombre.value = it })
                     CampoPerfilAdmin(
                         label = "Apellidos",
                         value = apellidos,
-                        onValueChange = { apellidos = it })
+                        onValueChange = { viewModel.apellidos.value = it })
 
                     // DESPLEGABLES FECHA NACIMIENTO
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -185,7 +192,7 @@ fun AdminPerfilCliente(
                                 seleccionado = dia,
                                 modifier = Modifier.weight(1f),
                                 opciones = dayList,
-                                onValueChange = { opcion, index -> dia = opcion }
+                                onValueChange = { opcion, _ -> viewModel.dia.value = opcion }
                             )
                             CampoDesplegableAdmin(
                                 label = mes,
@@ -194,9 +201,9 @@ fun AdminPerfilCliente(
                                 opciones = meses,
                                 onValueChange = { opcion, index ->
                                     val result = dayPerMonthFunction(index)
-                                    mes = opcion
-                                    if(result.first < dia.toInt()) {
-                                        dia = result.first.toString()
+                                    viewModel.mes.value = opcion
+                                    if(dia.isNotEmpty() && result.first < dia.toInt()) {
+                                        viewModel.dia.value = result.first.toString()
                                     }
                                     dayList = result.second
                                 }
@@ -206,7 +213,7 @@ fun AdminPerfilCliente(
                                 seleccionado = anio,
                                 modifier = Modifier.weight(1f),
                                 opciones = anios,
-                                onValueChange = { opcion, index -> anio = opcion }
+                                onValueChange = { opcion, _ -> viewModel.anio.value = opcion }
                             )
                         }
                     }
@@ -214,82 +221,30 @@ fun AdminPerfilCliente(
                     CampoPerfilAdmin(
                         label = "Teléfono",
                         value = telefono,
-                        onValueChange = { telefono = it })
+                        onValueChange = { viewModel.telefono.value = it })
 
-                    // EMAIL (NO Editable POR AHORA)
+                    // EMAIL (NO Editable)
                     CampoPerfilAdmin(
                         label = "Email",
                         value = email,
                         enabled = false,
-                        onValueChange = { email = it })
-
-                    // DESPLEGABLES CENTRO Y PROFESORES --- QUITAR PARA HACER LOGICA
-                    /*
-                    CampoDesplegableGimnasios(
-                        label = "Gimnasio",
-                        opciones = listaGimnasios,
-                        seleccionado = centroSeleccionado,
-                        onValueChange = { nuevoCentro ->
-                            centroSeleccionado = nuevoCentro
-                            profesoresSeleccionados = emptySet()
-                        }
-                    )
-
-                    CampoDesplegableProfesores(
-                        label = "Profesor/es asignado/s",
-                        opciones = profesoresDisponibles,
-                        seleccionados = profesoresSeleccionados,
-                        enabled = centroSeleccionado.isNotEmpty(),
-                        onSelectionChange = { nuevaSeleccion ->
-                            profesoresSeleccionados = nuevaSeleccion
-                        }
-                    )
-                    */
-
-                    // DESPLEGABLE CINTURÓN
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = "Cinturón",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
-                        )
-                        CampoDesplegableAdmin(
-                            label = cinturon,
-                            opciones = mapBeltColor.keys.toList(),
-                            seleccionado = cinturon,
-                            onValueChange = { opcion, index -> cinturon = opcion }
-                        )
-                    }
+                        onValueChange = { viewModel.email.value = it })
 
                     // --- CHECKBOX MENOR DE EDAD ---
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                esMenor = !esMenor
-                                if (!esMenor) {
-                                    nombreMenor = ""
-                                    apellidosMenor = ""
-                                    diaMenor = ""
-                                    mesMenor = ""
-                                    anioMenor = ""
-                                }
+                                viewModel.esMenor.value = !esMenor
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        androidx.compose.material3.Checkbox(
+                        Checkbox(
                             checked = esMenor,
                             onCheckedChange = { checked ->
-                                esMenor = checked
-                                if (!checked) {
-                                    nombreMenor = ""
-                                    apellidosMenor = ""
-                                    diaMenor = ""
-                                    mesMenor = ""
-                                    anioMenor = ""
-                                }
+                                viewModel.esMenor.value = checked
                             },
-                            colors = androidx.compose.material3.CheckboxDefaults.colors(
+                            colors = CheckboxDefaults.colors(
                                 checkedColor = MaterialTheme.colorScheme.tertiary
                             )
                         )
@@ -301,17 +256,16 @@ fun AdminPerfilCliente(
 
                     // --- CAMPOS CONDICIONALES DEL MENOR ---
                     if (esMenor) {
-                        // Usamos tu componente CampoPerfilAdmin para mantener el diseño
                         CampoPerfilAdmin(
                             label = "Nombre del niño/a",
                             value = nombreMenor,
-                            onValueChange = { nombreMenor = it }
+                            onValueChange = { viewModel.nombreMenor.value = it }
                         )
 
                         CampoPerfilAdmin(
                             label = "Apellidos niño/a",
                             value = apellidosMenor,
-                            onValueChange = { apellidosMenor = it }
+                            onValueChange = { viewModel.apellidosMenor.value = it }
                         )
 
                         Column(modifier = Modifier.fillMaxWidth()) {
@@ -324,13 +278,12 @@ fun AdminPerfilCliente(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                // Usamos tu componente CampoDesplegableAdmin
                                 CampoDesplegableAdmin(
                                     label = diaMenor.ifEmpty { "Día" },
                                     seleccionado = diaMenor,
                                     modifier = Modifier.weight(1f),
                                     opciones = dayListMenor,
-                                    onValueChange = { opcion, _ -> diaMenor = opcion }
+                                    onValueChange = { opcion, _ -> viewModel.diaMenor.value = opcion }
                                 )
                                 CampoDesplegableAdmin(
                                     label = mesMenor.ifEmpty { "Mes" },
@@ -339,9 +292,9 @@ fun AdminPerfilCliente(
                                     opciones = meses,
                                     onValueChange = { opcion, index ->
                                         val result = dayPerMonthFunction(index)
-                                        mesMenor = opcion
+                                        viewModel.mesMenor.value = opcion
                                         if (diaMenor.isNotEmpty() && result.first < diaMenor.toInt()) {
-                                            diaMenor = result.first.toString()
+                                            viewModel.diaMenor.value = result.first.toString()
                                         }
                                         dayListMenor = result.second
                                     }
@@ -351,13 +304,46 @@ fun AdminPerfilCliente(
                                     seleccionado = anioMenor,
                                     modifier = Modifier.weight(1f),
                                     opciones = aniosMenor,
-                                    onValueChange = { opcion, _ -> anioMenor = opcion }
+                                    onValueChange = { opcion, _ -> viewModel.anioMenor.value = opcion }
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    // --- DESPLEGABLES CENTRO Y PROFESORES ---
+                    CampoDesplegableGimnasios(
+                        label = "Gimnasio",
+                        opciones = listaCentros,
+                        seleccionadoId = centroSeleccionado,
+                        onValueChange = { nuevoCentroId ->
+                            viewModel.onCenterSelected(nuevoCentroId)
+                        }
+                    )
+
+                    CampoDesplegableProfesores(
+                        label = "Profesor/es asignado/s",
+                        opciones = profesoresDisponibles,
+                        seleccionadosIds = profesoresSeleccionados,
+                        enabled = centroSeleccionado.isNotEmpty(),
+                        onSelectionChange = { nuevaSeleccion ->
+                            viewModel.profesoresSeleccionados.value = nuevaSeleccion
+                        }
+                    )
+
+                    // DESPLEGABLE CINTURÓN
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "Cinturón",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
+                        )
+                        CampoDesplegableAdmin(
+                            label = beltId,
+                            opciones = mapBeltColor.keys.toList(),
+                            seleccionado = beltId,
+                            onValueChange = { opcion, _ -> viewModel.cinturon.value = opcion }
+                        )
+                    }
 
                     // BOTÓN ACTUALIZAR
                     Button(
@@ -432,9 +418,9 @@ fun CampoDesplegableAdmin(
     ) {
         Row(
             modifier = Modifier
-                .menuAnchor() // Imprescindible para el menú
+                .menuAnchor()
                 .fillMaxWidth()
-                .height(45.dp) // Altura personalizada más baja
+                .height(45.dp)
                 .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -453,7 +439,6 @@ fun CampoDesplegableAdmin(
             )
         }
 
-        // Menu desplegable
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
@@ -465,8 +450,8 @@ fun CampoDesplegableAdmin(
                     text = { Text(opcion) },
                     onClick = {
                         var index = 0
-                        val prueba = label.toIntOrNull()
-                        if (prueba == null) {
+                        // Pequeño hack para obtener el índice si es el mes
+                        if (opciones.size == 12 && opciones.contains("Enero")) {
                             index = opciones.indexOf(opcion) + 1
                         }
                         onValueChange(opcion, index)
@@ -478,7 +463,7 @@ fun CampoDesplegableAdmin(
     }
 }
 
-// --- DIALOG: CONFIRMAR ACTUALIZACIÓN (Reutilizado del diseño previo) ---
+// --- DIALOG: CONFIRMAR ACTUALIZACIÓN ---
 @Composable
 fun ConfirmarCambiosDialogAdmin(
     nombreCompleto: String,
@@ -569,7 +554,6 @@ fun EliminarAlumnoDialog(nombreCompleto: String, onConfirm: () -> Unit, onDismis
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Botón Eliminar (Izquierda - Error)
                     Button(
                         onClick = onConfirm,
                         modifier = Modifier.weight(1f),
@@ -582,7 +566,6 @@ fun EliminarAlumnoDialog(nombreCompleto: String, onConfirm: () -> Unit, onDismis
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
-                    // Botón Cancelar (Derecha - Auxiliar LightGray)
                     Button(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),

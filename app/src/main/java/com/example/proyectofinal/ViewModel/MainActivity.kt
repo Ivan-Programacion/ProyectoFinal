@@ -82,6 +82,8 @@ import com.example.proyectofinal.ViewModel.BeltsViewModel
 import com.example.proyectofinal.ViewModel.BeltsViewModelFactory
 import com.example.proyectofinal.ViewModel.AdminListaClientesViewModel
 import com.example.proyectofinal.ViewModel.AdminListaClientesViewModelFactory
+import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
+import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModelFactory
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -133,6 +135,12 @@ fun App(startDestination: String = "login") {
     val adminListaClientesViewModel: AdminListaClientesViewModel = viewModel(
         factory = AdminListaClientesViewModelFactory(
             authRepository = AuthRepositoryImpl(),
+            userRepository = UserRepositoryImpl()
+        )
+    )
+
+    val adminPerfilClienteViewModel: AdminPerfilClienteViewModel = viewModel(
+        factory = AdminPerfilClienteViewModelFactory(
             userRepository = UserRepositoryImpl()
         )
     )
@@ -319,7 +327,8 @@ fun App(startDestination: String = "login") {
             composable(StateNavigate.adminListaClientes.value) {
                 AdminListaClientes(
                     innerPadding,
-                    viewModel = adminListaClientesViewModel
+                    viewModel = adminListaClientesViewModel,
+                    adminPerfilViewModel = adminPerfilClienteViewModel
                 ) {
                     controller.navigate(
                         it
@@ -334,7 +343,10 @@ fun App(startDestination: String = "login") {
                 }
             }
             composable(StateNavigate.adminPerfilCliente.value) {
-                AdminPerfilCliente(innerPadding) {
+                AdminPerfilCliente(
+                    innerPadding,
+                    viewModel = adminPerfilClienteViewModel
+                ) {
                     controller.navigate(
                         it
                     )

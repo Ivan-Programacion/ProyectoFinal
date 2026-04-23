@@ -29,9 +29,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,8 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectofinal.Logic.AlumnoEjemplo
 import com.example.proyectofinal.ViewModel.AdminListaClientesViewModel
+import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -51,12 +48,13 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 fun AdminListaClientes(
     paddingValues: PaddingValues = PaddingValues(),
     viewModel: AdminListaClientesViewModel = viewModel(),
+    adminPerfilViewModel: AdminPerfilClienteViewModel = viewModel(),
     controller: (String) -> Unit,
 ) {
     // ESTADOS DEL VIEWMODEL RECOLECTADOS (REACTIVOS)
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val alumnosFiltrados by viewModel.filteredStudents.collectAsStateWithLifecycle()
-    println("ALUMNOS FILTRADOS -> $alumnosFiltrados")
+    
     // Para botón atrás del móvil
     val context = LocalContext.current as? Activity
 
@@ -184,7 +182,10 @@ fun AdminListaClientes(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { controller(StateNavigate.adminPerfilCliente.value) },
+                                .clickable {
+                                    adminPerfilViewModel.setStudentId(alumno.id)
+                                    controller(StateNavigate.adminPerfilCliente.value)
+                                },
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.onSecondary
@@ -225,6 +226,6 @@ fun AdminListaClientes(
 @Composable
 fun AdminListaClientespreview() {
     ProyectoFinalTheme {
-        AdminListaClientes {  }
+        AdminListaClientes(controller = { })
     }
 }

@@ -67,11 +67,7 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun RegistroInfo(
-    paddingValues: PaddingValues = PaddingValues(),
-    viewModel: AuthViewModel = viewModel(),
-    controller: (String) -> Unit
-) {
+fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
     // Observar estados del viewModel
     val nombre by viewModel.nombre.collectAsStateWithLifecycle()
     val apellidos by viewModel.apellidos.collectAsStateWithLifecycle()
@@ -128,7 +124,7 @@ fun RegistroInfo(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver atrás",
                             tint = MaterialTheme.colorScheme.primary
-                        )
+                    )
                     }
                     Text(
                         text = "Crear cuenta",
@@ -159,21 +155,23 @@ fun RegistroInfo(
                             modifier = Modifier.weight(1f),
                             onValueChange = { opcion, index ->
                                 viewModel.dia.value = opcion
-                            }
+                        }
                         )
                         CampoFecha(
                             label = "Mes",
-                            opciones = meses.keys.toList(),
-                            seleccionado = mes,
+                            opciones = meses.values.toList(),
+                            seleccionado = meses[mes] ?: mes,
                             modifier = Modifier.weight(1.2f),
-                            onValueChange = { opcion, index ->
+                            onValueChange = { valueSeleccionado, index ->
+                                // Buscamos la KEY correspondiente al VALUE seleccionado
+                                val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
                                 val result = dayPerMonthFunction(index)
-                                viewModel.mes.value = opcion
+                                viewModel.mes.value = keyMes
                                 if (dia.isNotEmpty() && result.first < dia.toInt()) {
                                     viewModel.dia.value = result.first.toString()
                                 }
                                 dayList = result.second
-                            }
+                        }
                         )
                         CampoFecha(
                             label = "Año",
@@ -247,7 +245,7 @@ fun RegistroInfo(
                         },
                         colors = CheckboxDefaults.colors(
                             checkedColor = MaterialTheme.colorScheme.tertiary
-                        )
+                    )
                     )
                     Text(
                         text = "Esta cuenta es para un menor de 14 años",
@@ -280,18 +278,17 @@ fun RegistroInfo(
                                 opciones = dias,
                                 seleccionado = diaMenor,
                                 modifier = Modifier.weight(1f),
-                                onValueChange = { opcion, index ->
-                                    viewModel.diaMenor.value = opcion
-                                }
+                                onValueChange = { opcion, index -> viewModel.diaMenor.value = opcion }
                             )
                             CampoFecha(
                                 label = "Mes",
-                                opciones = meses.keys.toList(),
-                                seleccionado = mesMenor,
+                                opciones = meses.values.toList(),
+                                seleccionado = meses[mesMenor] ?: mesMenor,
                                 modifier = Modifier.weight(1.2f),
-                                onValueChange = { opcion, index ->
+                                onValueChange = { valueSeleccionado, index ->
+                                    val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
                                     val result = dayPerMonthFunction(index)
-                                    viewModel.mesMenor.value = opcion
+                                    viewModel.mesMenor.value = keyMes
                                     if (diaMenor.isNotEmpty() && result.first < diaMenor.toInt()) {
                                         viewModel.diaMenor.value = result.first.toString()
                                     }
@@ -303,9 +300,7 @@ fun RegistroInfo(
                                 opciones = aniosMenor,
                                 seleccionado = anioMenor,
                                 modifier = Modifier.weight(1.3f),
-                                onValueChange = { opcion, index ->
-                                    viewModel.anioMenor.value = opcion
-                                },
+                                onValueChange = { opcion, index -> viewModel.anioMenor.value = opcion },
                             )
                         }
                     }
@@ -356,7 +351,7 @@ fun FilaRegistro(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        if (label == "Teléfono") {
+        if(label == "Teléfono") {
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
@@ -426,14 +421,13 @@ fun CampoFecha(
                 .width(120.dp)
         ) {
             opciones.forEach { opcion ->
-                val isMonth = label == "Mes"
                 DropdownMenuItem(
-                    text = {
-                        if (isMonth) Text(meses.getValue(opcion)) else Text(opcion)
-                    },
+                    text = { Text(opcion) },
                     onClick = {
                         var index = 0
-                        if (isMonth) index = opciones.indexOf(opcion) + 1
+                        if (label == "Mes") {
+                            index = opciones.indexOf(opcion) + 1
+                        }
                         onValueChange(opcion, index)
                         expanded = false
                     }
@@ -528,8 +522,7 @@ fun CampoDesplegableProfesores(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val nombresSeleccionados = opciones.filter { seleccionadosIds.contains(it.id) }
-                    .map { "${it.name} ${it.lastName}" }
+                val nombresSeleccionados = opciones.filter { seleccionadosIds.contains(it.id) }.map { "${it.name} ${it.lastName}" }
                 val textoMostrar =
                     if (nombresSeleccionados.isEmpty()) "Selecciona profesor/es" else nombresSeleccionados.joinToString(
                         ", "

@@ -198,13 +198,14 @@ fun AdminPerfilCliente(
                                 onValueChange = { opcion, _ -> viewModel.dia.value = opcion }
                             )
                             CampoDesplegableAdmin(
-                                label = mes,
+                                label = "Mes",
                                 modifier = Modifier.weight(1f),
-                                seleccionado = mes,
-                                opciones = meses.keys.toList(),
-                                onValueChange = { opcion, index ->
+                                seleccionado = meses[mes] ?: mes,
+                                opciones = meses.values.toList(),
+                                onValueChange = { valueSeleccionado, index ->
+                                    val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
                                     val result = dayPerMonthFunction(index)
-                                    viewModel.mes.value = opcion
+                                    viewModel.mes.value = keyMes
                                     if(dia.isNotEmpty() && result.first < dia.toInt()) {
                                         viewModel.dia.value = result.first.toString()
                                     }
@@ -289,13 +290,14 @@ fun AdminPerfilCliente(
                                     onValueChange = { opcion, _ -> viewModel.diaMenor.value = opcion }
                                 )
                                 CampoDesplegableAdmin(
-                                    label = mesMenor.ifEmpty { "Mes" },
-                                    seleccionado = mesMenor,
+                                    label = "Mes",
+                                    seleccionado = meses[mesMenor] ?: mesMenor,
                                     modifier = Modifier.weight(1f),
-                                    opciones = meses.keys.toList(),
-                                    onValueChange = { opcion, index ->
+                                    opciones = meses.values.toList(),
+                                    onValueChange = { valueSeleccionado, index ->
+                                        val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
                                         val result = dayPerMonthFunction(index)
-                                        viewModel.mesMenor.value = opcion
+                                        viewModel.mesMenor.value = keyMes
                                         if (diaMenor.isNotEmpty() && result.first < diaMenor.toInt()) {
                                             viewModel.diaMenor.value = result.first.toString()
                                         }
@@ -461,16 +463,11 @@ fun CampoDesplegableAdmin(
                 .width(120.dp)
         ) {
             opciones.forEach { opcion ->
-                val isMonth = label == "Mes" || meses.containsValue(label)
-                println("LABEL -> $label")
-                println("LÓGICA MES BIEN ? -> $isMonth")
                 DropdownMenuItem(
-                    text = {
-                        if (isMonth) Text(meses.getValue(opcion)) else Text(opcion)
-                    },
+                    text = { Text(opcion) },
                     onClick = {
                         var index = 0
-                        if (isMonth) index = opciones.indexOf(opcion) + 1
+                        if (label == "Mes") index = opciones.indexOf(opcion) + 1
                         onValueChange(opcion, index)
                         expanded = false
                     }

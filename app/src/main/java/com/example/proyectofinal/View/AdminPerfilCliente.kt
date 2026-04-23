@@ -56,7 +56,6 @@ import com.example.proyectofinal.Logic.anios
 import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.dias
-import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -100,7 +99,7 @@ fun AdminPerfilCliente(
 
     // --- ESTADOS DE LOS DIALOGS ---
     var showConfirmDialog by remember { mutableStateOf(false) }
-    var showEliminarDialog by remember { mutableStateOf(false) }
+    var showStatusDialog by remember { mutableStateOf(false) }
 
     // --- LÓGICA DE DIALOGS ---
     if (showConfirmDialog) {
@@ -116,18 +115,18 @@ fun AdminPerfilCliente(
         )
     }
 
-    if (showEliminarDialog) {
-        EliminarAlumnoDialog(
+    if (showStatusDialog) {
+        ModificarStatusAlumnoDialog(
             nombreCompleto = "$nombre $apellidos",
             isActive = isActive,
             onConfirm = {
                 viewModel.toggleUserActivation {
-                    showEliminarDialog = false
+                    showStatusDialog = false
                     // Opcionalmente podemos volver a la lista o quedarnos
                     controller(StateNavigate.adminListaClientes.value)
                 }
             },
-            onDismiss = { showEliminarDialog = false }
+            onDismiss = { showStatusDialog = false }
         )
     }
 
@@ -368,7 +367,7 @@ fun AdminPerfilCliente(
 
                     // BOTÓN ELIMINAR/DESACTIVAR/ACTIVAR USUARIO
                     Button(
-                        onClick = { showEliminarDialog = true },
+                        onClick = { showStatusDialog = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(55.dp),
@@ -544,7 +543,7 @@ fun ConfirmarCambiosDialogAdmin(
 
 // --- DIALOG: ELIMINAR/DESACTIVAR ALUMNO ---
 @Composable
-fun EliminarAlumnoDialog(
+fun ModificarStatusAlumnoDialog(
     nombreCompleto: String, 
     isActive: Boolean,
     onConfirm: () -> Unit, 

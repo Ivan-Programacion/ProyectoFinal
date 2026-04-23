@@ -194,9 +194,9 @@ fun App(startDestination: String = "login") {
             SnackbarHost(hostState = snackbarHostState) { snackbarData ->
                 Snackbar(
                     modifier = Modifier.padding(16.dp),
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = if (isErrorSnackbar) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
                     // Si es error se pone rojo, si no (éxito), se usa color tertiary
-                    contentColor = if (isErrorSnackbar) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(

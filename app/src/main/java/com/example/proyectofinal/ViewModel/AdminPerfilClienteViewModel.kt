@@ -189,7 +189,6 @@ class AdminPerfilClienteViewModel(
     }
 
     fun toggleUserActivation(onSuccess: () -> Unit) {
-        val currentId = _studentId.value ?: return
         val userBase = currentUser ?: return
         viewModelScope.launch {
             val newActiveState = !isActive.value
@@ -197,15 +196,6 @@ class AdminPerfilClienteViewModel(
             if (userRepository.updateUser(updatedUser)) {
                 isActive.value = newActiveState
                 currentUser = updatedUser
-                onSuccess()
-            }
-        }
-    }
-
-    fun deleteStudent(onSuccess: () -> Unit) {
-        val currentId = _studentId.value ?: return
-        viewModelScope.launch {
-            if (userRepository.deleteUser(currentId)) {
                 onSuccess()
             }
         }

@@ -212,6 +212,8 @@ class AuthViewModel(
                 if (createdInFirestore) {
                     currentUserUid.value = uid // Actualizamos el estado del uid actual
                     _uiState.value = AuthUiState.Success()
+                    resetViewModelsStates()
+
                 } else {
                     _uiState.value =
                         AuthUiState.Error("Error al guardar los datos del usuario. Intentalo más tarde")
@@ -220,6 +222,35 @@ class AuthViewModel(
                 _uiState.value = AuthUiState.Error(errorMessage)
             }
         }
+    }
+
+    private fun resetViewModelsStates() {
+        loginEmail.value = ""
+        loginPassword.value = ""
+        loginPasswordVisible.value = false
+        nombre.value = ""
+        apellidos.value = ""
+        email.value = ""
+        telefono.value = ""
+        dia.value = ""
+        mes.value = ""
+        anio.value = ""
+        esMenor.value = false
+        nombreMenor.value = ""
+        apellidosMenor.value = ""
+        diaMenor.value = ""
+        mesMenor.value = ""
+        anioMenor.value = ""
+        centroSeleccionado.value = ""
+        profesoresSeleccionados.value = emptySet()
+
+        registroPassword.value = ""
+        registroRepeatPassword.value = ""
+        registroAceptoTerminos.value = false
+        registroPasswordVisible.value = false
+        registroRepeatPasswordVisible.value = false
+        showDialogTerminos.value = false
+
     }
 
     // Construye el modelo User con los estados actuales y llama al registro

@@ -1,10 +1,12 @@
 package com.example.proyectofinal.Model
 
+import com.google.firebase.firestore.PropertyName
+
 data class User(
     val id: String = "", // UID de Firebase Auth
     val email: String = "",
     val role: String = "STUDENT", // "STUDENT", "TEACHER", "SUPERADMIN"
-    val isClientApproved: Boolean = true, // -------------------- POR AHORA TRUE, HASTA QUE VEAMOS SU IMPLEMENTACIÓN
+    val isClientApproved: Boolean = true,
     val centerId: String = "",
     val teacherIds: List<String> = emptyList(),
     val name: String = "",
@@ -14,7 +16,7 @@ data class User(
     val beltId: String = "white",
     val isMinor: Boolean = false,
 
-    // Datos del tutor (Opcionales, por eso llevan "?" y valor por defecto null)
+    // Datos del tutor (Opcionales)
     val tutorName: String? = null,
     val tutorLastName: String? = null,
     val tutorBirthDate: String? = null,

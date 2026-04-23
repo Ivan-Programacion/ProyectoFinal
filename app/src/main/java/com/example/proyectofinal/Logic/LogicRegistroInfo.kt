@@ -6,19 +6,20 @@ import java.time.LocalDate
 
 // Listas de datos
 val dias = (1..31).map { it.toString() }
-val meses = listOf(
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
+// UTILIZARLA PARA SACAR EL NOMBRE DEL MES CORRECTO
+val meses = mapOf(
+    "Enero" to "January",
+    "Febrero" to "Febrero",
+    "Marzo" to "Marzo",
+    "Abril" to "Abril",
+    "Mayo" to "Mayo",
+    "Junio" to "Junio",
+    "Julio" to "Julio",
+    "Agosto" to "Agosto",
+    "Septiembre" to "Septiembre",
+    "Octubre" to "Octubre",
+    "Noviembre" to "Noviembre",
+    "Diciembre" to "Diciembre"
 )
 // Obtenemos el año actual
 @RequiresApi(Build.VERSION_CODES.O)

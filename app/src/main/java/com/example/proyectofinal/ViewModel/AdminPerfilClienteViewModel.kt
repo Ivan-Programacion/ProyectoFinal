@@ -3,8 +3,11 @@ package com.example.proyectofinal.ViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.proyectofinal.Logic.meses
+import com.example.proyectofinal.Model.Belt
 import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
+import com.example.proyectofinal.Repository.ContentRepository
 import com.example.proyectofinal.Repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,7 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AdminPerfilClienteViewModel(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val contentRepository: ContentRepository
 ) : ViewModel() {
 
     private val _studentId = MutableStateFlow<String?>(null)
@@ -26,7 +30,6 @@ class AdminPerfilClienteViewModel(
     val mes = MutableStateFlow("")
     val anio = MutableStateFlow("")
     
-    // Estos campos siempre pertenecen al documento principal (el alumno/usuario)
     val email = MutableStateFlow("")
     val telefono = MutableStateFlow("")
 
@@ -41,7 +44,7 @@ class AdminPerfilClienteViewModel(
     // Otros campos
     val centroSeleccionado = MutableStateFlow("")
     val profesoresSeleccionados = MutableStateFlow<Set<String>>(emptySet())
-    val cinturon = MutableStateFlow("")
+    val beltId = MutableStateFlow("white")
 
     // Listas para desplegables
     private val _listaCentros = MutableStateFlow<List<Center>>(emptyList())
@@ -50,13 +53,17 @@ class AdminPerfilClienteViewModel(
     private val _profesoresDisponibles = MutableStateFlow<List<User>>(emptyList())
     val profesoresDisponibles: StateFlow<List<User>> = _profesoresDisponibles.asStateFlow()
 
+    private val _listaCinturones = MutableStateFlow<List<Belt>>(emptyList())
+    val listaCinturones: StateFlow<List<Belt>> = _listaCinturones.asStateFlow()
+
     init {
-        loadCenters()
+        loadInitialData()
     }
 
-    private fun loadCenters() {
+    private fun loadInitialData() {
         viewModelScope.launch {
             _listaCentros.value = userRepository.getCenters()
+            _listaCinturones.value = contentRepository.getBelts()
         }
     }
 
@@ -78,6 +85,28 @@ class AdminPerfilClienteViewModel(
         loadStudentData(id)
     }
 
+    // Helper para convertir YYYY-MM-DD a [DD, NombreMes, YYYY]
+    private fun parseDate(date: String?): List<String> {
+        if (date.isNullOrBlank()) return listOf("", "", "")
+        val parts = date.split("-")
+        return if (parts.size == 3) {
+            val dayNum = parts[2].toIntOrNull()?.toString() ?: ""
+            val monthNum = parts[1].toIntOrNull() ?: 1
+            val monthName = meses.keys.toList().getOrNull(monthNum - 1) ?: ""
+            val year = parts[0]
+            listOf(dayNum, monthName, year)
+        } else listOf("", "", "")
+    }
+
+    // Helper para convertir DD, NombreMes, YYYY a YYYY-MM-DD
+    private fun formatDate(d: String, mName: String, a: String): String {
+        if (d.isEmpty() || mName.isEmpty() || a.isEmpty()) return ""
+        val mIndex = meses.keys.toList().indexOf(mName) + 1
+        val mLabel = if (mIndex < 10) "0$mIndex" else "$mIndex"
+        val dLabel = if (d.length == 1) "0$d" else d
+        return "$a-$mLabel-$dLabel"
+    }
+
     private fun loadStudentData(id: String) {
         viewModelScope.launch {
             val user = userRepository.getUser(id)
@@ -88,34 +117,23 @@ class AdminPerfilClienteViewModel(
                 esMenor.value = it.isMinor
                 centroSeleccionado.value = it.centerId
                 profesoresSeleccionados.value = it.teacherIds.toSet()
-                cinturon.value = it.beltId
+                beltId.value = it.beltId
                 
                 if (it.isMinor) {
-                    // SI ES MENOR:
-                    // Arriba (Tutor): tutorName, tutorLastName, tutorBirthDate
                     nombre.value = it.tutorName ?: ""
                     apellidos.value = it.tutorLastName ?: ""
-                    it.tutorBirthDate?.split("/")?.let { p ->
-                        if (p.size == 3) { dia.value = p[0]; mes.value = p[1]; anio.value = p[2] }
-                    }
-                    // Abajo (Alumno): name, lastName, birthDate
+                    val tDate = parseDate(it.tutorBirthDate)
+                    dia.value = tDate[0]; mes.value = tDate[1]; anio.value = tDate[2]
+                    
                     nombreMenor.value = it.name
                     apellidosMenor.value = it.lastName
-                    it.birthDate.split("/").let { p ->
-                        if (p.size == 3) { diaMenor.value = p[0]; mesMenor.value = p[1]; anioMenor.value = p[2] }
-                    }
+                    val aDate = parseDate(it.birthDate)
+                    diaMenor.value = aDate[0]; mesMenor.value = aDate[1]; anioMenor.value = aDate[2]
                 } else {
-                    // SI ES ADULTO:
-                    // Arriba (Alumno): name, lastName, birthDate
                     nombre.value = it.name
                     apellidos.value = it.lastName
-                    it.birthDate.split("/").let { p ->
-                        if (p.size == 3) { dia.value = p[0]; mes.value = p[1]; anio.value = p[2] }
-                    }
-                    // Limpiamos campos del menor
-                    nombreMenor.value = ""
-                    apellidosMenor.value = ""
-                    diaMenor.value = ""; mesMenor.value = ""; anioMenor.value = ""
+                    val aDate = parseDate(it.birthDate)
+                    dia.value = aDate[0]; mes.value = aDate[1]; anio.value = aDate[2]
                 }
 
                 if (it.centerId.isNotEmpty()) {
@@ -131,26 +149,24 @@ class AdminPerfilClienteViewModel(
         
         viewModelScope.launch {
             val updatedUser = if (esMenor.value) {
-                // Caso menor: name/lastName es el niño (abajo), tutorName es el adulto (arriba)
                 userBase.copy(
                     name = nombreMenor.value,
                     lastName = apellidosMenor.value,
-                    birthDate = "${diaMenor.value}/${mesMenor.value}/${anioMenor.value}",
+                    birthDate = formatDate(diaMenor.value, mesMenor.value, anioMenor.value),
                     tutorName = nombre.value,
                     tutorLastName = apellidos.value,
-                    tutorBirthDate = "${dia.value}/${mes.value}/${anio.value}",
+                    tutorBirthDate = formatDate(dia.value, mes.value, anio.value),
                     isMinor = true,
                     phone = telefono.value,
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
-                    beltId = cinturon.value
+                    beltId = beltId.value
                 )
             } else {
-                // Caso adulto: name/lastName es el adulto (arriba), tutorName es null
                 userBase.copy(
                     name = nombre.value,
                     lastName = apellidos.value,
-                    birthDate = "${dia.value}/${mes.value}/${anio.value}",
+                    birthDate = formatDate(dia.value, mes.value, anio.value),
                     tutorName = null,
                     tutorLastName = null,
                     tutorBirthDate = null,
@@ -158,7 +174,7 @@ class AdminPerfilClienteViewModel(
                     phone = telefono.value,
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
-                    beltId = cinturon.value
+                    beltId = beltId.value
                 )
             }
             
@@ -179,12 +195,13 @@ class AdminPerfilClienteViewModel(
 }
 
 class AdminPerfilClienteViewModelFactory(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val contentRepository: ContentRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AdminPerfilClienteViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AdminPerfilClienteViewModel(userRepository) as T
+            return AdminPerfilClienteViewModel(userRepository, contentRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

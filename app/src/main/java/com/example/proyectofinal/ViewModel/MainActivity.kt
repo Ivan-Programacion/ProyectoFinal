@@ -117,31 +117,36 @@ fun App(startDestination: String = "login") {
     // Creamos la factoría y el ViewModel para poder usar AuthRepository y UserRepository en cada
     // uno de los ViewModel que utilicemos
     val context = LocalContext.current
+    val userRepository = UserRepositoryImpl()
+    val authRepository = AuthRepositoryImpl()
+    val contentRepository = ContentRepositoryImpl()
+
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
-            authRepository = AuthRepositoryImpl(),
-            userRepository = UserRepositoryImpl()
+            authRepository = authRepository,
+            userRepository = userRepository
         )
     )
 
     val beltsViewModel: BeltsViewModel = viewModel(
         factory = BeltsViewModelFactory(
-            authRepository = AuthRepositoryImpl(),
-            userRepository = UserRepositoryImpl(),
-            contentRepository = ContentRepositoryImpl()
+            authRepository = authRepository,
+            userRepository = userRepository,
+            contentRepository = contentRepository
         )
     )
 
     val adminListaClientesViewModel: AdminListaClientesViewModel = viewModel(
         factory = AdminListaClientesViewModelFactory(
-            authRepository = AuthRepositoryImpl(),
-            userRepository = UserRepositoryImpl()
+            authRepository = authRepository,
+            userRepository = userRepository
         )
     )
 
     val adminPerfilClienteViewModel: AdminPerfilClienteViewModel = viewModel(
         factory = AdminPerfilClienteViewModelFactory(
-            userRepository = UserRepositoryImpl()
+            userRepository = userRepository,
+            contentRepository = contentRepository
         )
     )
 
@@ -155,7 +160,7 @@ fun App(startDestination: String = "login") {
     val snackbarHostState = remember { SnackbarHostState() }
     // Guardamos si el snackbar mostrado es de error o no para darle estilo
     var isErrorSnackbar by remember { mutableStateOf(true) }
-    
+
     val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
     val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
 
@@ -168,6 +173,7 @@ fun App(startDestination: String = "login") {
                     authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
                 }
             }
+
             is AuthUiState.Success -> {
                 val message = (authUiState as AuthUiState.Success).message
                 // Solo lo enseñamos si hay mensaje y estamos en el perfil
@@ -177,6 +183,7 @@ fun App(startDestination: String = "login") {
                     authViewModel.resetUiState()
                 }
             }
+
             else -> {}
         }
     }
@@ -186,7 +193,7 @@ fun App(startDestination: String = "login") {
             // Definimos el estilo del SnackbarHost
             SnackbarHost(hostState = snackbarHostState) { snackbarData ->
                 Snackbar(
-                    modifier = Modifier.padding(16.dp), // Añadimos margen exterior
+                    modifier = Modifier.padding(16.dp),
                     containerColor = MaterialTheme.colorScheme.surface,
                     // Si es error se pone rojo, si no (éxito), se usa color tertiary
                     contentColor = if (isErrorSnackbar) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
@@ -291,11 +298,7 @@ fun App(startDestination: String = "login") {
                 ListaCinturones(
                     paddingValues = innerPadding,
                     viewModel = beltsViewModel
-                ) {
-                    controller.navigate(
-                        it
-                    )
-                }
+                ) { controller.navigate(it) }
             }
             composable(StateNavigate.perfil.value) {
                 Perfil(
@@ -329,11 +332,7 @@ fun App(startDestination: String = "login") {
                     innerPadding,
                     viewModel = adminListaClientesViewModel,
                     adminPerfilViewModel = adminPerfilClienteViewModel
-                ) {
-                    controller.navigate(
-                        it
-                    )
-                }
+                ) { controller.navigate(it) }
             }
             composable(StateNavigate.adminGestionExamen.value) {
                 AdminGestionExamen(innerPadding) {
@@ -346,27 +345,18 @@ fun App(startDestination: String = "login") {
                 AdminPerfilCliente(
                     innerPadding,
                     viewModel = adminPerfilClienteViewModel
-                ) {
-                    controller.navigate(
-                        it
-                    )
-                }
+                ) { controller.navigate(it) }
             }
         }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class) // Está en fase de prueba
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
     TopAppBar(
-        {
-            Text(
-                tituloTopBar(currentRoute),
-                style = MaterialTheme.typography.titleMedium
-            )
-        },
+        { Text(tituloTopBar(currentRoute), style = MaterialTheme.typography.titleMedium) },
         navigationIcon = {
             // Si es una pantalla secundaría que proviene de una principal:
             /*
@@ -391,18 +381,13 @@ fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
 
 @Composable
 fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-    ) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         var state by remember { mutableStateOf(StateNavigate.listaCinturones) }
         // Si es admin, muestra este item
         if (isAdmin) {
             NavigationBarItem(
                 selected = state == StateNavigate.adminListaClientes,
-                {
-                    state = StateNavigate.adminListaClientes
-                    controller("adminListaClientes")
-                },
+                { state = StateNavigate.adminListaClientes; controller("adminListaClientes") },
                 icon = { Icon(Icons.Default.Book, contentDescription = "Gestion exámenes") },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
@@ -411,13 +396,9 @@ fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
                 ),
                 label = { Text("Gestión") })
         }
-        // onClick de cada item --> se identifica la pantalla (state); después se cambia a dicha pantalla (controller([pantalla])
         NavigationBarItem(
             selected = state == StateNavigate.favoritos,
-            {
-                state = StateNavigate.favoritos
-                controller("favoritos")
-            },
+            { state = StateNavigate.favoritos; controller("favoritos") },
             icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
@@ -427,12 +408,8 @@ fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
             label = { Text("Favoritos") })
         NavigationBarItem(
             state == StateNavigate.listaCinturones,
-            {
-                state = StateNavigate.listaCinturones
-                controller("listaCinturones")
-            },
+            { state = StateNavigate.listaCinturones; controller("listaCinturones") },
             { Icon(Icons.Default.MilitaryTech, contentDescription = "Cinturones") },
-            // Colores de los items del NavBar
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
@@ -441,10 +418,7 @@ fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
             label = { Text("Cinturones") })
         NavigationBarItem(
             state == StateNavigate.perfil,
-            {
-                state = StateNavigate.perfil
-                controller("perfil")
-            },
+            { state = StateNavigate.perfil; controller("perfil") },
             { Icon(Icons.Default.AccountCircle, contentDescription = "Perfil") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
@@ -459,7 +433,5 @@ fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    ProyectoFinalTheme {
-        App()
-    }
+    ProyectoFinalTheme { App() }
 }

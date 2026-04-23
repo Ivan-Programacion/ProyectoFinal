@@ -74,7 +74,7 @@ fun AdminPerfilCliente(
     val apellidos by viewModel.apellidos.collectAsStateWithLifecycle()
     val telefono by viewModel.telefono.collectAsStateWithLifecycle()
     val email by viewModel.email.collectAsStateWithLifecycle()
-    val beltId by viewModel.cinturon.collectAsStateWithLifecycle()
+    val beltId by viewModel.beltId.collectAsStateWithLifecycle()
 
     val dia by viewModel.dia.collectAsStateWithLifecycle()
     val mes by viewModel.mes.collectAsStateWithLifecycle()
@@ -198,7 +198,7 @@ fun AdminPerfilCliente(
                                 label = mes,
                                 modifier = Modifier.weight(1f),
                                 seleccionado = mes,
-                                opciones = meses,
+                                opciones = meses.keys.toList(),
                                 onValueChange = { opcion, index ->
                                     val result = dayPerMonthFunction(index)
                                     viewModel.mes.value = opcion
@@ -289,7 +289,7 @@ fun AdminPerfilCliente(
                                     label = mesMenor.ifEmpty { "Mes" },
                                     seleccionado = mesMenor,
                                     modifier = Modifier.weight(1f),
-                                    opciones = meses,
+                                    opciones = meses.keys.toList(),
                                     onValueChange = { opcion, index ->
                                         val result = dayPerMonthFunction(index)
                                         viewModel.mesMenor.value = opcion
@@ -341,7 +341,7 @@ fun AdminPerfilCliente(
                             label = beltId,
                             opciones = mapBeltColor.keys.toList(),
                             seleccionado = beltId,
-                            onValueChange = { opcion, _ -> viewModel.cinturon.value = opcion }
+                            onValueChange = { opcion, _ -> viewModel.beltId.value = opcion }
                         )
                     }
 
@@ -446,14 +446,14 @@ fun CampoDesplegableAdmin(
                 .width(120.dp)
         ) {
             opciones.forEach { opcion ->
+                val isMonth = label == "Mes" || meses.containsKey(label)
                 DropdownMenuItem(
-                    text = { Text(opcion) },
+                    text = {
+                        if (isMonth) Text(meses.getValue(opcion)) else Text(opcion)
+                    },
                     onClick = {
                         var index = 0
-                        // Pequeño hack para obtener el índice si es el mes
-                        if (opciones.size == 12 && opciones.contains("Enero")) {
-                            index = opciones.indexOf(opcion) + 1
-                        }
+                        if (isMonth) index = opciones.indexOf(opcion) + 1
                         onValueChange(opcion, index)
                         expanded = false
                     }

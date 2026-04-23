@@ -75,6 +75,7 @@ fun AdminPerfilCliente(
     val telefono by viewModel.telefono.collectAsStateWithLifecycle()
     val email by viewModel.email.collectAsStateWithLifecycle()
     val beltId by viewModel.beltId.collectAsStateWithLifecycle()
+    val isActive by viewModel.isActive.collectAsStateWithLifecycle()
 
     val dia by viewModel.dia.collectAsStateWithLifecycle()
     val mes by viewModel.mes.collectAsStateWithLifecycle()
@@ -91,6 +92,7 @@ fun AdminPerfilCliente(
     val profesoresSeleccionados by viewModel.profesoresSeleccionados.collectAsStateWithLifecycle()
     val listaCentros by viewModel.listaCentros.collectAsStateWithLifecycle()
     val profesoresDisponibles by viewModel.profesoresDisponibles.collectAsStateWithLifecycle()
+    val listaCinturones by viewModel.listaCinturones.collectAsStateWithLifecycle()
 
     // Estados locales para la lógica de días de la UI
     var dayList by remember { mutableStateOf(dias) }
@@ -117,9 +119,11 @@ fun AdminPerfilCliente(
     if (showEliminarDialog) {
         EliminarAlumnoDialog(
             nombreCompleto = "$nombre $apellidos",
+            isActive = isActive,
             onConfirm = {
-                viewModel.deleteStudent {
+                viewModel.toggleUserActivation {
                     showEliminarDialog = false
+                    // Opcionalmente podemos volver a la lista o quedarnos
                     controller(StateNavigate.adminListaClientes.value)
                 }
             },
@@ -148,7 +152,7 @@ fun AdminPerfilCliente(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = "Datos perfil adulto/tutor", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "Datos perfil alumno/tutor", style = MaterialTheme.typography.titleMedium)
 
                     // AVATAR
                     Surface(
@@ -337,11 +341,17 @@ fun AdminPerfilCliente(
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                         )
+                        
+                        val beltNameToShow = listaCinturones.find { it.id == beltId }?.name?.get("es") ?: beltId
+                        
                         CampoDesplegableAdmin(
-                            label = beltId,
-                            opciones = mapBeltColor.keys.toList(),
-                            seleccionado = beltId,
-                            onValueChange = { opcion, _ -> viewModel.beltId.value = opcion }
+                            label = beltNameToShow,
+                            opciones = listaCinturones.map { it.name["es"] ?: it.id },
+                            seleccionado = beltNameToShow,
+                            onValueChange = { nameSelected, _ -> 
+                                val idSelected = listaCinturones.find { (it.name["es"] ?: it.id) == nameSelected }?.id ?: "white"
+                                viewModel.beltId.value = idSelected
+                            }
                         )
                     }
 
@@ -356,16 +366,22 @@ fun AdminPerfilCliente(
                         Text("Actualizar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
 
-                    // BOTÓN ELIMINAR USUARIO
+                    // BOTÓN ELIMINAR/DESACTIVAR/ACTIVAR USUARIO
                     Button(
                         onClick = { showEliminarDialog = true },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(55.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isActive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary
+                        )
                     ) {
-                        Text("Eliminar alumno", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(
+                            text = if (isActive) "Desactivar alumno" else "Activar alumno",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
                     }
                 }
             }
@@ -526,9 +542,14 @@ fun ConfirmarCambiosDialogAdmin(
     }
 }
 
-// --- DIALOG: ELIMINAR ALUMNO ---
+// --- DIALOG: ELIMINAR/DESACTIVAR ALUMNO ---
 @Composable
-fun EliminarAlumnoDialog(nombreCompleto: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun EliminarAlumnoDialog(
+    nombreCompleto: String, 
+    isActive: Boolean,
+    onConfirm: () -> Unit, 
+    onDismiss: () -> Unit
+) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
@@ -540,13 +561,13 @@ fun EliminarAlumnoDialog(nombreCompleto: String, onConfirm: () -> Unit, onDismis
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "¿Eliminar alumno?",
+                    text = if (isActive) "¿Desactivar alumno?" else "¿Activar alumno?",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Estás a punto de eliminar al alumno $nombreCompleto permanentemente de la aplicación. ¿Estás seguro de querer eliminar al alumno?",
+                    text = "Estás a punto de modificar el estado del alumno $nombreCompleto. ¿Estás seguro?",
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -557,11 +578,13 @@ fun EliminarAlumnoDialog(nombreCompleto: String, onConfirm: () -> Unit, onDismis
                     Button(
                         onClick = onConfirm,
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isActive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary
+                        ),
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Text(
-                            "Eliminar",
+                            text = if (isActive) "Desactivar" else "Activar",
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
                         )

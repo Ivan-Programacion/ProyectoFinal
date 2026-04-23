@@ -7,6 +7,7 @@ data class User(
     val email: String = "",
     val role: String = "STUDENT", // "STUDENT", "TEACHER", "SUPERADMIN"
     val isClientApproved: Boolean = true,
+    val isActive: Boolean = true, // Para activar o desactivar alumno
     val centerId: String = "",
     val teacherIds: List<String> = emptyList(),
     val name: String = "",

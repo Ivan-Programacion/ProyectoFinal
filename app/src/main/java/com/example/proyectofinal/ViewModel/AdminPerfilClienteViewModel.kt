@@ -45,6 +45,7 @@ class AdminPerfilClienteViewModel(
     val centroSeleccionado = MutableStateFlow("")
     val profesoresSeleccionados = MutableStateFlow<Set<String>>(emptySet())
     val beltId = MutableStateFlow("white")
+    val isActive = MutableStateFlow(true)
 
     // Listas para desplegables
     private val _listaCentros = MutableStateFlow<List<Center>>(emptyList())
@@ -118,6 +119,7 @@ class AdminPerfilClienteViewModel(
                 centroSeleccionado.value = it.centerId
                 profesoresSeleccionados.value = it.teacherIds.toSet()
                 beltId.value = it.beltId
+                isActive.value = it.isActive
                 
                 if (it.isMinor) {
                     nombre.value = it.tutorName ?: ""
@@ -160,7 +162,8 @@ class AdminPerfilClienteViewModel(
                     phone = telefono.value,
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
-                    beltId = beltId.value
+                    beltId = beltId.value,
+                    isActive = isActive.value
                 )
             } else {
                 userBase.copy(
@@ -174,11 +177,26 @@ class AdminPerfilClienteViewModel(
                     phone = telefono.value,
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
-                    beltId = beltId.value
+                    beltId = beltId.value,
+                    isActive = isActive.value
                 )
             }
             
             if (userRepository.updateUser(updatedUser)) {
+                onSuccess()
+            }
+        }
+    }
+
+    fun toggleUserActivation(onSuccess: () -> Unit) {
+        val currentId = _studentId.value ?: return
+        val userBase = currentUser ?: return
+        viewModelScope.launch {
+            val newActiveState = !isActive.value
+            val updatedUser = userBase.copy(isActive = newActiveState)
+            if (userRepository.updateUser(updatedUser)) {
+                isActive.value = newActiveState
+                currentUser = updatedUser
                 onSuccess()
             }
         }

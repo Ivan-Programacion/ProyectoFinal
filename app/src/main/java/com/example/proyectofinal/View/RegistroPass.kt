@@ -106,7 +106,10 @@ fun RegistroPass(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { onBack() }) {
+                    IconButton(onClick = {
+                        onBack()
+                        viewModel.resetRegisterPassViewModelsStates()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver atrás",
@@ -208,12 +211,18 @@ fun RegistroPass(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         "¿Ya tienes cuenta? ",
-                        modifier = Modifier.clickable { controller(StateNavigate.login.value) })
+                        modifier = Modifier.clickable {
+                            controller(StateNavigate.login.value)
+                            viewModel.resetRegisterPassViewModelsStates()
+                        })
                     Text(
                         text = "Iniciar sesión",
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { controller(StateNavigate.login.value) }
+                        modifier = Modifier.clickable {
+                            controller(StateNavigate.login.value)
+                            viewModel.resetRegisterPassViewModelsStates()
+                        }
                     )
                 }
             }

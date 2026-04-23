@@ -223,8 +223,8 @@ class AuthViewModel(
             }
         }
     }
-
-    private fun resetViewModelsStates() {
+// Resetear viewModels de RegistroInfo y RegistroPass
+    fun resetViewModelsStates() {
         loginEmail.value = ""
         loginPassword.value = ""
         loginPasswordVisible.value = false
@@ -251,6 +251,15 @@ class AuthViewModel(
         registroRepeatPasswordVisible.value = false
         showDialogTerminos.value = false
 
+    }
+    // Resetear viewModels de RegistroPass solo
+    fun resetRegisterPassViewModelsStates() {
+        registroPassword.value = ""
+        registroRepeatPassword.value = ""
+        registroAceptoTerminos.value = false
+        registroPasswordVisible.value = false
+        registroRepeatPasswordVisible.value = false
+        showDialogTerminos.value = false
     }
 
     // Construye el modelo User con los estados actuales y llama al registro
@@ -291,6 +300,7 @@ class AuthViewModel(
             if (loginSuccess) {
                 currentUserUid.value = authRepository.getCurrentUserUid() // Actualizamos al nuevo logueado
                 _uiState.value = AuthUiState.Success()
+                resetViewModelsStates()
             } else {
                 _uiState.value = AuthUiState.Error(errorMessage)
             }

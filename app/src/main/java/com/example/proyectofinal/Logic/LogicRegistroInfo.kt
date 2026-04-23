@@ -9,17 +9,17 @@ val dias = (1..31).map { it.toString() }
 // UTILIZARLA PARA SACAR EL NOMBRE DEL MES CORRECTO
 val meses = mapOf(
     "Enero" to "January",
-    "Febrero" to "Febrero",
-    "Marzo" to "Marzo",
-    "Abril" to "Abril",
-    "Mayo" to "Mayo",
-    "Junio" to "Junio",
-    "Julio" to "Julio",
-    "Agosto" to "Agosto",
-    "Septiembre" to "Septiembre",
-    "Octubre" to "Octubre",
-    "Noviembre" to "Noviembre",
-    "Diciembre" to "Diciembre"
+    "Febrero" to "February",
+    "Marzo" to "March",
+    "Abril" to "April",
+    "Mayo" to "May",
+    "Junio" to "Jun",
+    "Julio" to "July",
+    "Agosto" to "August",
+    "Septiembre" to "September",
+    "Octubre" to "October",
+    "Noviembre" to "Nobember",
+    "Diciembre" to "December"
 )
 // Obtenemos el año actual
 @RequiresApi(Build.VERSION_CODES.O)

@@ -64,7 +64,9 @@ class AdminPerfilClienteViewModel(
     private fun loadInitialData() {
         viewModelScope.launch {
             _listaCentros.value = userRepository.getCenters()
-            _listaCinturones.value = contentRepository.getBelts()
+            // Cargamos y ordenamos los cinturones por el campo order
+            val belts = contentRepository.getBelts()
+            _listaCinturones.value = belts.sortedBy { it.order }
         }
     }
 
@@ -86,26 +88,28 @@ class AdminPerfilClienteViewModel(
         loadStudentData(id)
     }
 
-    // Helper para convertir YYYY-MM-DD a [DD, NombreMes, YYYY]
+    // Helper para convertir YYYY-ClaveMes-DD a [DD, NombreMes, YYYY]
     private fun parseDate(date: String?): List<String> {
         if (date.isNullOrBlank()) return listOf("", "", "")
         val parts = date.split("-")
         return if (parts.size == 3) {
-            val dayNum = parts[2].toIntOrNull()?.toString() ?: ""
-            val monthNum = parts[1].toIntOrNull() ?: 1
-            val monthName = meses.keys.toList().getOrNull(monthNum - 1) ?: ""
             val year = parts[0]
-            listOf(dayNum, monthName, year)
+            val monthInDb = parts[1] // Nombre del mes (ej: "Mayo")
+            val dayNum = parts[2].toIntOrNull()?.toString() ?: ""
+            
+            // Buscamos la clave en el map que coincida (ignorando mayúsculas por seguridad)
+            val monthName = com.example.proyectofinal.Logic.meses.keys.find { it.equals(monthInDb, ignoreCase = true) } ?: monthInDb
+            
+            listOf(dayNum, meses.getValue(monthName), year)
         } else listOf("", "", "")
     }
 
-    // Helper para convertir DD, NombreMes, YYYY a YYYY-MM-DD
+    // Helper para convertir DD, NombreMes, YYYY a YYYY-ClaveMes-DD
     private fun formatDate(d: String, mName: String, a: String): String {
         if (d.isEmpty() || mName.isEmpty() || a.isEmpty()) return ""
-        val mIndex = meses.keys.toList().indexOf(mName) + 1
-        val mLabel = if (mIndex < 10) "0$mIndex" else "$mIndex"
         val dLabel = if (d.length == 1) "0$d" else d
-        return "$a-$mLabel-$dLabel"
+        // mName ya es la clave ("Mayo", "Enero", etc.)
+        return "$a-$mName-$dLabel"
     }
 
     private fun loadStudentData(id: String) {

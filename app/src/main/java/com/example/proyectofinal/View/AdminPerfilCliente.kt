@@ -461,7 +461,9 @@ fun CampoDesplegableAdmin(
                 .width(120.dp)
         ) {
             opciones.forEach { opcion ->
-                val isMonth = label == "Mes" || meses.containsKey(label)
+                val isMonth = label == "Mes" || meses.containsValue(label)
+                println("LABEL -> $label")
+                println("LÓGICA MES BIEN ? -> $isMonth")
                 DropdownMenuItem(
                     text = {
                         if (isMonth) Text(meses.getValue(opcion)) else Text(opcion)

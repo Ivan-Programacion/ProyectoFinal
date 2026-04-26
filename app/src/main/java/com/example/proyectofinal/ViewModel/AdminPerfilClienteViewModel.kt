@@ -29,7 +29,7 @@ class AdminPerfilClienteViewModel(
     val dia = MutableStateFlow("")
     val mes = MutableStateFlow("")
     val anio = MutableStateFlow("")
-    
+
     val email = MutableStateFlow("")
     val telefono = MutableStateFlow("")
 
@@ -61,6 +61,27 @@ class AdminPerfilClienteViewModel(
         loadInitialData()
     }
 
+    fun resetViewModelsStatesAdmin() {
+        nombre.value = ""
+        apellidos.value = ""
+        dia.value = ""
+        mes.value = ""
+        anio.value = ""
+        telefono.value = ""
+        esMenor.value = false
+        nombreMenor.value = ""
+        apellidosMenor.value = ""
+        diaMenor.value = ""
+        mesMenor.value = ""
+        anioMenor.value = ""
+        centroSeleccionado.value = ""
+        profesoresSeleccionados.value = emptySet()
+        beltId.value = "white"
+        isActive.value = true
+        _listaCentros.value = emptyList()
+        _profesoresDisponibles.value = emptyList()
+    }
+
     private fun loadInitialData() {
         viewModelScope.launch {
             _listaCentros.value = userRepository.getCenters()
@@ -83,7 +104,6 @@ class AdminPerfilClienteViewModel(
     }
 
     fun setStudentId(id: String) {
-        if (_studentId.value == id) return
         _studentId.value = id
         loadStudentData(id)
     }
@@ -96,10 +116,15 @@ class AdminPerfilClienteViewModel(
             val year = parts[0]
             val monthInDb = parts[1] // Nombre del mes (ej: "Mayo")
             val dayNum = parts[2].toIntOrNull()?.toString() ?: ""
-            
+
             // Buscamos la clave en el map que coincida (ignorando mayúsculas por seguridad)
-            val monthName = com.example.proyectofinal.Logic.meses.keys.find { it.equals(monthInDb, ignoreCase = true) } ?: monthInDb
-            
+            val monthName = meses.keys.find {
+                it.equals(
+                    monthInDb,
+                    ignoreCase = true
+                )
+            } ?: monthInDb
+
             listOf(dayNum, meses.getValue(monthName), year)
         } else listOf("", "", "")
     }
@@ -109,7 +134,10 @@ class AdminPerfilClienteViewModel(
         if (d.isEmpty() || mName.isEmpty() || a.isEmpty()) return ""
         val dLabel = if (d.length == 1) "0$d" else d
         // mName ya es la clave ("Mayo", "Enero", etc.)
-        return "$a-$mName-$dLabel"
+        println("mName -> $mName")
+        val monthKey = meses.entries.find { it.value == mName }?.key ?: mName
+        println("monthKey -> $monthKey")
+        return "$a-$monthKey-$dLabel"
     }
 
     private fun loadStudentData(id: String) {
@@ -124,13 +152,12 @@ class AdminPerfilClienteViewModel(
                 profesoresSeleccionados.value = it.teacherIds.toSet()
                 beltId.value = it.beltId
                 isActive.value = it.isActive
-                
                 if (it.isMinor) {
                     nombre.value = it.tutorName ?: ""
                     apellidos.value = it.tutorLastName ?: ""
                     val tDate = parseDate(it.tutorBirthDate)
                     dia.value = tDate[0]; mes.value = tDate[1]; anio.value = tDate[2]
-                    
+
                     nombreMenor.value = it.name
                     apellidosMenor.value = it.lastName
                     val aDate = parseDate(it.birthDate)
@@ -152,7 +179,7 @@ class AdminPerfilClienteViewModel(
     fun updateStudent(onSuccess: () -> Unit) {
         val currentId = _studentId.value ?: return
         val userBase = currentUser ?: return
-        
+
         viewModelScope.launch {
             val updatedUser = if (esMenor.value) {
                 userBase.copy(
@@ -185,7 +212,7 @@ class AdminPerfilClienteViewModel(
                     isActive = isActive.value
                 )
             }
-            
+
             if (userRepository.updateUser(updatedUser)) {
                 onSuccess()
             }

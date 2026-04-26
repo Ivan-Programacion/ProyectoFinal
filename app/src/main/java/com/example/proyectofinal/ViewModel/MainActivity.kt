@@ -212,9 +212,13 @@ fun App(startDestination: String = "login") {
             }
         },
         topBar = {
-            // Si NO estamos navegando antes de entrar en la aplicación por las pantalals login, registro, etc
+            // Si NO estamos navegando antes de entrar en la aplicación por las pantallas login, registro, etc
             // controller.popBackStack() --> Para volver atrás en caso de que la pantalla tenga flecha hacia atrás
-            if (currentRoute !in pantallasIniciales) TopBar(currentRoute) { controller.popBackStack() }
+            if (currentRoute !in pantallasIniciales) TopBar(currentRoute) {
+                controller.popBackStack()
+                // Reseteamos los campos de AdminPerfilCliente a lo que ya exisitian, por si se habían cambiado sin Actualizar
+                //if(currentRoute == StateNavigate.adminPerfilCliente.value) adminPerfilClienteViewModel.resetViewModelsStatesAdmin()
+            }
             // Si lo estamos, no añadimos el TopBar
             else Spacer(Modifier.padding(bottom = 104.dp))
         },

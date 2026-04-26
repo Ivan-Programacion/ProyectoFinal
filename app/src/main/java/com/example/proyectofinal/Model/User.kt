@@ -6,8 +6,12 @@ data class User(
     val id: String = "", // UID de Firebase Auth
     val email: String = "",
     val role: String = "STUDENT", // "STUDENT", "TEACHER", "SUPERADMIN"
-    val isClientApproved: Boolean = true,
-    val isActive: Boolean = true, // Para activar o desactivar alumno
+    @get:PropertyName("clientApproved")
+    @set:PropertyName("clientApproved")
+    var isClientApproved: Boolean = true,
+    @get:PropertyName("active")
+    @set:PropertyName("active")
+    var isActive: Boolean = true, // Para activar o desactivar alumno
     val centerId: String = "",
     val teacherIds: List<String> = emptyList(),
     val name: String = "",
@@ -15,7 +19,9 @@ data class User(
     val birthDate: String = "", // Formato "YYYY-MM-DD"
     val phone: String = "",
     val beltId: String = "white",
-    val isMinor: Boolean = false,
+    @get:PropertyName("minor")
+    @set:PropertyName("minor")
+    var isMinor: Boolean = false,
 
     // Datos del tutor (Opcionales)
     val tutorName: String? = null,

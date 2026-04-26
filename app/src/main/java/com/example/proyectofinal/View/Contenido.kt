@@ -92,7 +92,7 @@ fun Contenido(paddingValues: PaddingValues = PaddingValues()) {
                                     modifier = Modifier.size(32.dp), // Tamaño de estrella más grande
                                     imageVector = Icons.Default.Star,
                                     contentDescription = null, // null porque la descripción la lleva el contenedor o el otro icono
-                                    tint = mapBeltColor.getValue("Amarillo") // Relleno amarillo
+                                    tint = mapBeltColor.getValue("yellow") // Relleno amarillo
                                 )
                                 Icon(
                                     modifier = Modifier.size(32.dp), // Tamaño de estrella más grande

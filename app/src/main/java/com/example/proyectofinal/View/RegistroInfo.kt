@@ -310,7 +310,11 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
 
                 // --- BOTÓN SIGUIENTE ---
                 Button(
-                    onClick = { controller(StateNavigate.registroPass.value) },
+                    onClick = {
+                        viewModel.checkEmailAndNavigate(email) { 
+                            controller(StateNavigate.registroPass.value) 
+                        } 
+                    },
                     enabled = isNextButtonEnabled,
                     modifier = Modifier
                         .fillMaxWidth()

@@ -3,6 +3,8 @@ package com.example.proyectofinal.Repository
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -25,6 +27,10 @@ class AuthRepositoryImpl(
             if (password != repeatPassword || !isValidPassword) throw IllegalArgumentException()
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             result.user?.uid
+        } catch (e: FirebaseAuthUserCollisionException) {
+            e.printStackTrace()
+            message("Correo electrónico no válido o ya registrado")
+            null
         } catch (e: FirebaseNetworkException) {
             e.printStackTrace()
             message("Error de conexión. No se pudo registrar el usuario")

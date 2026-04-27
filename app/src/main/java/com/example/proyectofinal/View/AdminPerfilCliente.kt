@@ -342,14 +342,14 @@ fun AdminPerfilCliente(
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                         )
-                        
+
                         val beltNameToShow = listaCinturones.find { it.id == beltId }?.name?.get("es") ?: beltId
-                        
+
                         CampoDesplegableAdmin(
                             label = beltNameToShow,
                             opciones = listaCinturones.map { it.name["es"] ?: it.id },
                             seleccionado = beltNameToShow,
-                            onValueChange = { nameSelected, _ -> 
+                            onValueChange = { nameSelected, _ ->
                                 val idSelected = listaCinturones.find { (it.name["es"] ?: it.id) == nameSelected }?.id ?: "white"
                                 viewModel.beltId.value = idSelected
                             }
@@ -379,7 +379,7 @@ fun AdminPerfilCliente(
                         )
                     ) {
                         Text(
-                            text = if (isActive) "Desactivar alumno" else "Activar alumno",
+                            text = if (isActive) "Dar de baja alumno" else "Activar alumno",
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -543,9 +543,9 @@ fun ConfirmarCambiosDialogAdmin(
 // --- DIALOG: ELIMINAR/DESACTIVAR ALUMNO ---
 @Composable
 fun ModificarStatusAlumnoDialog(
-    nombreCompleto: String, 
+    nombreCompleto: String,
     isActive: Boolean,
-    onConfirm: () -> Unit, 
+    onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
@@ -559,7 +559,7 @@ fun ModificarStatusAlumnoDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (isActive) "¿Desactivar alumno?" else "¿Activar alumno?",
+                    text = if (isActive) "¿Dar de baja alumno?" else "¿Activar alumno?",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                 )
@@ -571,7 +571,7 @@ fun ModificarStatusAlumnoDialog(
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Button(
                         onClick = onConfirm,
@@ -582,9 +582,10 @@ fun ModificarStatusAlumnoDialog(
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Text(
-                            text = if (isActive) "Desactivar" else "Activar",
+                            text = if (isActive) "Dar de baja" else "Activar",
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
                         )
                     }
                     Button(
@@ -597,7 +598,8 @@ fun ModificarStatusAlumnoDialog(
                             "Cancelar",
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }

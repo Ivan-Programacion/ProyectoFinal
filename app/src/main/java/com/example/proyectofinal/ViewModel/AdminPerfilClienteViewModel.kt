@@ -134,9 +134,7 @@ class AdminPerfilClienteViewModel(
         if (d.isEmpty() || mName.isEmpty() || a.isEmpty()) return ""
         val dLabel = if (d.length == 1) "0$d" else d
         // mName ya es la clave ("Mayo", "Enero", etc.)
-        println("mName -> $mName")
         val monthKey = meses.entries.find { it.value == mName }?.key ?: mName
-        println("monthKey -> $monthKey")
         return "$a-$monthKey-$dLabel"
     }
 

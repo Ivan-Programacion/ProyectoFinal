@@ -168,7 +168,7 @@ fun App(startDestination: String = "login") {
         when (authUiState) {
             is AuthUiState.Error -> {
                 isErrorSnackbar = true
-                if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registroPass.value || currentRoute == StateNavigate.perfil.value) {
+                if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registroPass.value || currentRoute == StateNavigate.perfil.value || currentRoute == StateNavigate.registro.value) {
                     snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
                     authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
                 }

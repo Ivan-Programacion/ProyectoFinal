@@ -94,6 +94,16 @@ class AuthViewModel(
         }
     }
 
+    // Comprueba en Firebase si el email es válido y no está en uso antes de pasar a la contraseña
+    fun checkEmailAndNavigate(emailToCheck: String, onSuccess: () -> Unit) {
+        if (isValidEmail(emailToCheck)) {
+            _uiState.value = AuthUiState.Idle
+            onSuccess()
+        } else {
+            _uiState.value = AuthUiState.Error("Correo electrónico no válido.")
+        }
+    }
+
     // Login States
     val loginEmail = MutableStateFlow("")
     val loginPassword = MutableStateFlow("")
@@ -139,9 +149,9 @@ class AuthViewModel(
     val registroRepeatPasswordVisible = MutableStateFlow(false)
     val showDialogTerminos = MutableStateFlow(false)
 
-    // Verificación de email mínima
+    // Verificación de email mínima desde Android
     private fun isValidEmail(emailStr: String): Boolean {
-        return emailStr.contains("@") && emailStr.contains(".")
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(emailStr).matches()
     }
 
     // Comprobación de botón "Siguiente" enabled en RegistroInfo
@@ -178,9 +188,9 @@ class AuthViewModel(
         val mesMenorStr = args[13] as String
         val anioMenorStr = args[14] as String
 
-        val mainFieldsValid = nombreStr.isNotBlank() && apellidosStr.isNotBlank() &&
+        val mainFieldsValid = nombreStr.isNotBlank() && apellidosStr.isNotBlank() && emailStr.isNotBlank() &&
                 telefonoStr.isNotBlank() && diaStr.isNotBlank() && mesStr.isNotBlank() && anioStr.isNotBlank() &&
-                centroStr.isNotBlank() && profeSet.isNotEmpty() && isValidEmail(emailStr)
+                centroStr.isNotBlank() && profeSet.isNotEmpty()
 
         // Comprobación con la lógica del checkbox de menor
         if (!isMenor) {

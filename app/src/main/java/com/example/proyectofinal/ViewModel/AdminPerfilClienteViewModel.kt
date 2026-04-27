@@ -167,6 +167,12 @@ class AdminPerfilClienteViewModel(
                     apellidos.value = it.lastName
                     val aDate = parseDate(it.birthDate)
                     dia.value = aDate[0]; mes.value = aDate[1]; anio.value = aDate[2]
+                    
+                    nombreMenor.value = ""
+                    apellidosMenor.value = ""
+                    diaMenor.value = ""
+                    mesMenor.value = ""
+                    anioMenor.value = ""
                 }
 
                 if (it.centerId.isNotEmpty()) {

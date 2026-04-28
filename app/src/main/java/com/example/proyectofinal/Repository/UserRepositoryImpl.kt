@@ -7,6 +7,7 @@ import com.google.firebase.firestore.Source
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -21,6 +22,7 @@ class UserRepositoryImpl(
     private val userCollection = db.collection(collection)
 
     override suspend fun getUser(userId: String): User? {
+        if (userId.isBlank()) return null
         return try {
             val snapshot = userCollection.document(userId).get().await()
             if (snapshot.exists()) {
@@ -38,7 +40,7 @@ class UserRepositoryImpl(
     Cada vez que surja un cambio en Firestore para ese usuario , el listener captura el snapshot
     (el nuevo estado) y lo envía a la app a través del canal (trySend(user)) en tiempo real.
      */
-    override fun getUserStream(userId: String): Flow<User?> = callbackFlow {
+    override fun getUserStream(userId: String): Flow<User?> = if (userId.isBlank()) flowOf(null) else callbackFlow {
         // addSnapshotListener escucha cambios en tiempo real. Y si lo hay, lo envía a la app
         val subscription = userCollection.document(userId).addSnapshotListener { snapshot, error ->
             if (error != null) {
@@ -91,6 +93,7 @@ class UserRepositoryImpl(
     }
 
     override suspend fun deleteUser(userId: String): Boolean {
+        if (userId.isBlank()) return false
         return try {
             userCollection.document(userId).delete().await()
             true
@@ -111,6 +114,7 @@ class UserRepositoryImpl(
     }
 
     override suspend fun getTeachersByCenter(centerId: String): List<User> {
+        if (centerId.isBlank()) return emptyList()
         return try {
             val snapshot = userCollection
                 .whereEqualTo("role", "TEACHER")
@@ -124,7 +128,7 @@ class UserRepositoryImpl(
         }
     }
 
-    override fun getStudentsByTeacherStream(teacherId: String): Flow<List<User>> = callbackFlow {
+    override fun getStudentsByTeacherStream(teacherId: String): Flow<List<User>> = if (teacherId.isBlank()) flowOf(emptyList()) else callbackFlow {
         val subscription = userCollection
             .whereEqualTo("clientApproved", true)
             .whereArrayContains("teacherIds", teacherId)
@@ -141,7 +145,7 @@ class UserRepositoryImpl(
         awaitClose { subscription.remove() }
     }
 
-    override fun getStudentsForExam(centerId: String, teacherId: String): Flow<List<User>> = callbackFlow {
+    override fun getStudentsForExam(centerId: String, teacherId: String): Flow<List<User>> = if (centerId.isBlank() || teacherId.isBlank()) flowOf(emptyList()) else callbackFlow {
         val query = userCollection
             .whereEqualTo("centerId", centerId)
             // Se puede filtrar por professor también
@@ -163,6 +167,7 @@ class UserRepositoryImpl(
     }
 
     override suspend fun updateStudentExamStatus(userId: String, status: String, text: String) {
+        if (userId.isBlank()) return
         try {
             userCollection.document(userId).update(
                 mapOf("examStatus" to status, "examText" to text)
@@ -173,6 +178,7 @@ class UserRepositoryImpl(
     }
 
     override suspend fun updateAllStudentsExamStatusByCenter(centerId: String, oldStatus: String, newStatus: String, text: String) {
+        if (centerId.isBlank()) return
         try {
             val students = userCollection
                 .whereEqualTo("centerId", centerId)
@@ -191,6 +197,7 @@ class UserRepositoryImpl(
     }
 
     override suspend fun passExamAndUpgradeBelt(userId: String, newBeltId: String, status: String, text: String) {
+        if (userId.isBlank()) return
         try {
             userCollection.document(userId).update(
                 mapOf("examStatus" to status, "examText" to text, "beltId" to newBeltId)

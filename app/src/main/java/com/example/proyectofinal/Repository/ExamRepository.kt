@@ -7,5 +7,5 @@ interface ExamRepository {
     // Obtiene la instancia del examen
     suspend fun getExam(centerId: String): Exam?
     fun observeExam(centerId: String): Flow<Exam?>
-    suspend fun updateExamStatus(centerId: String, currentStatus: String)
+    suspend fun updateExamStatus(centerId: String, currentStatus: String, infoMessage: String = "")
 }

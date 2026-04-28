@@ -54,7 +54,11 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
+fun Perfil(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: AuthViewModel = viewModel(),
+    controller: (String) -> Unit
+) {
     // 1. Recolectamos el usuario real (Reactivo)
     val currentUser by viewModel.currentUserState.collectAsStateWithLifecycle()
     val currentExam by viewModel.currentExamState.collectAsStateWithLifecycle()
@@ -217,7 +221,11 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
                         examStatus == "APPLICANT" -> "Esperando aprobación de solicitud..."
                         examStatus == "REFUSED" -> "Tu solicitud de examen ha sido rechazada."
                         examStatus == "CANDIDATE" && estadoExamenGlobal == "IN_PROGRESS" -> "¡Tu examen está en curso! Suerte."
-                        estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE" -> "¡Ya puedes solicitar tu examen!"
+                        estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE" -> {
+                            currentExam?.infoMessage?.takeIf { it.isNotBlank() }
+                                ?: "¡Ya puedes solicitar tu examen!"
+                        }
+
                         else -> "No hay proceso de examen en estos momentos."
                     }
 

@@ -40,10 +40,11 @@ class ExamRepositoryImpl(
         awaitClose { listener.remove() }
     }
 
-    override suspend fun updateExamStatus(centerId: String, currentStatus: String) {
+    override suspend fun updateExamStatus(centerId: String, currentStatus: String, infoMessage: String) {
         try {
             val updates = mutableMapOf<String, Any>(
-                "currentStatus" to currentStatus
+                "currentStatus" to currentStatus,
+                "infoMessage" to infoMessage
             )
 
             examCollection.document(centerId).set(updates, com.google.firebase.firestore.SetOptions.merge()).await()

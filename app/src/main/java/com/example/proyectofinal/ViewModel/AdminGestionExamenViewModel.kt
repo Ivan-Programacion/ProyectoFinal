@@ -30,10 +30,17 @@ class AdminGestionExamenViewModel(
     private val contentRepository: ContentRepository
 ) : ViewModel() {
 
-    private val teacherUid = authRepository.getCurrentUserUid() ?: ""
-
     // Flujo Reactivo del Usuario Actual (Profesor) para obtener su centerId
-    private val currentTeacher: StateFlow<User?> = userRepository.getUserStream(teacherUid)
+    // Ahora reacciona al stream de autenticación para evitar IDs vacíos al arrancar
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val currentTeacher: StateFlow<User?> = authRepository.getAuthStateStream()
+        .flatMapLatest { uid ->
+            if (!uid.isNullOrBlank()) {
+                userRepository.getUserStream(uid)
+            } else {
+                flowOf(null)
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     // Flujo Reactivo de Estado del Exam basado en el centerId del profe
@@ -68,7 +75,7 @@ class AdminGestionExamenViewModel(
         .flatMapLatest { teacher ->
             if (teacher.centerId.isNotEmpty()) {
                 // Aquí filtra alumnos de SU centro y SU id (podría ser teacherIds en list)
-                userRepository.getStudentsByTeacherStream(teacherUid)
+                userRepository.getStudentsByTeacherStream(teacher.id)
             } else {
                 flowOf(emptyList())
             }
@@ -119,9 +126,7 @@ class AdminGestionExamenViewModel(
     // ACCIONES DE PROFESOR SOBRE EL EXAMEN GLOBALES
     fun startOpenRequests(globalMessage: String) = viewModelScope.launch {
         val centerId = currentTeacher.value?.centerId ?: return@launch
-        examRepository.updateExamStatus(centerId, "OPEN_REQUESTS")
-        // La lógica de mensaje general podrías guardarla a nivel exam o broadcast,
-        // pero como es text a users que pasen a estado NONE / APPLICANT...
+        examRepository.updateExamStatus(centerId, "OPEN_REQUESTS", globalMessage)
     }
 
     fun startInProgress() = viewModelScope.launch {
@@ -132,12 +137,12 @@ class AdminGestionExamenViewModel(
             newStatus = "CANDIDATE",
             text = "¡El proceso de examen ha comenzado!"
         )
-        examRepository.updateExamStatus(centerId, "IN_PROGRESS")
+        examRepository.updateExamStatus(centerId, "IN_PROGRESS", currentExam.value.infoMessage)
     }
 
     fun finishExam() = viewModelScope.launch {
         val centerId = currentTeacher.value?.centerId ?: return@launch
-        examRepository.updateExamStatus(centerId, "CLOSED")
+        examRepository.updateExamStatus(centerId, "CLOSED", "")
         
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")

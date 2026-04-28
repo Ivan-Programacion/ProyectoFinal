@@ -31,4 +31,16 @@ interface UserRepository {
 
     // Obtener los alumnos asignados a un profesor en tiempo real
     fun getStudentsByTeacherStream(teacherId: String): Flow<List<User>>
+
+    // Obtener los alumnos para un examen específico
+    fun getStudentsForExam(centerId: String, teacherId: String): Flow<List<User>>
+
+    // Actualizar el estado de examen de un alumno
+    suspend fun updateStudentExamStatus(userId: String, status: String, text: String)
+
+    // Actualizar el estado de examen de todos los alumnos de un centro
+    suspend fun updateAllStudentsExamStatusByCenter(centerId: String, oldStatus: String, newStatus: String, text: String)
+
+    // Pasar examen y actualizar cinturón
+    suspend fun passExamAndUpgradeBelt(userId: String, newBeltId: String, status: String, text: String)
 }

@@ -140,4 +140,63 @@ class UserRepositoryImpl(
             }
         awaitClose { subscription.remove() }
     }
+
+    override fun getStudentsForExam(centerId: String, teacherId: String): Flow<List<User>> = callbackFlow {
+        val query = userCollection
+            .whereEqualTo("centerId", centerId)
+            // Se puede filtrar por professor también
+            .whereEqualTo("teacherId", teacherId)
+
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(emptyList())
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                val users = snapshot.toObjects(User::class.java)
+                trySend(users)
+            } else {
+                trySend(emptyList())
+            }
+        }
+        awaitClose { listener.remove() }
+    }
+
+    override suspend fun updateStudentExamStatus(userId: String, status: String, text: String) {
+        try {
+            userCollection.document(userId).update(
+                mapOf("examStatus" to status, "examText" to text)
+            ).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun updateAllStudentsExamStatusByCenter(centerId: String, oldStatus: String, newStatus: String, text: String) {
+        try {
+            val students = userCollection
+                .whereEqualTo("centerId", centerId)
+                .whereEqualTo("examStatus", oldStatus)
+                .get().await()
+            // Utilización de rubBatch para actualizar los documentos de usuarios en cascada
+            db.runBatch { batch ->
+                students.documents.forEach { doc ->
+                    batch.update(doc.reference, "examStatus", newStatus)
+                    batch.update(doc.reference, "examText", text)
+                }
+            }.await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override suspend fun passExamAndUpgradeBelt(userId: String, newBeltId: String, status: String, text: String) {
+        try {
+            userCollection.document(userId).update(
+                mapOf("examStatus" to status, "examText" to text, "beltId" to newBeltId)
+            ).await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

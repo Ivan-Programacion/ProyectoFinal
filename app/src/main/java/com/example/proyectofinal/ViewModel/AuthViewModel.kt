@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.proyectofinal.Model.Center
+import com.example.proyectofinal.Model.Exam
 import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.Repository.AuthRepository
+import com.example.proyectofinal.Repository.ExamRepository
 import com.example.proyectofinal.Repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +30,8 @@ sealed class AuthUiState {
 
 class AuthViewModel(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val examRepository: ExamRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -57,6 +60,21 @@ class AuthViewModel(
     val currentUserState: StateFlow<User?> = currentUserUid.flatMapLatest { uid ->
         if (uid != null) {
             userRepository.getUserStream(uid)
+        } else {
+            flowOf(null)
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    // Stream en vivo del examen en base al centerId del usuario. Si no hay, null.
+    // Se vuelve a escuchar si el usuario cambia o si el examen es actualizado en Firestore.
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentExamState: StateFlow<Exam?> = currentUserState.flatMapLatest { user ->
+        if (user != null && user.centerId.isNotEmpty()) {
+            examRepository.observeExam(user.centerId)
         } else {
             flowOf(null)
         }
@@ -341,6 +359,21 @@ class AuthViewModel(
         authRepository.logout()
         currentUserUid.value = null
     }
+
+    fun requestExam() {
+        viewModelScope.launch {
+            val currentUser = currentUserState.value
+            if (currentUser != null) {
+                val updatedUser = currentUser.copy(examStatus = "APPLICANT")
+                val success = userRepository.updateUser(updatedUser)
+                if (success) {
+                    _uiState.value = AuthUiState.Success("Solicitud de examen enviada correctamente")
+                } else {
+                    _uiState.value = AuthUiState.Error("Error al enviar la solicitud de examen")
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -350,12 +383,13 @@ ya que de lo contrario no sabe de dónde obtener esas instancias.
  */
 class AuthViewModelFactory(
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val examRepository: ExamRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AuthViewModel(authRepository, userRepository) as T
+            return AuthViewModel(authRepository, userRepository, examRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

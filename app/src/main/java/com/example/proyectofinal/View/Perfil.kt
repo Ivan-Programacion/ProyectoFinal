@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectofinal.Logic.EstadoExamen
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -58,6 +57,7 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
     // 1. Recolectamos el usuario real (Reactivo)
     val currentUser by viewModel.currentUserState.collectAsStateWithLifecycle()
+    val currentExam by viewModel.currentExamState.collectAsStateWithLifecycle()
 
     // 2. Inicializamos los campos con los datos del usuario real
     // Utilizamos `remember(currentUser)` para que, si el flujo de base de datos se actualiza (ej. tras arrancar o modificar),
@@ -66,14 +66,15 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
     var apellidos by remember(currentUser) { mutableStateOf(currentUser?.lastName ?: "") }
     var telefono by remember(currentUser) { mutableStateOf(currentUser?.phone ?: "") }
     val email = currentUser?.email ?: ""
+    val examStatus = currentUser?.examStatus ?: "NONE"
+    val examText = currentUser?.examText ?: ""
 
     // ESTADO PARA EL DIALOG
     var showConfirmDialog by remember { mutableStateOf(false) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    // --- NUEVOS ESTADOS PARA SOLICITAR EXAMEN ---
-    var estadoExamen by remember { mutableStateOf(EstadoExamen.OPEN_REQUESTS) }
-    var solicitudEnviada by remember { mutableStateOf(false) }
+    // --- NUEVOS ESTADOS COMPROBANDO EXAMEN REAL ---
+    val estadoExamenGlobal = currentExam?.currentStatus ?: "CLOSED"
     var showSolicitarExamenDialog by remember { mutableStateOf(false) }
 
     // Lógica del Dialog de Confirmación
@@ -104,7 +105,7 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
         SolicitarExamenDialog(
             onConfirm = {
                 showSolicitarExamenDialog = false
-                solicitudEnviada = true // Cambiamos el estado al aceptar
+                viewModel.requestExam()
             },
             onDismiss = { showSolicitarExamenDialog = false }
         )
@@ -211,8 +212,12 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
 
                     // Lógica para el mensaje informativo
                     val mensajeInformativo = when {
-                        solicitudEnviada -> "Esperando aprobación de solicitud..."
-                        estadoExamen == EstadoExamen.OPEN_REQUESTS -> "¡Examen el próximo domingo 21 de junio!"
+                        examStatus == "APPROVED" -> "¡Enhorabuena! Has aprobado tu último examen."
+                        examStatus == "FAILED" -> "No has superado el examen. Sigue practicando."
+                        examStatus == "APPLICANT" -> "Esperando aprobación de solicitud..."
+                        examStatus == "REFUSED" -> "Tu solicitud de examen ha sido rechazada."
+                        examStatus == "CANDIDATE" && estadoExamenGlobal == "IN_PROGRESS" -> "¡Tu examen está en curso! Suerte."
+                        estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE" -> "¡Ya puedes solicitar tu examen!"
                         else -> "No hay proceso de examen en estos momentos."
                     }
 
@@ -222,16 +227,27 @@ fun Perfil(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewMo
                         shape = RoundedCornerShape(12.dp),
                         color = MaterialTheme.colorScheme.onSecondary
                     ) {
-                        Text(
-                            text = mensajeInformativo,
+                        Column(
                             modifier = Modifier.padding(16.dp),
-                            textAlign = TextAlign.Center
-                        )
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = mensajeInformativo,
+                                textAlign = TextAlign.Center
+                            )
+                            if (examText.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = examText,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        }
                     }
 
                     // Botón para acceder
                     val botonHabilitado =
-                        estadoExamen == EstadoExamen.OPEN_REQUESTS && !solicitudEnviada
+                        estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE"
 
                     Button(
                         onClick = { showSolicitarExamenDialog = true },

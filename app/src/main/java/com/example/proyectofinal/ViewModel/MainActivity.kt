@@ -76,6 +76,7 @@ import com.example.proyectofinal.Repository.AuthRepository
 import com.example.proyectofinal.Repository.AuthRepositoryImpl
 import com.example.proyectofinal.Repository.UserRepositoryImpl
 import com.example.proyectofinal.Repository.ContentRepositoryImpl
+import com.example.proyectofinal.Repository.ExamRepositoryImpl
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModelFactory
 import com.example.proyectofinal.ViewModel.BeltsViewModel
@@ -84,6 +85,8 @@ import com.example.proyectofinal.ViewModel.AdminListaClientesViewModel
 import com.example.proyectofinal.ViewModel.AdminListaClientesViewModelFactory
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModelFactory
+import com.example.proyectofinal.ViewModel.AdminGestionExamenViewModel
+import com.example.proyectofinal.ViewModel.AdminGestionExamenViewModelFactory
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -120,11 +123,13 @@ fun App(startDestination: String = "login") {
     val userRepository = UserRepositoryImpl()
     val authRepository = AuthRepositoryImpl()
     val contentRepository = ContentRepositoryImpl()
+    val examRepository = ExamRepositoryImpl()
 
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(
             authRepository = authRepository,
-            userRepository = userRepository
+            userRepository = userRepository,
+            examRepository = examRepository
         )
     )
 
@@ -146,6 +151,15 @@ fun App(startDestination: String = "login") {
     val adminPerfilClienteViewModel: AdminPerfilClienteViewModel = viewModel(
         factory = AdminPerfilClienteViewModelFactory(
             userRepository = userRepository,
+            contentRepository = contentRepository
+        )
+    )
+
+    val adminGestionExamenViewModel: AdminGestionExamenViewModel = viewModel(
+        factory = AdminGestionExamenViewModelFactory(
+            examRepository = examRepository,
+            userRepository = userRepository,
+            authRepository = authRepository,
             contentRepository = contentRepository
         )
     )
@@ -339,11 +353,11 @@ fun App(startDestination: String = "login") {
                 ) { controller.navigate(it) }
             }
             composable(StateNavigate.adminGestionExamen.value) {
-                AdminGestionExamen(innerPadding) {
-                    controller.navigate(
-                        it
-                    )
-                }
+                AdminGestionExamen(
+                    innerPadding,
+                    viewModel = adminGestionExamenViewModel,
+                    adminPerfilViewModel = adminPerfilClienteViewModel
+                ) { controller.navigate(it) }
             }
             composable(StateNavigate.adminPerfilCliente.value) {
                 AdminPerfilCliente(

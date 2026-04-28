@@ -44,42 +44,46 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.proyectofinal.Logic.AlumnoExamen
-import com.example.proyectofinal.Logic.EstadoExamen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.Model.User
+import com.example.proyectofinal.ViewModel.AdminGestionExamenViewModel
+import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
-fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+fun AdminGestionExamen(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: AdminGestionExamenViewModel = viewModel(),
+    adminPerfilViewModel: AdminPerfilClienteViewModel = viewModel(),
+    controller: (String) -> Unit
+) {
 
-//*********************** LOGICA DE PRUEBA *******************************//
-    // --- ESTADOS PROVISIONALES ---
+    // --- ESTADOS REACTIVOS DEL VIEWMODEL ---
+    val currentExam by viewModel.currentExam.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val ordenAscendente by viewModel.ordenAscendente.collectAsStateWithLifecycle()
+    val listaAlumnos by viewModel.filteredStudents.collectAsStateWithLifecycle()
+    val listaCinturones by viewModel.listaCinturones.collectAsStateWithLifecycle()
+    val estadoExamen = currentExam.currentStatus
+
+    // --- ESTADOS DE LA UI ---
     // Estados para los Dialogs Individuales
     var showAprobarIndividualDialog by remember { mutableStateOf(false) }
     var showRechazarIndividualDialog by remember { mutableStateOf(false) }
 
     // Estado para guardar a qué alumno le hemos pulsado el botón
-    var alumnoSeleccionado by remember { mutableStateOf<AlumnoExamen?>(null) }
-    var estadoExamen by remember { mutableStateOf(EstadoExamen.CLOSED) }
-    var searchQuery by remember { mutableStateOf("") }
+    var alumnoSeleccionado by remember { mutableStateOf<User?>(null) }
+    
     // Estado para controlar si el menú desplegable está abierto o cerrado
     var expandedMenuFiltro by remember { mutableStateOf(false) }
-    var ordenAscendente by remember { mutableStateOf(true) }
 
-    // Estados de los Dialogs
+    // Estados de los Dialogs Globales
     var showCancelarDialog by remember { mutableStateOf(false) }
     var showRealizarDialog by remember { mutableStateOf(false) }
     var showAprobarDialog by remember { mutableStateOf(false) }
 
-    // Datos de prueba
-    val listaAlumnos = remember {
-        listOf(
-            AlumnoExamen(1, "Juan", "Pérez", "Blanco"),
-            AlumnoExamen(2, "María", "Gómez", "Amarillo"),
-            AlumnoExamen(3, "Carlos", "López", "Naranja")
-        )
-    }
-//*********************** LOGICA DE PRUEBA *******************************//
     // --- DIALOGS ---
     if (showCancelarDialog) {
         DialogAccionExamen(
@@ -92,9 +96,9 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
-            onAceptar = {
+            onAceptar = { _ ->
                 showCancelarDialog = false
-                estadoExamen = EstadoExamen.CLOSED
+                viewModel.cancelExam()
             },
             onCancelar = { showCancelarDialog = false }
         )
@@ -112,9 +116,9 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = true,
-            onAceptar = {
+            onAceptar = { mensajeOpcional ->
                 showRealizarDialog = false
-                estadoExamen = EstadoExamen.OPEN_REQUESTS
+                viewModel.startOpenRequests(mensajeOpcional)
             },
             onCancelar = { showRealizarDialog = false }
         )
@@ -122,9 +126,9 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
 
     if (showAprobarDialog) {
         DialogAccionExamen(
-            titulo = if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Empezar examen" else "Terminar examen",
+            titulo = if (estadoExamen == "OPEN_REQUESTS") "Empezar examen" else "Terminar examen",
             descripcion =
-                if (estadoExamen == EstadoExamen.OPEN_REQUESTS)
+                if (estadoExamen == "OPEN_REQUESTS")
                     "Vas a proceder a empezar el examen. Esto hará que se acepten TODAS las solicitudes. " +
                             "¿Estás seguro de querer aceptar todas las solicitudes?"
                 else "Se va proceder a terminar el examen. Esto hará que se APRUEBEN a todos los alumnos. " +
@@ -135,10 +139,10 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
-            onAceptar = {
+            onAceptar = { _ ->
                 showAprobarDialog = false
-                estadoExamen = if (estadoExamen == EstadoExamen.OPEN_REQUESTS) EstadoExamen.IN_PROGRESS
-                else EstadoExamen.CLOSED
+                if (estadoExamen == "OPEN_REQUESTS") viewModel.startInProgress()
+                else viewModel.finishExam()
             },
             onCancelar = { showAprobarDialog = false }
         )
@@ -147,11 +151,11 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
     // --- DIALOGS INDIVIDUALES ---
     if (showAprobarIndividualDialog && alumnoSeleccionado != null) {
         val accionText =
-            if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Aceptar solicitud" else "Aprobar examen"
-        val descripcionText = if (estadoExamen == EstadoExamen.OPEN_REQUESTS)
-            "¿Estás seguro de querer ACEPTAR la solicitud de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+            if (estadoExamen == "OPEN_REQUESTS") "Aceptar solicitud" else "Aprobar examen"
+        val descripcionText = if (estadoExamen == "OPEN_REQUESTS")
+            "¿Estás seguro de querer ACEPTAR la solicitud de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
         else
-            "¿Estás seguro de querer APROBAR el examen de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+            "¿Estás seguro de querer APROBAR el examen de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
 
         DialogAccionExamen(
             titulo = accionText,
@@ -162,8 +166,12 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
-            onAceptar = {
-                // Aquí iría tu lógica real: viewModel.aprobarAlumno(alumnoSeleccionado.id)
+            onAceptar = { _ ->
+                if (estadoExamen == "OPEN_REQUESTS") {
+                    viewModel.approveStudentRequest(alumnoSeleccionado!!.id)
+                } else {
+                    viewModel.passStudentExam(alumnoSeleccionado!!)
+                }
                 showAprobarIndividualDialog = false
                 alumnoSeleccionado = null
             },
@@ -176,24 +184,28 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
 
     if (showRechazarIndividualDialog && alumnoSeleccionado != null) {
         val accionText =
-            if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Rechazar solicitud" else "Suspender examen"
-        val descripcionText = if (estadoExamen == EstadoExamen.OPEN_REQUESTS)
-            "¿Estás seguro de querer DENEGAR la solicitud de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+            if (estadoExamen == "OPEN_REQUESTS") "Rechazar solicitud" else "Suspender examen"
+        val descripcionText = if (estadoExamen == "OPEN_REQUESTS")
+            "¿Estás seguro de querer DENEGAR la solicitud de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
         else
-            "¿Estás seguro de querer SUSPENDER el examen de ${alumnoSeleccionado?.nombre} ${alumnoSeleccionado?.apellidos}?"
+            "¿Estás seguro de querer SUSPENDER el examen de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
 
         DialogAccionExamen(
             titulo = accionText,
             descripcion = descripcionText,
             textoAceptar =
-                if (estadoExamen == EstadoExamen.OPEN_REQUESTS) "Denegar" else "Sí",
+                if (estadoExamen == "OPEN_REQUESTS") "Denegar" else "Sí",
             textoCancelar = "Cancelar",
             colorAceptar = MaterialTheme.colorScheme.error, // Rojo porque es una acción destructiva/negativa
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
-            onAceptar = {
-                // Aquí irá lógica: viewModel.rechazarAlumno(alumnoSeleccionado.id)
+            onAceptar = { _ ->
+                if (estadoExamen == "OPEN_REQUESTS") {
+                    viewModel.refuseStudentRequest(alumnoSeleccionado!!.id)
+                } else {
+                    viewModel.failStudentExam(alumnoSeleccionado!!.id)
+                }
                 showRechazarIndividualDialog = false
                 alumnoSeleccionado = null
             },
@@ -239,7 +251,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { showCancelarDialog = true },
-                        enabled = estadoExamen != EstadoExamen.CLOSED,
+                        enabled = estadoExamen != "CLOSED",
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error,
@@ -248,20 +260,21 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                     ) {
                         Text(
                             "Cancelar examen",
-                            color = if (estadoExamen != EstadoExamen.CLOSED) Color.White else Color.DarkGray,
+                            color = if (estadoExamen != "CLOSED") Color.White else Color.DarkGray,
                         )
                     }
 
                     // Botón Derecho: Realizar / Aceptar / Aprobar
                     val textoBtnDerecho = when (estadoExamen) {
-                        EstadoExamen.CLOSED -> "Realizar examen"
-                        EstadoExamen.OPEN_REQUESTS -> "Empezar examen"
-                        EstadoExamen.IN_PROGRESS -> "Terminar examen"
+                        "CLOSED" -> "Realizar examen"
+                        "OPEN_REQUESTS" -> "Empezar examen"
+                        "IN_PROGRESS" -> "Terminar examen"
+                        else -> "Realizar examen"
                     }
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            if (estadoExamen == EstadoExamen.CLOSED) showRealizarDialog = true
+                            if (estadoExamen == "CLOSED") showRealizarDialog = true
                             else showAprobarDialog = true
                         },
                         shape = RoundedCornerShape(12.dp)
@@ -288,7 +301,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
             ) {
                 // Título condicional
                 val textoCondicion =
-                    if (estadoExamen == EstadoExamen.IN_PROGRESS) "Examinados" else "Solicitudes"
+                    if (estadoExamen == "IN_PROGRESS") "Examinados" else "Solicitudes"
                 Text(
                     text = textoCondicion,
                     style = MaterialTheme.typography.titleMedium,
@@ -304,7 +317,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                 ) {
                     OutlinedTextField(
                         value = searchQuery,
-                        onValueChange = { searchQuery = it },
+                        onValueChange = { viewModel.onSearchQueryChanged(it) },
                         modifier = Modifier.weight(1f),
                         placeholder = {
                             Text(
@@ -350,7 +363,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                                     )
                                 },
                                 onClick = {
-                                    ordenAscendente = true
+                                    viewModel.toggleOrdenAscendente(true)
                                     expandedMenuFiltro = false // Cerramos el menú tras elegir
                                 }
                             )
@@ -362,7 +375,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                                     )
                                 },
                                 onClick = {
-                                    ordenAscendente = false
+                                    viewModel.toggleOrdenAscendente(false)
                                     expandedMenuFiltro = false
                                 }
                             )
@@ -373,7 +386,7 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Lista de alumnos
-                if (listaAlumnos.isEmpty() || estadoExamen == EstadoExamen.CLOSED) {
+                if (listaAlumnos.isEmpty() || estadoExamen == "CLOSED") {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = "La lista está vacía",
@@ -389,8 +402,10 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                         // ALUMNO
                         items(listaAlumnos) { alumno ->
                             Card(
-                                modifier = Modifier.fillMaxWidth().clickable{ controller(
-                                    StateNavigate.adminPerfilCliente.value) },
+                                modifier = Modifier.fillMaxWidth().clickable{ 
+                                    adminPerfilViewModel.setStudentId(alumno.id)
+                                    controller(StateNavigate.adminPerfilCliente.value) 
+                                },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
                             ) {
@@ -404,11 +419,12 @@ fun AdminGestionExamen(paddingValues: PaddingValues = PaddingValues(), controlle
                                     // Datos Alumno
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = "${alumno.nombre} ${alumno.apellidos}",
+                                            text = "${alumno.name} ${alumno.lastName}",
                                             fontWeight = FontWeight.Bold,
                                         )
+                                        val beltName = (listaCinturones.find { it.id == alumno.beltId }?.name?.get("es") as? String) ?: "Blanco"
                                         Text(
-                                            text = alumno.cinturon,
+                                            text = beltName,
                                             style = MaterialTheme.typography.bodySmall,
                                         )
                                     }
@@ -471,7 +487,7 @@ fun DialogAccionExamen(
     colorCancelar: Color,
     colorTextoCancelar: Color,
     mostrarTextArea: Boolean,
-    onAceptar: () -> Unit,
+    onAceptar: (String) -> Unit,
     onCancelar: () -> Unit
 ) {
     var comentario by remember { mutableStateOf("") }
@@ -523,7 +539,7 @@ fun DialogAccionExamen(
                 ) {
                     // Botón Aceptar (Izquierda - Acción principal)
                     Button(
-                        onClick = onAceptar,
+                        onClick = { onAceptar(comentario) },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = colorAceptar),
                         shape = RoundedCornerShape(12.dp)

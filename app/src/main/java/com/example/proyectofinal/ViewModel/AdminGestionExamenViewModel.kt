@@ -137,21 +137,54 @@ class AdminGestionExamenViewModel(
             newStatus = "CANDIDATE",
             text = "¡El proceso de examen ha comenzado!"
         )
+        // Actualizamos también a los que ya estaban como CANDIDATE (aprobados individualmente)
+        // para que se les refresque el examText correctamente
+        userRepository.updateAllStudentsExamStatusByCenter(
+            centerId = centerId,
+            oldStatus = "CANDIDATE",
+            newStatus = "CANDIDATE",
+            text = "¡El proceso de examen ha comenzado!"
+        )
         examRepository.updateExamStatus(centerId, "IN_PROGRESS", currentExam.value.infoMessage)
     }
 
     fun finishExam() = viewModelScope.launch {
         val centerId = currentTeacher.value?.centerId ?: return@launch
+        
+        // 1. Aprobar y subir cinturón a todos los CANDIDATE del centro
+        val allUsers = userRepository.getAllUsers()
+        val candidates = allUsers.filter { it.centerId == centerId && it.examStatus == "CANDIDATE" }
+        
+        val belts = listaCinturones.value
+        candidates.forEach { user ->
+            val currentOrder = belts.find { it.id == user.beltId }?.order ?: 0
+            val nextBelt = belts.find { it.order == currentOrder + 1 }
+            val finalBeltId = nextBelt?.id ?: user.beltId
+            // Como luego se van a pasar a NONE, solo actualizamos el cinturón directamente
+            // usando la función pero dejándolo en APPROVED temporalmente
+            userRepository.passExamAndUpgradeBelt(user.id, finalBeltId, "APPROVED", "¡Enhorabuena, has aprobado el examen!")
+        }
+
+        // 2. Cerrar el examen y resetear estados
         examRepository.updateExamStatus(centerId, "CLOSED", "")
         
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "FAILED", "NONE", "")
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "REFUSED", "NONE", "")
+        userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPLICANT", "NONE", "")
     }
 
     fun cancelExam() = viewModelScope.launch {
-        finishExam()
+        val centerId = currentTeacher.value?.centerId ?: return@launch
+        
+        examRepository.updateExamStatus(centerId, "CLOSED", "")
+        
+        userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
+        userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")
+        userRepository.updateAllStudentsExamStatusByCenter(centerId, "FAILED", "NONE", "")
+        userRepository.updateAllStudentsExamStatusByCenter(centerId, "REFUSED", "NONE", "")
+        userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPLICANT", "NONE", "")
     }
 
     // ACCIONES SOBRE EL ALUMNO INDIVIDUAL

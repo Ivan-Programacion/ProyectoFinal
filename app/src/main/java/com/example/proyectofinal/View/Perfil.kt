@@ -72,6 +72,7 @@ fun Perfil(
     val email = currentUser?.email ?: ""
     val examStatus = currentUser?.examStatus ?: "NONE"
     val examText = currentUser?.examText ?: ""
+    val isActive = currentUser?.isActive ?: false
 
     // ESTADO PARA EL DIALOG
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -214,20 +215,14 @@ fun Perfil(
                         style = MaterialTheme.typography.titleMedium,
                     )
 
-                    // Lógica para el mensaje informativo
-                    val mensajeInformativo = when {
-                        examStatus == "APPROVED" -> "¡Enhorabuena! Has aprobado tu último examen."
-                        examStatus == "FAILED" -> "No has superado el examen. Sigue practicando."
-                        examStatus == "APPLICANT" -> "Esperando aprobación de solicitud..."
-                        examStatus == "REFUSED" -> "Tu solicitud de examen ha sido rechazada."
-                        examStatus == "CANDIDATE" && estadoExamenGlobal == "IN_PROGRESS" -> "¡Tu examen está en curso! Suerte."
-                        estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE" -> {
-                            currentExam?.infoMessage?.takeIf { it.isNotBlank() }
-                                ?: "¡Ya puedes solicitar tu examen!"
-                        }
-
-                        else -> "No hay proceso de examen en estos momentos."
-                    }
+                    // Lógica para el mensaje informativo extraída al ViewModel
+                    val mensajeInformativo = viewModel.getMensajeInformativoExamen(
+                        isActive = isActive,
+                        examStatus = examStatus,
+                        examText = examText,
+                        estadoExamenGlobal = estadoExamenGlobal,
+                        infoMessage = currentExam?.infoMessage
+                    )
 
                     // Card interior o recuadro para resaltar el mensaje del profesor
                     Surface(
@@ -243,19 +238,12 @@ fun Perfil(
                                 text = mensajeInformativo,
                                 textAlign = TextAlign.Center
                             )
-                            if (examText.isNotBlank()) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = examText,
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
                         }
                     }
 
                     // Botón para acceder
                     val botonHabilitado =
-                        estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE"
+                        isActive && estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE"
 
                     Button(
                         onClick = { showSolicitarExamenDialog = true },
@@ -532,3 +520,8 @@ fun Perfilpreview() {
         Perfil() {}
     }
 }
+
+
+
+
+

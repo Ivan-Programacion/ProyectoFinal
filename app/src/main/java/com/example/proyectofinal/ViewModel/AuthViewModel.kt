@@ -374,6 +374,31 @@ class AuthViewModel(
             }
         }
     }
+
+    // Lógica para el mensaje informativo en la pantalla Perfil
+    fun getMensajeInformativoExamen(
+        isActive: Boolean,
+        examStatus: String,
+        examText: String,
+        estadoExamenGlobal: String,
+        infoMessage: String?
+    ): String {
+        return when {
+            !isActive -> "Tu cuenta está dada de baja. Habla con tu sensei para reactivarla."
+            examStatus == "APPROVED" -> examText.takeIf { it.isNotBlank() } ?: "¡Enhorabuena! Has aprobado tu último examen."
+            examStatus == "FAILED" -> examText.takeIf { it.isNotBlank() } ?: "Lo siento, no has superado el examen."
+            examStatus == "APPLICANT" -> examText.takeIf { it.isNotBlank() } ?: "Esperando aprobación de solicitud..."
+            examStatus == "REFUSED" -> examText.takeIf { it.isNotBlank() } ?: "Tu solicitud de examen ha sido denegada."
+            examStatus == "CANDIDATE" && estadoExamenGlobal == "IN_PROGRESS" -> examText.takeIf { it.isNotBlank() } ?: "¡El proceso de examen ha comenzado!"
+            examStatus == "CANDIDATE" && estadoExamenGlobal == "OPEN_REQUESTS" -> examText.takeIf { it.isNotBlank() } ?: "¡Tu solicitud ha sido aprobada! El examen está a punto de empezar."
+            estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE" -> {
+                infoMessage?.takeIf { it.isNotBlank() } ?: "¡Ya puedes solicitar tu examen!"
+            }
+            estadoExamenGlobal == "IN_PROGRESS" && examStatus == "NONE" -> "Hay un examen en proceso al cual no llegaste a solicitar acceso a tiempo."
+            else -> "No hay proceso de examen en estos momentos."
+        }
+    }
+
 }
 
 /*

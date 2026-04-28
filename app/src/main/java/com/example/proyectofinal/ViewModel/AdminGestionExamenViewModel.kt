@@ -151,12 +151,13 @@ class AdminGestionExamenViewModel(
     fun finishExam() = viewModelScope.launch {
         val centerId = currentTeacher.value?.centerId ?: return@launch
         
-        // 1. Aprobar y subir cinturón a todos los CANDIDATE del centro
+        // 1. Aprobar y subir cinturón a todos los CANDIDATE del centro y los que ya estaban APPROVED
         val allUsers = userRepository.getAllUsers()
-        val candidates = allUsers.filter { it.centerId == centerId && it.examStatus == "CANDIDATE" }
+        // Buscamos tanto a los CANDIDATE (que se aprueban todos por cierre masivo) como a los APPROVED (aprobados individualmente)
+        val candidatesAndApproved = allUsers.filter { it.centerId == centerId && (it.examStatus == "CANDIDATE" || it.examStatus == "APPROVED") }
         
         val belts = listaCinturones.value
-        candidates.forEach { user ->
+        candidatesAndApproved.forEach { user ->
             val currentOrder = belts.find { it.id == user.beltId }?.order ?: 0
             val nextBelt = belts.find { it.order == currentOrder + 1 }
             val finalBeltId = nextBelt?.id ?: user.beltId
@@ -197,11 +198,7 @@ class AdminGestionExamenViewModel(
     }
 
     fun passStudentExam(user: User) = viewModelScope.launch {
-        val currentOrder = listaCinturones.value.find { it.id == user.beltId }?.order ?: 0
-        val nextBelt = listaCinturones.value.find { it.order == currentOrder + 1 }
-        val finalBeltId = nextBelt?.id ?: user.beltId
-
-        userRepository.passExamAndUpgradeBelt(user.id, finalBeltId, "APPROVED", "¡Enhorabuena, has aprobado el examen!")
+        userRepository.updateStudentExamStatus(user.id, "APPROVED", "¡Has aprobado el examen! Recibirás tu nuevo cinturón al finalizar.")
     }
 
     fun failStudentExam(userId: String) = viewModelScope.launch {

@@ -239,6 +239,7 @@ fun App(startDestination: String = "login") {
         bottomBar = {
             // Si NO estamos navegando antes de entrar en la aplicación por las pantallas login, registro, etc
             if (currentRoute !in pantallasIniciales) NavBar(
+                currentRoute = currentRoute,
                 controller = {
                     beforeRoute = it
                     controller.navigate(it)
@@ -398,14 +399,13 @@ fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
 }
 
 @Composable
-fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
+fun NavBar(currentRoute: String?, controller: (route: String) -> Unit, isAdmin: Boolean = false) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-        var state by remember { mutableStateOf(StateNavigate.listaCinturones) }
         // Si es admin, muestra este item
         if (isAdmin) {
             NavigationBarItem(
-                selected = state == StateNavigate.adminListaClientes,
-                { state = StateNavigate.adminListaClientes; controller("adminListaClientes") },
+                selected = currentRoute == StateNavigate.adminListaClientes.value,
+                { controller(StateNavigate.adminListaClientes.value) },
                 icon = { Icon(Icons.Default.Book, contentDescription = "Gestion exámenes") },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
@@ -415,8 +415,8 @@ fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
                 label = { Text("Gestión") })
         }
         NavigationBarItem(
-            selected = state == StateNavigate.favoritos,
-            { state = StateNavigate.favoritos; controller("favoritos") },
+            selected = currentRoute == StateNavigate.favoritos.value,
+            { controller(StateNavigate.favoritos.value) },
             icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
@@ -425,9 +425,9 @@ fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
             ),
             label = { Text("Favoritos") })
         NavigationBarItem(
-            state == StateNavigate.listaCinturones,
-            { state = StateNavigate.listaCinturones; controller("listaCinturones") },
-            { Icon(Icons.Default.MilitaryTech, contentDescription = "Cinturones") },
+            selected = currentRoute == StateNavigate.listaCinturones.value,
+            onClick = { controller(StateNavigate.listaCinturones.value) },
+            icon = { Icon(Icons.Default.MilitaryTech, contentDescription = "Cinturones") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
@@ -435,9 +435,9 @@ fun NavBar(controller: (route: String) -> Unit, isAdmin: Boolean = false) {
             ),
             label = { Text("Cinturones") })
         NavigationBarItem(
-            state == StateNavigate.perfil,
-            { state = StateNavigate.perfil; controller("perfil") },
-            { Icon(Icons.Default.AccountCircle, contentDescription = "Perfil") },
+            selected = currentRoute == StateNavigate.perfil.value,
+            onClick = { controller(StateNavigate.perfil.value) },
+            icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Perfil") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,

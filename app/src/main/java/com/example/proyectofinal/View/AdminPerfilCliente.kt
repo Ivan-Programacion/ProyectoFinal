@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -399,18 +401,34 @@ fun CampoPerfilAdmin(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
         )
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledContainerColor = Color.LightGray,
-                disabledTextColor = MaterialTheme.colorScheme.primary
+        if(label == "Teléfono") {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledContainerColor = Color.LightGray,
+                    disabledTextColor = MaterialTheme.colorScheme.primary
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
-        )
+        } else {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = enabled,
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledContainerColor = Color.LightGray,
+                    disabledTextColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
     }
 }
 

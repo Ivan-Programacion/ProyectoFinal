@@ -61,7 +61,7 @@ fun Favoritos(paddingValues: PaddingValues = PaddingValues(), controller: (Strin
     // Interceptamos el botón de atrás
     BackHandler {
         // Cerramos la aplicación por completo
-        context?.finish()
+        controller(StateNavigate.listaCinturones.value)
     }
     LazyColumn(
         modifier = Modifier

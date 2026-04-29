@@ -63,7 +63,6 @@ fun AdminListaClientes(
     val context = LocalContext.current as? Activity
 
     // Para vaciar el campo de busqueda al volver a la pantalla
-    // Se necesita hacer con LifecycleOwner ya que utilizamos datos reactivos
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {

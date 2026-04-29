@@ -108,7 +108,6 @@ fun AdminPerfilCliente(
             onConfirm = {
                 viewModel.updateStudent {
                     showConfirmDialog = false
-                    controller(StateNavigate.adminListaClientes.value)
                 }
             },
             onDismiss = { showConfirmDialog = false }
@@ -123,7 +122,6 @@ fun AdminPerfilCliente(
                 viewModel.toggleUserActivation {
                     showStatusDialog = false
                     // Opcionalmente podemos volver a la lista o quedarnos
-                    controller(StateNavigate.adminListaClientes.value)
                 }
             },
             onDismiss = { showStatusDialog = false }

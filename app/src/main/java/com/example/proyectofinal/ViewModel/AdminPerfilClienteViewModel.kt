@@ -185,6 +185,9 @@ class AdminPerfilClienteViewModel(
         val userBase = currentUser ?: return
 
         viewModelScope.launch {
+            val centerChanged = centroSeleccionado.value != userBase.centerId
+            val newExamStatus = if (centerChanged) "NONE" else userBase.examStatus
+
             val updatedUser = if (esMenor.value) {
                 userBase.copy(
                     name = nombreMenor.value,
@@ -198,7 +201,8 @@ class AdminPerfilClienteViewModel(
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
                     beltId = beltId.value,
-                    isActive = isActive.value
+                    isActive = isActive.value,
+                    examStatus = newExamStatus
                 )
             } else {
                 userBase.copy(
@@ -213,7 +217,8 @@ class AdminPerfilClienteViewModel(
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
                     beltId = beltId.value,
-                    isActive = isActive.value
+                    isActive = isActive.value,
+                    examStatus = newExamStatus
                 )
             }
 
@@ -227,7 +232,11 @@ class AdminPerfilClienteViewModel(
         val userBase = currentUser ?: return
         viewModelScope.launch {
             val newActiveState = !isActive.value
-            val updatedUser = userBase.copy(isActive = newActiveState)
+            val newExamStatus = if (!newActiveState) "NONE" else userBase.examStatus
+            val updatedUser = userBase.copy(
+                isActive = newActiveState,
+                examStatus = newExamStatus
+            )
             if (userRepository.updateUser(updatedUser)) {
                 isActive.value = newActiveState
                 currentUser = updatedUser

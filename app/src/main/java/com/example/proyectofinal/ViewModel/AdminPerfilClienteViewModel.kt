@@ -24,6 +24,9 @@ class AdminPerfilClienteViewModel(
     private val _studentId = MutableStateFlow<String?>(null)
     private var currentUser: User? = null
 
+    // Exponemos el estado de AuthViewModel para controlar loadings y snackbars globales
+    val authUiState: StateFlow<AuthUiState> = authViewModel.uiState
+
     // Estados de los campos superiores (Adulto o Tutor)
     val nombre = MutableStateFlow("")
     val apellidos = MutableStateFlow("")
@@ -167,7 +170,7 @@ class AdminPerfilClienteViewModel(
                     apellidos.value = it.lastName
                     val aDate = parseDate(it.birthDate)
                     dia.value = aDate[0]; mes.value = aDate[1]; anio.value = aDate[2]
-
+                    
                     nombreMenor.value = ""
                     apellidosMenor.value = ""
                     diaMenor.value = ""
@@ -183,7 +186,6 @@ class AdminPerfilClienteViewModel(
     }
 
     fun updateStudent(onSuccess: () -> Unit) {
-        val currentId = _studentId.value ?: return
         val userBase = currentUser ?: return
 
         viewModelScope.launch {

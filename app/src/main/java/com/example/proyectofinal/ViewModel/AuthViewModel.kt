@@ -340,8 +340,9 @@ class AuthViewModel(
         }
     }
 
-    fun updateUserProfile(name: String, lastName: String, phone: String) {
+    fun updateUserProfile(name: String, lastName: String, phone: String, onUpdate: () -> Unit) {
         viewModelScope.launch {
+            setUiState(AuthUiState.Loading)
             val currentUser = currentUserState.value
             if (currentUser != null) {
                 val updatedUser = currentUser.copy(
@@ -352,6 +353,7 @@ class AuthViewModel(
                 val success = userRepository.updateUser(updatedUser)
                 if (success) {
                     _uiState.value = AuthUiState.Success("Datos actualizados correctamente")
+                    onUpdate()
                 } else {
                     _uiState.value = AuthUiState.Error("Error de conexión. No se pudieron actualizar los datos")
                 }

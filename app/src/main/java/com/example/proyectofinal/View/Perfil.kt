@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -64,6 +66,8 @@ fun Perfil(
     // 1. Recolectamos el usuario real (Reactivo)
     val currentUser by viewModel.currentUserState.collectAsStateWithLifecycle()
     val currentExam by viewModel.currentExamState.collectAsStateWithLifecycle()
+    val authUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading = authUiState is AuthUiState.Loading
 
     // 2. Inicializamos los campos con los datos del usuario real
     // Utilizamos `remember(currentUser)` para que, si el flujo de base de datos se actualiza (ej. tras arrancar o modificar),
@@ -87,12 +91,14 @@ fun Perfil(
     // Lógica del Dialog de Confirmación
     if (showConfirmDialog) {
         ConfirmarCambiosDialog(
+            isLoading = isLoading,
             onConfirm = {
                 // Ejecutamos la lógica de actualización en Firebase
-                viewModel.updateUserProfile(nombre, apellidos, telefono)
-                showConfirmDialog = false
+                viewModel.updateUserProfile(nombre, apellidos, telefono) {
+                    showConfirmDialog = false
+                }
             },
-            onDismiss = { showConfirmDialog = false }
+            onDismiss = { if (!isLoading) showConfirmDialog = false }
         )
     }
     // Logicca deñ Dialog de Cerrar Sesión
@@ -362,7 +368,11 @@ fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun ConfirmarCambiosDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun ConfirmarCambiosDialog(
+    isLoading: Boolean = false,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
@@ -396,11 +406,19 @@ fun ConfirmarCambiosDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text(
-                            "Aceptar",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                "Aceptar",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                     // Botón Cancelar
                     Button(
@@ -432,7 +450,7 @@ fun CampoPerfil(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
         )
-        if(label == "Teléfono") {
+        if (label == "Teléfono") {
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,

@@ -28,6 +28,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -61,6 +62,7 @@ import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
+import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -72,6 +74,9 @@ fun AdminPerfilCliente(
     controller: (String) -> Unit
 ) {
     // --- ESTADOS DEL VIEWMODEL ---
+    val authUiState by viewModel.authUiState.collectAsStateWithLifecycle()
+    val isLoading = authUiState is AuthUiState.Loading
+
     val nombre by viewModel.nombre.collectAsStateWithLifecycle()
     val apellidos by viewModel.apellidos.collectAsStateWithLifecycle()
     val telefono by viewModel.telefono.collectAsStateWithLifecycle()
@@ -108,12 +113,13 @@ fun AdminPerfilCliente(
     if (showConfirmDialog) {
         ConfirmarCambiosDialogAdmin(
             nombreCompleto = "$nombre $apellidos",
+            isLoading = isLoading,
             onConfirm = {
                 viewModel.updateStudent {
                     showConfirmDialog = false
                 }
             },
-            onDismiss = { showConfirmDialog = false }
+            onDismiss = { if (!isLoading) showConfirmDialog = false }
         )
     }
 
@@ -121,13 +127,14 @@ fun AdminPerfilCliente(
         ModificarStatusAlumnoDialog(
             nombreCompleto = "$nombre $apellidos",
             isActive = isActive,
+            isLoading = isLoading,
             onConfirm = {
                 viewModel.toggleUserActivation {
                     showStatusDialog = false
                     // Opcionalmente podemos volver a la lista o quedarnos
                 }
             },
-            onDismiss = { showStatusDialog = false }
+            onDismiss = { if (!isLoading) showStatusDialog = false }
         )
     }
 
@@ -513,6 +520,7 @@ fun CampoDesplegableAdmin(
 @Composable
 fun ConfirmarCambiosDialogAdmin(
     nombreCompleto: String,
+    isLoading: Boolean = false,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -547,11 +555,19 @@ fun ConfirmarCambiosDialogAdmin(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text(
-                            "Aceptar",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                "Aceptar",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                     Button(
                         onClick = onDismiss,
@@ -577,6 +593,7 @@ fun ConfirmarCambiosDialogAdmin(
 fun ModificarStatusAlumnoDialog(
     nombreCompleto: String,
     isActive: Boolean,
+    isLoading: Boolean = false,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -613,12 +630,20 @@ fun ModificarStatusAlumnoDialog(
                         ),
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text(
-                            text = if (isActive) "Dar de baja" else "Activar",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = if (isActive) "Dar de baja" else "Activar",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                     Button(
                         onClick = onDismiss,

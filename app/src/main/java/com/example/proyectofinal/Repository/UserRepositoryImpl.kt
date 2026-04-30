@@ -2,6 +2,7 @@ package com.example.proyectofinal.Repository
 
 import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.channels.awaitClose
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
+import java.net.ConnectException
 
 class UserRepositoryImpl(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
@@ -85,7 +87,13 @@ class UserRepositoryImpl(
                 userCollection.document(user.id).set(user).await()
                 true
             }
-            result ?: false
+            result ?: true // Siempre true aunque haya fallo de conexión porque cuando recupere la conexión, se producirá el cambio
+        } catch (e: FirebaseNetworkException) {
+            e.printStackTrace()
+            true
+        } catch (e: ConnectException) {
+            e.printStackTrace()
+            true
         } catch (e: Exception) {
             e.printStackTrace()
             false

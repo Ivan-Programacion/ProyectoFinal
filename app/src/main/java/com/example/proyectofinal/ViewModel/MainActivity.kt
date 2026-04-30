@@ -186,7 +186,8 @@ fun App(startDestination: String = "login") {
                 if (currentRoute == StateNavigate.login.value ||
                     currentRoute == StateNavigate.registroPass.value ||
                     currentRoute == StateNavigate.perfil.value ||
-                    currentRoute == StateNavigate.registro.value
+                    currentRoute == StateNavigate.registro.value ||
+                    currentRoute == StateNavigate.adminPerfilCliente.value
                 ) {
                     snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
                     authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales

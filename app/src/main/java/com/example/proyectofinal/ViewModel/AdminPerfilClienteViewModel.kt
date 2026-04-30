@@ -10,6 +10,7 @@ import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.Repository.ContentRepository
 import com.example.proyectofinal.Repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -181,7 +182,8 @@ class AdminPerfilClienteViewModel(
         }
     }
 
-    fun updateStudent(onUpdate: () -> Unit) {
+    fun updateStudent(onSuccess: () -> Unit) {
+        val currentId = _studentId.value ?: return
         val userBase = currentUser ?: return
 
         viewModelScope.launch {
@@ -223,13 +225,16 @@ class AdminPerfilClienteViewModel(
                 )
             }
 
-            userRepository.updateUser(updatedUser)
-            authViewModel.setUiState(AuthUiState.Success("Alumno actualizado correctamente"))
-            onUpdate()
+            if (userRepository.updateUser(updatedUser)) {
+                authViewModel.setUiState(AuthUiState.Success("Alumno actualizado correctamente"))
+                onSuccess()
+            } else {
+                authViewModel.setUiState(AuthUiState.Error("Error al actualizar el alumno"))
+            }
         }
     }
 
-    fun toggleUserActivation(onUpdate: () -> Unit) {
+    fun toggleUserActivation(onSuccess: () -> Unit) {
         val userBase = currentUser ?: return
         viewModelScope.launch {
             authViewModel.setUiState(AuthUiState.Loading)
@@ -239,13 +244,15 @@ class AdminPerfilClienteViewModel(
                 isActive = newActiveState,
                 examStatus = newExamStatus
             )
-            userRepository.updateUser(updatedUser)
-            isActive.value = newActiveState
-            currentUser = updatedUser
-            val msg =
-                if (newActiveState) "Alumno activado correctamente" else "Alumno dado de baja correctamente"
-            authViewModel.setUiState(AuthUiState.Success(msg))
-            onUpdate()
+            if (userRepository.updateUser(updatedUser)) {
+                isActive.value = newActiveState
+                currentUser = updatedUser
+                val msg = if (newActiveState) "Alumno activado correctamente" else "Alumno dado de baja correctamente"
+                authViewModel.setUiState(AuthUiState.Success(msg))
+                onSuccess()
+            } else {
+                authViewModel.setUiState(AuthUiState.Error("Error al cambiar el estado del alumno"))
+            }
         }
     }
 }
@@ -258,11 +265,7 @@ class AdminPerfilClienteViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AdminPerfilClienteViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AdminPerfilClienteViewModel(
-                userRepository,
-                contentRepository,
-                authViewModel
-            ) as T
+            return AdminPerfilClienteViewModel(userRepository, contentRepository, authViewModel) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

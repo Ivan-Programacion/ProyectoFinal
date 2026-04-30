@@ -67,7 +67,11 @@ import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: AuthViewModel = viewModel(), controller: (String) -> Unit) {
+fun RegistroInfo(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: AuthViewModel = viewModel(),
+    controller: (String) -> Unit
+) {
     // Observar estados del viewModel
     val nombre by viewModel.nombre.collectAsStateWithLifecycle()
     val apellidos by viewModel.apellidos.collectAsStateWithLifecycle()
@@ -124,7 +128,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver atrás",
                             tint = MaterialTheme.colorScheme.primary
-                    )
+                        )
                     }
                     Text(
                         text = "Crear cuenta",
@@ -155,7 +159,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                             modifier = Modifier.weight(1f),
                             onValueChange = { opcion, index ->
                                 viewModel.dia.value = opcion
-                        }
+                            }
                         )
                         CampoFecha(
                             label = "Mes",
@@ -164,14 +168,16 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                             modifier = Modifier.weight(1.2f),
                             onValueChange = { valueSeleccionado, index ->
                                 // Buscamos la KEY correspondiente al VALUE seleccionado
-                                val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
+                                val keyMes =
+                                    meses.entries.find { it.value == valueSeleccionado }?.key
+                                        ?: valueSeleccionado
                                 val result = dayPerMonthFunction(index)
                                 viewModel.mes.value = keyMes
                                 if (dia.isNotEmpty() && result.first < dia.toInt()) {
                                     viewModel.dia.value = result.first.toString()
                                 }
                                 dayList = result.second
-                        }
+                            }
                         )
                         CampoFecha(
                             label = "Año",
@@ -245,7 +251,7 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                         },
                         colors = CheckboxDefaults.colors(
                             checkedColor = MaterialTheme.colorScheme.tertiary
-                    )
+                        )
                     )
                     Text(
                         text = "Esta cuenta es para un menor de 14 años",
@@ -278,7 +284,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                                 opciones = dias,
                                 seleccionado = diaMenor,
                                 modifier = Modifier.weight(1f),
-                                onValueChange = { opcion, index -> viewModel.diaMenor.value = opcion }
+                                onValueChange = { opcion, index ->
+                                    viewModel.diaMenor.value = opcion
+                                }
                             )
                             CampoFecha(
                                 label = "Mes",
@@ -286,7 +294,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                                 seleccionado = meses[mesMenor] ?: mesMenor,
                                 modifier = Modifier.weight(1.2f),
                                 onValueChange = { valueSeleccionado, index ->
-                                    val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
+                                    val keyMes =
+                                        meses.entries.find { it.value == valueSeleccionado }?.key
+                                            ?: valueSeleccionado
                                     val result = dayPerMonthFunction(index)
                                     viewModel.mesMenor.value = keyMes
                                     if (diaMenor.isNotEmpty() && result.first < diaMenor.toInt()) {
@@ -300,7 +310,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                                 opciones = aniosMenor,
                                 seleccionado = anioMenor,
                                 modifier = Modifier.weight(1.3f),
-                                onValueChange = { opcion, index -> viewModel.anioMenor.value = opcion },
+                                onValueChange = { opcion, index ->
+                                    viewModel.anioMenor.value = opcion
+                                },
                             )
                         }
                     }
@@ -311,9 +323,9 @@ fun RegistroInfo(paddingValues: PaddingValues = PaddingValues(), viewModel: Auth
                 // --- BOTÓN SIGUIENTE ---
                 Button(
                     onClick = {
-                        viewModel.checkEmailAndNavigate(email) { 
-                            controller(StateNavigate.registroPass.value) 
-                        } 
+                        viewModel.checkEmailAndNavigate(email) {
+                            controller(StateNavigate.registroPass.value)
+                        }
                     },
                     enabled = isNextButtonEnabled,
                     modifier = Modifier
@@ -355,7 +367,7 @@ fun FilaRegistro(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        if(label == "Teléfono") {
+        if (label == "Teléfono") {
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
@@ -398,8 +410,8 @@ fun CampoFecha(
             modifier = Modifier
                 .menuAnchor() // Imprescindible para el menú
                 .fillMaxWidth()
-                .height(45.dp) // Altura personalizada más baja
-                .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                .height(53.dp) // Altura personalizada para que sea igual que OutlinedTextField
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -413,7 +425,7 @@ fun CampoFecha(
                 imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
-                tint = Color.Gray
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
@@ -460,19 +472,23 @@ fun CampoDesplegableGimnasios(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }
         ) {
-            Row(
+            OutlinedTextField(
+                value = nombreSeleccionado.ifEmpty { "Selecciona un centro" },
+                onValueChange = {},
+                readOnly = true,
                 modifier = Modifier
                     .menuAnchor()
-                    .fillMaxWidth()
-                    .height(55.dp) // Altura estándar para campos de texto
-                    .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = nombreSeleccionado.ifEmpty { "Selecciona un centro" })
-                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.Gray)
-            }
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true
+            )
 
             ExposedDropdownMenu(
                 expanded = expanded,
@@ -511,38 +527,36 @@ fun CampoDesplegableProfesores(
             // Solo abrimos el menú si está habilitado
             onExpandedChange = { if (enabled) expanded = !expanded }
         ) {
-            Row(
+            val nombresSeleccionados = opciones.filter { seleccionadosIds.contains(it.id) }
+                .map { "${it.name} ${it.lastName}" }
+            val textoMostrar =
+                if (nombresSeleccionados.isEmpty()) "Selecciona profesor/es" else nombresSeleccionados.joinToString(
+                    ", "
+                )
+
+            OutlinedTextField(
+                value = textoMostrar,
+                onValueChange = {},
+                readOnly = true,
+                enabled = enabled,
                 modifier = Modifier
                     .menuAnchor()
-                    .fillMaxWidth()
-                    .height(55.dp)
-                    // Si está deshabilitado, lo ponemos gris clarito para dar feedback visual
-                    .border(
-                        1.dp,
-                        if (enabled) Color.Gray else Color.LightGray,
-                        RoundedCornerShape(12.dp)
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    Icon(
+                        Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else Color.LightGray
                     )
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val nombresSeleccionados = opciones.filter { seleccionadosIds.contains(it.id) }.map { "${it.name} ${it.lastName}" }
-                val textoMostrar =
-                    if (nombresSeleccionados.isEmpty()) "Selecciona profesor/es" else nombresSeleccionados.joinToString(
-                        ", "
-                    )
-                Text(
-                    text = textoMostrar,
-                    maxLines = 1,
-                    color = if (!enabled) Color.LightGray else MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f) // Para que el texto largo no empuje a la flecha
+                },
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    disabledBorderColor = Color.LightGray,
+                    disabledTextColor = Color.LightGray,
+                    disabledTrailingIconColor = Color.LightGray
                 )
-                Icon(
-                    Icons.Default.ArrowDropDown,
-                    contentDescription = null,
-                    tint = if (enabled) Color.Gray else Color.LightGray
-                )
-            }
+            )
 
             ExposedDropdownMenu(
                 expanded = expanded,

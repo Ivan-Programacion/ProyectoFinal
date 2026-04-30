@@ -469,8 +469,8 @@ fun CampoDesplegableAdmin(
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth()
-                .height(45.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                .height(53.dp)
+                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -484,7 +484,7 @@ fun CampoDesplegableAdmin(
                 imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
-                tint = Color.Gray
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 

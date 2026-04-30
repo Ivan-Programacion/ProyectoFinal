@@ -21,14 +21,19 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.text.Normalizer
 
 class AdminGestionExamenViewModel(
     private val examRepository: ExamRepository,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val contentRepository: ContentRepository
+    private val contentRepository: ContentRepository,
+    private val authViewModel: AuthViewModel
 ) : ViewModel() {
+
+    // Exponemos el estado de AuthViewModel para controlar loadings y snackbars globales
+    val authUiState: StateFlow<AuthUiState> = authViewModel.uiState
 
     // Flujo Reactivo del Usuario Actual (Profesor) para obtener su centerId
     // Ahora reacciona al stream de autenticación para evitar IDs vacíos al arrancar
@@ -124,61 +129,105 @@ class AdminGestionExamenViewModel(
     }
 
     // ACCIONES DE PROFESOR SOBRE EL EXAMEN GLOBALES
-    fun startOpenRequests(globalMessage: String) = viewModelScope.launch {
-        val centerId = currentTeacher.value?.centerId ?: return@launch
-        examRepository.updateExamStatus(centerId, "OPEN_REQUESTS", globalMessage)
-    }
-
-    fun startInProgress() = viewModelScope.launch {
-        val centerId = currentTeacher.value?.centerId ?: return@launch
-        userRepository.updateAllStudentsExamStatusByCenter(
-            centerId = centerId,
-            oldStatus = "APPLICANT",
-            newStatus = "CANDIDATE",
-            text = "¡El proceso de examen ha comenzado!"
-        )
-        // Actualizamos también a los que ya estaban como CANDIDATE (aprobados individualmente)
-        // para que se les refresque el examText correctamente
-        userRepository.updateAllStudentsExamStatusByCenter(
-            centerId = centerId,
-            oldStatus = "CANDIDATE",
-            newStatus = "CANDIDATE",
-            text = "¡El proceso de examen ha comenzado!"
-        )
-        examRepository.updateExamStatus(centerId, "IN_PROGRESS", currentExam.value.infoMessage)
-    }
-
-    fun finishExam() = viewModelScope.launch {
-        val centerId = currentTeacher.value?.centerId ?: return@launch
-        
-        // 1. Aprobar y subir cinturón a todos los CANDIDATE del centro y los que ya estaban APPROVED
-        val allUsers = userRepository.getAllUsers()
-        // Buscamos tanto a los CANDIDATE (que se aprueban todos por cierre masivo) como a los APPROVED (aprobados individualmente)
-        val candidatesAndApproved = allUsers.filter { it.centerId == centerId && (it.examStatus == "CANDIDATE" || it.examStatus == "APPROVED") }
-        
-        val belts = listaCinturones.value
-        candidatesAndApproved.forEach { user ->
-            val currentOrder = belts.find { it.id == user.beltId }?.order ?: 0
-            val nextBelt = belts.find { it.order == currentOrder + 1 }
-            val finalBeltId = nextBelt?.id ?: user.beltId
-            // Como luego se van a pasar a NONE, solo actualizamos el cinturón directamente
-            // usando la función pero dejándolo en APPROVED temporalmente
-            userRepository.passExamAndUpgradeBelt(user.id, finalBeltId, "APPROVED", "¡Enhorabuena, has aprobado el examen!")
+    fun startOpenRequests(globalMessage: String) {
+        viewModelScope.launch {
+            val centerId = currentTeacher.value?.centerId ?: return@launch
+            authViewModel.setUiState(AuthUiState.Success("Estado de solicitud de exámenes activado correctamente"))
+            examRepository.updateExamStatus(centerId, "OPEN_REQUESTS", globalMessage)
         }
+    }
 
-        // 2. Cerrar el examen y resetear estados
-        examRepository.updateExamStatus(centerId, "CLOSED", "")
-        
-        userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
-        userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")
-        userRepository.updateAllStudentsExamStatusByCenter(centerId, "FAILED", "NONE", "")
-        userRepository.updateAllStudentsExamStatusByCenter(centerId, "REFUSED", "NONE", "")
-        userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPLICANT", "NONE", "")
+    fun startInProgress(onUpdate: () -> Unit) {
+        viewModelScope.launch {
+            authViewModel.setUiState(AuthUiState.Loading)
+
+            // Comprobación de conexión real antes de proceder
+            val hasConnection = withTimeoutOrNull(5000) {
+                userRepository.getCenters()
+            } != null
+
+            if (!hasConnection) {
+                authViewModel.setUiState(AuthUiState.Error("Error al cambiar de estado del examen. No hay conexión"))
+                onUpdate()
+                return@launch
+            }
+
+            val centerId = currentTeacher.value?.centerId ?: return@launch
+            userRepository.updateAllStudentsExamStatusByCenter(
+                centerId = centerId,
+                oldStatus = "APPLICANT",
+                newStatus = "CANDIDATE",
+                text = "¡El proceso de examen ha comenzado!"
+            )
+            // Actualizamos también a los que ya estaban como CANDIDATE (aprobados individualmente)
+            // para que se les refresque el examText correctamente
+            userRepository.updateAllStudentsExamStatusByCenter(
+                centerId = centerId,
+                oldStatus = "CANDIDATE",
+                newStatus = "CANDIDATE",
+                text = "¡El proceso de examen ha comenzado!"
+            )
+            examRepository.updateExamStatus(centerId, "IN_PROGRESS", currentExam.value.infoMessage)
+            authViewModel.setUiState(AuthUiState.Success("Examen empezado correctamente"))
+            onUpdate()
+        }
+    }
+
+    fun finishExam(onUpdate: () -> Unit) {
+        viewModelScope.launch {
+            authViewModel.setUiState(AuthUiState.Loading)
+
+            // Comprobación de conexión real antes de proceder
+            val hasConnection = withTimeoutOrNull(5000) {
+                userRepository.getCenters()
+            } != null
+
+            if (!hasConnection) {
+                authViewModel.setUiState(AuthUiState.Error("Error al cambiar de estado del examen. No hay conexión"))
+                onUpdate()
+                return@launch
+            }
+
+            val centerId = currentTeacher.value?.centerId ?: return@launch
+
+            // 1. Aprobar y subir cinturón a todos los CANDIDATE del centro y los que ya estaban APPROVED
+            val allUsers = userRepository.getAllUsers()
+            // Buscamos tanto a los CANDIDATE (que se aprueban todos por cierre masivo) como a los APPROVED (aprobados individualmente)
+            val candidatesAndApproved =
+                allUsers.filter { it.centerId == centerId && (it.examStatus == "CANDIDATE" || it.examStatus == "APPROVED") }
+
+            val belts = listaCinturones.value
+            candidatesAndApproved.forEach { user ->
+                val currentOrder = belts.find { it.id == user.beltId }?.order ?: 0
+                val nextBelt = belts.find { it.order == currentOrder + 1 }
+                val finalBeltId = nextBelt?.id ?: user.beltId
+                // Como luego se van a pasar a NONE, solo actualizamos el cinturón directamente
+                // usando la función pero dejándolo en APPROVED temporalmente
+                userRepository.passExamAndUpgradeBelt(
+                    user.id,
+                    finalBeltId,
+                    "APPROVED",
+                    "¡Enhorabuena, has aprobado el examen!"
+                )
+            }
+
+            // 2. Cerrar el examen y resetear estados
+            examRepository.updateExamStatus(centerId, "CLOSED", "")
+
+            userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
+            userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")
+            userRepository.updateAllStudentsExamStatusByCenter(centerId, "FAILED", "NONE", "")
+            userRepository.updateAllStudentsExamStatusByCenter(centerId, "REFUSED", "NONE", "")
+            userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPLICANT", "NONE", "")
+
+            authViewModel.setUiState(AuthUiState.Success("Examen finalizado correctamente"))
+            onUpdate()
+        }
     }
 
     fun cancelExam() = viewModelScope.launch {
         val centerId = currentTeacher.value?.centerId ?: return@launch
-        
+        authViewModel.setUiState(AuthUiState.Success("Examen cancelado correctamente"))
         examRepository.updateExamStatus(centerId, "CLOSED", "")
         
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
@@ -190,18 +239,22 @@ class AdminGestionExamenViewModel(
 
     // ACCIONES SOBRE EL ALUMNO INDIVIDUAL
     fun approveStudentRequest(userId: String) = viewModelScope.launch {
+        authViewModel.setUiState(AuthUiState.Success("Solicitud de alumno aprobada correctamente"))
         userRepository.updateStudentExamStatus(userId, "CANDIDATE", "¡Tu solicitud ha sido aprobada! El examen está a punto de empezar.")
     }
 
     fun refuseStudentRequest(userId: String) = viewModelScope.launch {
+        authViewModel.setUiState(AuthUiState.Success("Solicitud de alumno denegada correctamente"))
         userRepository.updateStudentExamStatus(userId, "REFUSED", "Tu solicitud ha sido denegada.")
     }
 
     fun passStudentExam(user: User) = viewModelScope.launch {
+        authViewModel.setUiState(AuthUiState.Success("Aprobado el examen del alumno correctamente"))
         userRepository.updateStudentExamStatus(user.id, "APPROVED", "¡Has aprobado el examen! Recibirás tu nuevo cinturón al finalizar.")
     }
 
     fun failStudentExam(userId: String) = viewModelScope.launch {
+        authViewModel.setUiState(AuthUiState.Success("Suspendido el examen del alumno correctamente"))
         userRepository.updateStudentExamStatus(userId, "FAILED", "Lo siento, no has superado el examen.")
     }
 
@@ -216,12 +269,13 @@ class AdminGestionExamenViewModelFactory(
     private val examRepository: ExamRepository,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val contentRepository: ContentRepository
+    private val contentRepository: ContentRepository,
+    private val authViewModel: AuthViewModel
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AdminGestionExamenViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AdminGestionExamenViewModel(examRepository, userRepository, authRepository, contentRepository) as T
+            return AdminGestionExamenViewModel(examRepository, userRepository, authRepository, contentRepository, authViewModel) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

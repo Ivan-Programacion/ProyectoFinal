@@ -161,7 +161,8 @@ fun App(startDestination: String = "login") {
             examRepository = examRepository,
             userRepository = userRepository,
             authRepository = authRepository,
-            contentRepository = contentRepository
+            contentRepository = contentRepository,
+            authViewModel = authViewModel
         )
     )
 
@@ -187,7 +188,8 @@ fun App(startDestination: String = "login") {
                     currentRoute == StateNavigate.registroPass.value ||
                     currentRoute == StateNavigate.perfil.value ||
                     currentRoute == StateNavigate.registro.value ||
-                    currentRoute == StateNavigate.adminPerfilCliente.value
+                    currentRoute == StateNavigate.adminPerfilCliente.value ||
+                    currentRoute == StateNavigate.adminGestionExamen.value
                 ) {
                     snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
                     authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
@@ -197,7 +199,12 @@ fun App(startDestination: String = "login") {
             is AuthUiState.Success -> {
                 val message = (authUiState as AuthUiState.Success).message
                 // Solo lo enseñamos si hay mensaje y estamos en el perfil o en el perfil de administración del cliente
-                if (message.isNotEmpty() && (currentRoute == StateNavigate.perfil.value || currentRoute == StateNavigate.adminPerfilCliente.value)) {
+                if (message.isNotEmpty() && (
+                            currentRoute == StateNavigate.perfil.value ||
+                                    currentRoute == StateNavigate.adminPerfilCliente.value ||
+                                    currentRoute == StateNavigate.adminGestionExamen.value
+                            )
+                ) {
                     isErrorSnackbar = false
                     snackbarHostState.showSnackbar(message)
                     authViewModel.resetUiState()

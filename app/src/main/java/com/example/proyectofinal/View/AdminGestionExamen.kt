@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,7 +34,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.ViewModel.AdminGestionExamenViewModel
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
+import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -62,6 +63,9 @@ fun AdminGestionExamen(
     adminPerfilViewModel: AdminPerfilClienteViewModel = viewModel(),
     controller: (String) -> Unit
 ) {
+    // --- ESTADOS DEL VIEWMODEL ---
+    val authUiState by viewModel.authUiState.collectAsStateWithLifecycle()
+    val isLoading = authUiState is AuthUiState.Loading
 
     // --- ESTADOS REACTIVOS DEL VIEWMODEL ---
     val currentExam by viewModel.currentExam.collectAsStateWithLifecycle()
@@ -78,7 +82,7 @@ fun AdminGestionExamen(
 
     // Estado para guardar a qué alumno le hemos pulsado el botón
     var alumnoSeleccionado by remember { mutableStateOf<User?>(null) }
-    
+
     // Estado para controlar si el menú desplegable está abierto o cerrado
     var expandedMenuFiltro by remember { mutableStateOf(false) }
 
@@ -120,7 +124,7 @@ fun AdminGestionExamen(
                 showCancelarDialog = false
                 viewModel.cancelExam()
             },
-            onCancelar = { showCancelarDialog = false }
+            onCancelar = { showCancelarDialog = false },
         )
     }
 
@@ -155,16 +159,19 @@ fun AdminGestionExamen(
                         "¿Estás seguro de querer aprobar a todos los alumnos?",
             textoAceptar = "Aceptar",
             textoCancelar = "Cancelar",
+            isLoading = isLoading,
             colorAceptar = MaterialTheme.colorScheme.tertiary,
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
             mostrarTextArea = false,
             onAceptar = { _ ->
-                showAprobarDialog = false
-                if (estadoExamen == "OPEN_REQUESTS") viewModel.startInProgress()
-                else viewModel.finishExam()
+                if (estadoExamen == "OPEN_REQUESTS") {
+                    viewModel.startInProgress() { showAprobarDialog = false }
+                } else {
+                    viewModel.finishExam() { showAprobarDialog = false }
+                }
             },
-            onCancelar = { showAprobarDialog = false }
+            onCancelar = { showAprobarDialog = false },
         )
     }
 
@@ -198,7 +205,7 @@ fun AdminGestionExamen(
             onCancelar = {
                 showAprobarIndividualDialog = false
                 alumnoSeleccionado = null
-            }
+            },
         )
     }
 
@@ -232,7 +239,7 @@ fun AdminGestionExamen(
             onCancelar = {
                 showRechazarIndividualDialog = false
                 alumnoSeleccionado = null
-            }
+            },
         )
     }
 
@@ -422,10 +429,12 @@ fun AdminGestionExamen(
                         // ALUMNO
                         items(listaAlumnos) { alumno ->
                             Card(
-                                modifier = Modifier.fillMaxWidth().clickable{ 
-                                    adminPerfilViewModel.setStudentId(alumno.id)
-                                    controller(StateNavigate.adminPerfilCliente.value) 
-                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        adminPerfilViewModel.setStudentId(alumno.id)
+                                        controller(StateNavigate.adminPerfilCliente.value)
+                                    },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
                             ) {
@@ -442,7 +451,10 @@ fun AdminGestionExamen(
                                             text = "${alumno.name} ${alumno.lastName}",
                                             fontWeight = FontWeight.Bold,
                                         )
-                                        val beltName = (listaCinturones.find { it.id == alumno.beltId }?.name?.get("es") as? String) ?: "Blanco"
+                                        val beltName =
+                                            (listaCinturones.find { it.id == alumno.beltId }?.name?.get(
+                                                "es"
+                                            ) as? String) ?: "Blanco"
                                         Text(
                                             text = beltName,
                                             style = MaterialTheme.typography.bodySmall,
@@ -503,12 +515,13 @@ fun DialogAccionExamen(
     descripcion: String,
     textoAceptar: String,
     textoCancelar: String,
+    isLoading: Boolean = false,
     colorAceptar: Color,
     colorCancelar: Color,
     colorTextoCancelar: Color,
     mostrarTextArea: Boolean,
     onAceptar: (String) -> Unit,
-    onCancelar: () -> Unit
+    onCancelar: () -> Unit,
 ) {
     var comentario by remember { mutableStateOf("") }
 
@@ -564,13 +577,21 @@ fun DialogAccionExamen(
                         colors = ButtonDefaults.buttonColors(containerColor = colorAceptar),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(
-                            textoAceptar,
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                textoAceptar,
+                                color = Color.White,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
 
                     // Botón Cancelar (Derecha - Auxiliar)
@@ -598,6 +619,6 @@ fun DialogAccionExamen(
 @Composable
 fun AdminGestionExamenpreview() {
     ProyectoFinalTheme {
-        AdminGestionExamen(){}
+        AdminGestionExamen() {}
     }
 }

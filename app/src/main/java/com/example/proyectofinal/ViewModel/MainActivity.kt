@@ -151,7 +151,8 @@ fun App(startDestination: String = "login") {
     val adminPerfilClienteViewModel: AdminPerfilClienteViewModel = viewModel(
         factory = AdminPerfilClienteViewModelFactory(
             userRepository = userRepository,
-            contentRepository = contentRepository
+            contentRepository = contentRepository,
+            authViewModel = authViewModel
         )
     )
 
@@ -182,7 +183,11 @@ fun App(startDestination: String = "login") {
         when (authUiState) {
             is AuthUiState.Error -> {
                 isErrorSnackbar = true
-                if (currentRoute == StateNavigate.login.value || currentRoute == StateNavigate.registroPass.value || currentRoute == StateNavigate.perfil.value || currentRoute == StateNavigate.registro.value) {
+                if (currentRoute == StateNavigate.login.value ||
+                    currentRoute == StateNavigate.registroPass.value ||
+                    currentRoute == StateNavigate.perfil.value ||
+                    currentRoute == StateNavigate.registro.value
+                ) {
                     snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
                     authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
                 }
@@ -190,8 +195,8 @@ fun App(startDestination: String = "login") {
 
             is AuthUiState.Success -> {
                 val message = (authUiState as AuthUiState.Success).message
-                // Solo lo enseñamos si hay mensaje y estamos en el perfil
-                if (message.isNotEmpty() && currentRoute == StateNavigate.perfil.value) {
+                // Solo lo enseñamos si hay mensaje y estamos en el perfil o en el perfil de administración del cliente
+                if (message.isNotEmpty() && (currentRoute == StateNavigate.perfil.value || currentRoute == StateNavigate.adminPerfilCliente.value)) {
                     isErrorSnackbar = false
                     snackbarHostState.showSnackbar(message)
                     authViewModel.resetUiState()

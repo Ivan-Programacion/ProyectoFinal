@@ -10,14 +10,14 @@ import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.Repository.ContentRepository
 import com.example.proyectofinal.Repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AdminPerfilClienteViewModel(
     private val userRepository: UserRepository,
-    private val contentRepository: ContentRepository
+    private val contentRepository: ContentRepository,
+    private val authViewModel: AuthViewModel
 ) : ViewModel() {
 
     private val _studentId = MutableStateFlow<String?>(null)
@@ -80,6 +80,7 @@ class AdminPerfilClienteViewModel(
         isActive.value = true
         _listaCentros.value = emptyList()
         _profesoresDisponibles.value = emptyList()
+        authViewModel.resetUiState()
     }
 
     private fun loadInitialData() {
@@ -165,7 +166,7 @@ class AdminPerfilClienteViewModel(
                     apellidos.value = it.lastName
                     val aDate = parseDate(it.birthDate)
                     dia.value = aDate[0]; mes.value = aDate[1]; anio.value = aDate[2]
-                    
+
                     nombreMenor.value = ""
                     apellidosMenor.value = ""
                     diaMenor.value = ""
@@ -180,11 +181,11 @@ class AdminPerfilClienteViewModel(
         }
     }
 
-    fun updateStudent(onSuccess: () -> Unit) {
-        val currentId = _studentId.value ?: return
+    fun updateStudent(onUpdate: () -> Unit) {
         val userBase = currentUser ?: return
 
         viewModelScope.launch {
+            authViewModel.setUiState(AuthUiState.Loading)
             val centerChanged = centroSeleccionado.value != userBase.centerId
             val newExamStatus = if (centerChanged) "NONE" else userBase.examStatus
 
@@ -222,38 +223,46 @@ class AdminPerfilClienteViewModel(
                 )
             }
 
-            if (userRepository.updateUser(updatedUser)) {
-                onSuccess()
-            }
+            userRepository.updateUser(updatedUser)
+            authViewModel.setUiState(AuthUiState.Success("Alumno actualizado correctamente"))
+            onUpdate()
         }
     }
 
-    fun toggleUserActivation(onSuccess: () -> Unit) {
+    fun toggleUserActivation(onUpdate: () -> Unit) {
         val userBase = currentUser ?: return
         viewModelScope.launch {
+            authViewModel.setUiState(AuthUiState.Loading)
             val newActiveState = !isActive.value
             val newExamStatus = if (!newActiveState) "NONE" else userBase.examStatus
             val updatedUser = userBase.copy(
                 isActive = newActiveState,
                 examStatus = newExamStatus
             )
-            if (userRepository.updateUser(updatedUser)) {
-                isActive.value = newActiveState
-                currentUser = updatedUser
-                onSuccess()
-            }
+            userRepository.updateUser(updatedUser)
+            isActive.value = newActiveState
+            currentUser = updatedUser
+            val msg =
+                if (newActiveState) "Alumno activado correctamente" else "Alumno dado de baja correctamente"
+            authViewModel.setUiState(AuthUiState.Success(msg))
+            onUpdate()
         }
     }
 }
 
 class AdminPerfilClienteViewModelFactory(
     private val userRepository: UserRepository,
-    private val contentRepository: ContentRepository
+    private val contentRepository: ContentRepository,
+    private val authViewModel: AuthViewModel
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AdminPerfilClienteViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AdminPerfilClienteViewModel(userRepository, contentRepository) as T
+            return AdminPerfilClienteViewModel(
+                userRepository,
+                contentRepository,
+                authViewModel
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

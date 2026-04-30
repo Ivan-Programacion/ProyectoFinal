@@ -89,6 +89,11 @@ class AuthViewModel(
         _uiState.value = AuthUiState.Idle
     }
 
+    // Permite actualizar el estado desde fuera (por ejemplo desde otras pantallas admin)
+    fun setUiState(state: AuthUiState) {
+        _uiState.value = state
+    }
+
     // Función para probar la conexión antes de navegar a Registro
     fun checkConnectionAndNavigate(onSuccess: () -> Unit) {
         viewModelScope.launch {

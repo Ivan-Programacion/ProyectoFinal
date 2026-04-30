@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +64,8 @@ fun AdminGestionExamen(
     adminPerfilViewModel: AdminPerfilClienteViewModel = viewModel(),
     controller: (String) -> Unit
 ) {
+    // Contexto de la aplicacion necesaria para comprobar el estado de conexión del dispositivo
+    val context = LocalContext.current
     // --- ESTADOS DEL VIEWMODEL ---
     val authUiState by viewModel.authUiState.collectAsStateWithLifecycle()
     val isLoading = authUiState is AuthUiState.Loading
@@ -166,9 +169,9 @@ fun AdminGestionExamen(
             mostrarTextArea = false,
             onAceptar = { _ ->
                 if (estadoExamen == "OPEN_REQUESTS") {
-                    viewModel.startInProgress() { showAprobarDialog = false }
+                    viewModel.startInProgress(context) { showAprobarDialog = false }
                 } else {
-                    viewModel.finishExam() { showAprobarDialog = false }
+                    viewModel.finishExam(context) { showAprobarDialog = false }
                 }
             },
             onCancelar = { showAprobarDialog = false },

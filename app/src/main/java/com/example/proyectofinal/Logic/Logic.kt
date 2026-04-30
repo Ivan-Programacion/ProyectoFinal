@@ -5,6 +5,9 @@ import com.example.proyectofinal.ViewModel.ScreenTitle
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.coloresCinturones
 import java.util.Locale
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 
 // Función que cambia el titulo del TopBar según la pantalla en la que esté
 fun tituloTopBar(screen: String?): String {
@@ -64,3 +67,18 @@ val pantallasIniciales = listOf(
 // Lógica para obtener el nombre del UI dependiendo del locale (i18n)
 @SuppressLint("ConstantLocale")
 val locale = Locale.getDefault().language
+
+// Función que comprueba si hay conexión a internet en el dispositivo
+fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    // Obtenemos la red activa actual
+    val network = connectivityManager.activeNetwork ?: return false
+
+    // Obtenemos las capacidades de esa red
+    val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+    // Comprobamos si la red tiene capacidad de acceso a internet
+    return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+}

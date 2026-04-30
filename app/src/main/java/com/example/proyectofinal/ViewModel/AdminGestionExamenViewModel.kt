@@ -1,8 +1,10 @@
 package com.example.proyectofinal.ViewModel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.proyectofinal.Logic.isNetworkAvailable
 import com.example.proyectofinal.Model.Belt
 import com.example.proyectofinal.Model.Exam
 import com.example.proyectofinal.Model.User
@@ -137,15 +139,12 @@ class AdminGestionExamenViewModel(
         }
     }
 
-    fun startInProgress(onUpdate: () -> Unit) {
+    fun startInProgress(context: Context, onUpdate: () -> Unit) {
         viewModelScope.launch {
             authViewModel.setUiState(AuthUiState.Loading)
 
             // Comprobación de conexión real antes de proceder
-            val hasConnection = withTimeoutOrNull(5000) {
-                userRepository.getCenters()
-            } != null
-
+            val hasConnection = isNetworkAvailable(context)
             if (!hasConnection) {
                 authViewModel.setUiState(AuthUiState.Error("Error al cambiar de estado del examen. No hay conexión"))
                 onUpdate()
@@ -167,20 +166,18 @@ class AdminGestionExamenViewModel(
                 newStatus = "CANDIDATE",
                 text = "¡El proceso de examen ha comenzado!"
             )
+            onUpdate()
             examRepository.updateExamStatus(centerId, "IN_PROGRESS", currentExam.value.infoMessage)
             authViewModel.setUiState(AuthUiState.Success("Examen empezado correctamente"))
-            onUpdate()
         }
     }
 
-    fun finishExam(onUpdate: () -> Unit) {
+    fun finishExam(context: Context, onUpdate: () -> Unit) {
         viewModelScope.launch {
             authViewModel.setUiState(AuthUiState.Loading)
 
             // Comprobación de conexión real antes de proceder
-            val hasConnection = withTimeoutOrNull(5000) {
-                userRepository.getCenters()
-            } != null
+            val hasConnection = isNetworkAvailable(context)
 
             if (!hasConnection) {
                 authViewModel.setUiState(AuthUiState.Error("Error al cambiar de estado del examen. No hay conexión"))
@@ -210,18 +207,15 @@ class AdminGestionExamenViewModel(
                     "¡Enhorabuena, has aprobado el examen!"
                 )
             }
-
             // 2. Cerrar el examen y resetear estados
             examRepository.updateExamStatus(centerId, "CLOSED", "")
-
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "FAILED", "NONE", "")
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "REFUSED", "NONE", "")
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPLICANT", "NONE", "")
-
-            authViewModel.setUiState(AuthUiState.Success("Examen finalizado correctamente"))
             onUpdate()
+            authViewModel.setUiState(AuthUiState.Success("Examen finalizado correctamente"))
         }
     }
 

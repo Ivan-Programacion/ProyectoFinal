@@ -54,7 +54,9 @@ import androidx.activity.compose.BackHandler
 import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 
 
 /*
@@ -159,6 +161,10 @@ fun Login(
                             Icon(imageVector = image, contentDescription = null)
                         }
                     },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        autoCorrectEnabled = false // Fuerza explícitamente a que no haya sugerencias ni autocorrección
+                    ),
                 )
                 Text(
                     text = "¿Olvidaste la contraseña?",

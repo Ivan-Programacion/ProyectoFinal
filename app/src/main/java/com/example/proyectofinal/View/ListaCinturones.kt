@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.belts
+import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.ViewModel.BeltsViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -83,8 +84,6 @@ fun ListaCinturones(
                 verticalArrangement = Arrangement.spacedBy(12.dp) // Espacio más compacto entre cinturones
             ) {
                 items(beltsState) { beltState ->
-                    // Lógica para obtener el nombre del UI dependiendo del locale (i18n)
-                    val locale = Locale.getDefault().language
                     // Con el idioma local, nos traemos el nombre del cinturon correspondiente
                     val beltName = beltState.belt.name[locale]
 

@@ -1,8 +1,10 @@
 package com.example.proyectofinal.Logic
 
+import android.annotation.SuppressLint
 import com.example.proyectofinal.ViewModel.ScreenTitle
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.coloresCinturones
+import java.util.Locale
 
 // Función que cambia el titulo del TopBar según la pantalla en la que esté
 fun tituloTopBar(screen: String?): String {
@@ -58,3 +60,7 @@ val pantallasIniciales = listOf(
     StateNavigate.registro.value,
     StateNavigate.registroPass.value
 )
+
+// Lógica para obtener el nombre del UI dependiendo del locale (i18n)
+@SuppressLint("ConstantLocale")
+val locale = Locale.getDefault().language

@@ -58,6 +58,7 @@ import com.example.proyectofinal.Logic.anios
 import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.dias
+import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -151,7 +152,11 @@ fun AdminPerfilCliente(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = "Datos perfil alumno/tutor", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = "Datos perfil\nalumno/tutor",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center
+                    )
 
                     // AVATAR
                     Surface(
@@ -203,10 +208,12 @@ fun AdminPerfilCliente(
                                 seleccionado = meses[mes] ?: mes,
                                 opciones = meses.values.toList(),
                                 onValueChange = { valueSeleccionado, index ->
-                                    val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
+                                    val keyMes =
+                                        meses.entries.find { it.value == valueSeleccionado }?.key
+                                            ?: valueSeleccionado
                                     val result = dayPerMonthFunction(index)
                                     viewModel.mes.value = keyMes
-                                    if(dia.isNotEmpty() && result.first < dia.toInt()) {
+                                    if (dia.isNotEmpty() && result.first < dia.toInt()) {
                                         viewModel.dia.value = result.first.toString()
                                     }
                                     dayList = result.second
@@ -287,7 +294,9 @@ fun AdminPerfilCliente(
                                     seleccionado = diaMenor,
                                     modifier = Modifier.weight(1f),
                                     opciones = dayListMenor,
-                                    onValueChange = { opcion, _ -> viewModel.diaMenor.value = opcion }
+                                    onValueChange = { opcion, _ ->
+                                        viewModel.diaMenor.value = opcion
+                                    }
                                 )
                                 CampoDesplegableAdmin(
                                     label = "Mes",
@@ -295,7 +304,9 @@ fun AdminPerfilCliente(
                                     modifier = Modifier.weight(1f),
                                     opciones = meses.values.toList(),
                                     onValueChange = { valueSeleccionado, index ->
-                                        val keyMes = meses.entries.find { it.value == valueSeleccionado }?.key ?: valueSeleccionado
+                                        val keyMes =
+                                            meses.entries.find { it.value == valueSeleccionado }?.key
+                                                ?: valueSeleccionado
                                         val result = dayPerMonthFunction(index)
                                         viewModel.mesMenor.value = keyMes
                                         if (diaMenor.isNotEmpty() && result.first < diaMenor.toInt()) {
@@ -309,7 +320,9 @@ fun AdminPerfilCliente(
                                     seleccionado = anioMenor,
                                     modifier = Modifier.weight(1f),
                                     opciones = aniosMenor,
-                                    onValueChange = { opcion, _ -> viewModel.anioMenor.value = opcion }
+                                    onValueChange = { opcion, _ ->
+                                        viewModel.anioMenor.value = opcion
+                                    }
                                 )
                             }
                         }
@@ -343,14 +356,17 @@ fun AdminPerfilCliente(
                             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                         )
 
-                        val beltNameToShow = listaCinturones.find { it.id == beltId }?.name?.get("es") ?: beltId
+                        val beltNameToShow =
+                            listaCinturones.find { it.id == beltId }?.name?.get(locale) ?: beltId
 
                         CampoDesplegableAdmin(
                             label = beltNameToShow,
-                            opciones = listaCinturones.map { it.name["es"] ?: it.id },
+                            opciones = listaCinturones.map { it.name[locale] ?: it.id },
                             seleccionado = beltNameToShow,
                             onValueChange = { nameSelected, _ ->
-                                val idSelected = listaCinturones.find { (it.name["es"] ?: it.id) == nameSelected }?.id ?: "white"
+                                val idSelected = listaCinturones.find {
+                                    (it.name[locale] ?: it.id) == nameSelected
+                                }?.id ?: "white"
                                 viewModel.beltId.value = idSelected
                             }
                         )
@@ -401,7 +417,7 @@ fun CampoPerfilAdmin(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
         )
-        if(label == "Teléfono") {
+        if (label == "Teléfono") {
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,

@@ -55,6 +55,7 @@ import android.app.Activity
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 
@@ -80,6 +81,8 @@ fun Login(
 
     // Para poder ver el estado de la petición de login y saber si pasar o no a la siguiene pantalla
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading = uiState is AuthUiState.Loading // Guardando el estado de Loading
+
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
             // Si el login es un éxito, navegamos
@@ -179,6 +182,7 @@ fun Login(
 
                 Spacer(Modifier.height(24.dp))
 
+                // --- BOTÓN ACCEDER ---
                 Button(
                     onClick = {
                         viewModel.loginUser(userValue, passValue)
@@ -188,7 +192,15 @@ fun Login(
                         .height(50.dp),
                     shape = RoundedCornerShape(12.dp),
                 ) {
-                    Text("Acceder", fontWeight = FontWeight.Bold)
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Acceder", fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

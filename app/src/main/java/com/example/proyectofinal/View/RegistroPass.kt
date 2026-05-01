@@ -27,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,9 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -71,9 +69,11 @@ fun RegistroPass(
     val repeatPasswordVisible by viewModel.registroRepeatPasswordVisible.collectAsStateWithLifecycle()
 
     // Para poder ver el estado de la petición de registro y saber si pasar o no a la siguiene pantalla
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState) {
-        if (uiState is AuthUiState.Success) {
+    val authUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading = authUiState is AuthUiState.Loading
+
+    LaunchedEffect(authUiState) {
+        if (authUiState is AuthUiState.Success) {
             viewModel.resetUiState()
             controller(StateNavigate.listaCinturones.value)
         }
@@ -196,7 +196,7 @@ fun RegistroPass(
                 // --- BOTÓN CREAR CUENTA ---
                 Button(
                     onClick = {
-                        viewModel.registerWithCurrentForm()
+                        viewModel.preRegister()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -204,7 +204,15 @@ fun RegistroPass(
                     shape = RoundedCornerShape(12.dp),
                     enabled = aceptoTerminos && password.isNotEmpty() // Validación básica
                 ) {
-                    Text("Crear cuenta", fontWeight = FontWeight.Bold)
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Crear cuenta", fontWeight = FontWeight.Bold)
+                    }
                 }
 
                 // --- LINK A LOGIN ---
@@ -257,6 +265,7 @@ fun TerminosCondiciones(onDismiss: () -> Unit) {
             "5. LIMITACIONES DE RESPONSABILIDAD\n\n" +
             "Dado que es un software en desarrollo, el autor no se hace responsable de fallos técnicos, pérdida " +
             "de datos o malentendidos derivados del contenido pedagógico mostrado en la aplicación."
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier

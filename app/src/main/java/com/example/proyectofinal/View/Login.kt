@@ -30,9 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -80,11 +77,11 @@ fun Login(
     val context = LocalContext.current as? Activity
 
     // Para poder ver el estado de la petición de login y saber si pasar o no a la siguiene pantalla
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isLoading = uiState is AuthUiState.Loading // Guardando el estado de Loading
+    val authUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading = authUiState is AuthUiState.Loading // Guardando el estado de Loading
 
-    LaunchedEffect(uiState) {
-        if (uiState is AuthUiState.Success) {
+    LaunchedEffect(authUiState) {
+        if (authUiState is AuthUiState.Success) {
             // Si el login es un éxito, navegamos
             viewModel.loginEmail.value = ""
             viewModel.loginPassword.value = ""

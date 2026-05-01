@@ -296,7 +296,7 @@ class AuthViewModel(
     }
 
     // Construye el modelo User con los estados actuales y llama al registro
-    fun registerWithCurrentForm() {
+    fun preRegister() {
         // Para guardar la fecha en formato yyyy-mm-dd
         val dateStr = "${anio.value}-${mes.value.padStart(2, '0')}-${dia.value.padStart(2, '0')}"
         val minorDateStr = if (esMenor.value) {

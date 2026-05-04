@@ -212,7 +212,7 @@ fun RegistroInfo(
                 )
 
                 CampoDesplegableProfesores(
-                    label = "Profesor/es asignado/s",
+                    label = "Profesores",
                     opciones = profesoresDisponibles,
                     seleccionadosIds = profesoresSeleccionados,
                     enabled = centroSeleccionado.isNotEmpty(), // Solo habilitado si hay centro

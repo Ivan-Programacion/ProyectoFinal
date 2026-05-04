@@ -346,7 +346,7 @@ fun AdminPerfilCliente(
                     )
 
                     CampoDesplegableProfesores(
-                        label = "Profesor/es asignado/s",
+                        label = "Profesores asignados",
                         opciones = profesoresDisponibles,
                         seleccionadosIds = profesoresSeleccionados,
                         enabled = centroSeleccionado.isNotEmpty(),

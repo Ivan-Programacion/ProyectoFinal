@@ -104,6 +104,7 @@ exports.notifyStudentExamStatus = onDocumentWritten("users/{userId}", async (eve
             body = "Lo sentimos, tu solicitud de examen no ha sido aprobada en esta ocasión.";
             break;
         case "APPROVED": // EXAMEN APROBADO
+            // OJO: Añadir a la condicón el texto en inglés
             title = "¡Enhorabuena, has aprobado!";
             body = "Has superado el examen con éxito. ¡Revisa tu nuevo nivel de cinturón en la App!";
             break;

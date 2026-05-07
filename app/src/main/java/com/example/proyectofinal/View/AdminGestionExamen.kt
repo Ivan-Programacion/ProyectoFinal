@@ -277,7 +277,7 @@ fun AdminGestionExamen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    // Botón Izquierdo: Cancelar Examen
+                    // Botón Derecho: Cancelar Examen
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { showCancelarDialog = true },
@@ -294,7 +294,7 @@ fun AdminGestionExamen(
                         )
                     }
 
-                    // Botón Derecho: Realizar / Aceptar / Aprobar
+                    // Botón Izquierdo: Realizar / Aceptar / Aprobar
                     val textoBtnDerecho = when (estadoExamen) {
                         "CLOSED" -> "Realizar examen"
                         "OPEN_REQUESTS" -> "Empezar examen"

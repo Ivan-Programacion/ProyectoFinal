@@ -33,7 +33,9 @@ data class User(
     val examText: String = "",
 
     // Gestion de notificaciones
-    val fcmToken: String? = null,
+    @get:PropertyName("fcmToken")
+    @set:PropertyName("fcmToken")
+    var fcmToken: String? = null,
 
     // Listas de favoritos (IDs de los elementos)
     val favoritesTech: List<String> = emptyList(),

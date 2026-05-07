@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.Logic.removeFcmTokenOnLogout
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -106,9 +107,12 @@ fun Perfil(
         CerrarSesionDialog(
             onConfirm = {
                 showLogoutDialog = false
-                viewModel.logoutUser()
-                viewModel.resetUiState()
-                controller(StateNavigate.login.value)
+                // Vaciamos campo fcmToken y cerramos sesión
+                removeFcmTokenOnLogout(currentUser?.id) {
+                    controller(StateNavigate.login.value)
+                    viewModel.logoutUser()
+                    viewModel.resetUiState()
+                }
             },
             onDismiss = { showLogoutDialog = false }
         )

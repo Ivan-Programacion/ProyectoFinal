@@ -45,8 +45,9 @@ class UserRepositoryImpl(
     override fun getUserStream(userId: String): Flow<User?> = if (userId.isBlank()) flowOf(null) else callbackFlow {
         // addSnapshotListener escucha cambios en tiempo real. Y si lo hay, lo envía a la app
         val subscription = userCollection.document(userId).addSnapshotListener { snapshot, error ->
+            // Tratamos la excepcion de permiso denegado al cerrar sesión
             if (error != null) {
-                close(error)
+                trySend(null)
                 return@addSnapshotListener
             }
             if (snapshot != null && snapshot.exists()) {
@@ -142,7 +143,7 @@ class UserRepositoryImpl(
             .whereArrayContains("teacherIds", teacherId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    close(error)
+                    trySend(emptyList())
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {

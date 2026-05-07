@@ -26,6 +26,9 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
+google-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

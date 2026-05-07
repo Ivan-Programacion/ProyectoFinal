@@ -1,10 +1,13 @@
 package com.example.proyectofinal.ViewModel
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -14,7 +17,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,10 +48,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -77,18 +77,9 @@ import com.example.proyectofinal.Repository.AuthRepositoryImpl
 import com.example.proyectofinal.Repository.UserRepositoryImpl
 import com.example.proyectofinal.Repository.ContentRepositoryImpl
 import com.example.proyectofinal.Repository.ExamRepositoryImpl
-import com.example.proyectofinal.ViewModel.AuthUiState
-import com.example.proyectofinal.ViewModel.AuthViewModelFactory
-import com.example.proyectofinal.ViewModel.BeltsViewModel
-import com.example.proyectofinal.ViewModel.BeltsViewModelFactory
-import com.example.proyectofinal.ViewModel.AdminListaClientesViewModel
-import com.example.proyectofinal.ViewModel.AdminListaClientesViewModelFactory
-import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
-import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModelFactory
-import com.example.proyectofinal.ViewModel.AdminGestionExamenViewModel
-import com.example.proyectofinal.ViewModel.AdminGestionExamenViewModelFactory
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -179,6 +170,9 @@ fun App(startDestination: String = "login") {
 
     val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
     val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
+
+    // Permisos de notificación y guardar el token FCM de Firebase en el documento del usuario actual
+    NotificationPermissionAndTokenSetup(currentUser?.id)
 
     LaunchedEffect(authUiState) {
         when (authUiState) {
@@ -336,7 +330,20 @@ fun App(startDestination: String = "login") {
                 Perfil(
                     innerPadding,
                     viewModel = authViewModel
-                ) { controller.navigate(it) }
+                    // en Perfil realizamos diferente a los demás porque necesitamos limpiar todas las pantallas para evitar errores
+                ) { ruta ->
+                    controller.navigate(ruta) {
+                        // Si cerramos sesión desde el Perfil, limpiamos pantallas (viewModels)
+                        if (ruta == StateNavigate.login.value) {
+                            // Usamos el ID del grafo principal para asegurar que borra todo
+                            popUpTo(controller.graph.id) {
+                                inclusive = true
+                            }
+                        }
+                        // Evita que se creen múltiples copias de la misma pantalla si se pulsa rápido
+                        launchSingleTop = true
+                    }
+                }
             }
             composable(StateNavigate.favoritos.value) {
                 Favoritos(innerPadding) {
@@ -465,4 +472,23 @@ fun NavBar(currentRoute: String?, controller: (route: String) -> Unit, isAdmin: 
 @Composable
 fun GreetingPreview() {
     ProyectoFinalTheme { App() }
+}
+
+// Notificación push (componente)
+@Composable
+fun NotificationPermissionAndTokenSetup(currentUserId: String?) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) updateFcmTokenInFirestore(currentUserId)
+        }
+    )
+    // Lanzamos la función de actualizar token (comprobando permisos de Android 13 si fuera necesario)
+    LaunchedEffect(currentUserId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            updateFcmTokenInFirestore(currentUserId)
+        }
+    }
 }

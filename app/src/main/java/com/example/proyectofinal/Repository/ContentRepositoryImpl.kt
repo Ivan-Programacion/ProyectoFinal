@@ -47,8 +47,9 @@ class ContentRepositoryImpl(
         val listener = contentCollections(belts)
             .orderBy("order", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshot, error ->
+                // Tratamos la excepcion de permiso denegado al cerrar sesión
                 if (error != null) {
-                    close(error)
+                    trySend(emptyList())
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {

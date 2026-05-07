@@ -111,6 +111,20 @@ class AdminPerfilClienteViewModel(
     fun setStudentId(id: String) {
         _studentId.value = id
         loadStudentData(id)
+        
+        // Si las listas están vacías (suele ocurrir si el ViewModel se instanció
+        // antes de que el usuario hiciera login manual), las recargamos.
+        if (_listaCentros.value.isEmpty() || _listaCinturones.value.isEmpty()) {
+            viewModelScope.launch {
+                if (_listaCentros.value.isEmpty()) {
+                    _listaCentros.value = userRepository.getCenters()
+                }
+                if (_listaCinturones.value.isEmpty()) {
+                    val belts = contentRepository.getBelts()
+                    _listaCinturones.value = belts.sortedBy { it.order }
+                }
+            }
+        }
     }
 
     // Helper para convertir YYYY-ClaveMes-DD a [DD, NombreMes, YYYY]

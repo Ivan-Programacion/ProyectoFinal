@@ -4,8 +4,8 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 /**
- * CASO 1 Y 6: EXAMEN ACTIVADO O CANCELADO
- * Escucha cambios en "exam/{centerId}"
+ * CASO 1, 4, 5 y 6: GESTIÓN DEL CIERRE O APERTURA DEL EXAMEN
+ * Detecta si el examen se abre, se termina o se cancela.
  */
 exports.notifyExamStatusChange = onDocumentWritten("exam/{centerId}", async (event) => {
     const beforeData = event.data.before ? event.data.before.data() : null;
@@ -19,57 +19,84 @@ exports.notifyExamStatusChange = onDocumentWritten("exam/{centerId}", async (eve
 
     if (oldStatus === newStatus) return null;
 
-    let notificationConfig = null;
-
-    // CASO 1: ACTIVADO
+    // --- CASO 1: EXAMEN ACTIVADO (Abierto para solicitudes) ---
     if (oldStatus !== "OPEN_REQUESTS" && newStatus === "OPEN_REQUESTS") {
-        notificationConfig = {
-            title: "¡Examen de Kenpo abierto!",
-            body: "Se ha habilitado el proceso de examen. Entra a tu perfil para solicitarlo.",
-            filterStatus: null // Para todos los alumnos activos del centro
-        };
-    }
-    // CASO 6: CANCELADO (Pasa de cualquier estado activo a CLOSED sin haber terminado)
-    else if ((oldStatus === "OPEN_REQUESTS" || oldStatus === "IN_PROGRESS") && newStatus === "CLOSED") {
-        notificationConfig = {
-            title: "Examen cancelado",
-            body: "El proceso de examen ha sido cancelado. Lo sentimos.",
-            filterStatus: "NOT_NONE" // Para todos los que estaban participando
-        };
-    }
-
-    if (notificationConfig) {
-        let query = admin.firestore().collection("users")
+        const usersSnapshot = await admin.firestore().collection("users")
             .where("centerId", "==", centerId)
             .where("active", "==", true)
-            .where("clientApproved", "==", true);
+            .where("clientApproved", "==", true)
+            .get();
 
-        const usersSnapshot = await query.get();
         const tokens = [];
-
         usersSnapshot.forEach(doc => {
             const user = doc.data();
-            // Si es cancelación, filtramos que su examStatus no sea NONE
-            if (notificationConfig.filterStatus === "NOT_NONE") {
-                if (user.examStatus !== "NONE" && user.fcmToken) tokens.push(user.fcmToken);
-            } else {
-                if (user.fcmToken) tokens.push(user.fcmToken);
-            }
+            if (user.fcmToken) tokens.push(user.fcmToken);
         });
 
         if (tokens.length > 0) {
-            const message = {
-                notification: { title: notificationConfig.title, body: notificationConfig.body },
+            await admin.messaging().sendEachForMulticast({
+                notification: {
+                    title: "¡Examen de Kenpo abierto!",
+                    body: "Se ha habilitado el proceso de examen. Entra a tu perfil para solicitarlo."
+                },
                 tokens: tokens
-            };
-            await admin.messaging().sendEachForMulticast(message);
+            });
         }
     }
+
+    // --- CASOS 4, 5 y 6: EXAMEN CERRADO (Terminado o Cancelado) ---
+    else if (newStatus === "CLOSED") {
+        const usersSnapshot = await admin.firestore().collection("users")
+            .where("centerId", "==", centerId)
+            .get();
+
+        const approvedTokens = [];
+        const cancelledTokens = [];
+
+        usersSnapshot.forEach(doc => {
+            const user = doc.data();
+            if (!user.fcmToken) return;
+
+            // CASO 4: APROBADO INDIVIDUALMENTE (Ahora que el examen es CLOSED, le felicitamos)
+            if (user.examStatus === "APPROVED") {
+                approvedTokens.push(user.fcmToken);
+            }
+            // CASO 6: CANCELACIÓN (Solo para los que estaban esperando y no fueron procesados)
+            else if (user.examStatus === "CANDIDATE" || user.examStatus === "APPLICANT") {
+                cancelledTokens.push(user.fcmToken);
+            }
+            // CASOS REFUSED Y FAILED: No se añaden a ninguna lista (Ya fueron notificados o no deben recibir nada más)
+        });
+
+        // Enviar felicitaciones a los aprobados
+        if (approvedTokens.length > 0) {
+            await admin.messaging().sendEachForMulticast({
+                notification: {
+                    title: "¡Enhorabuena, has aprobado!",
+                    body: "Has superado el examen con éxito. ¡Revisa tu nuevo cinturón en la App!"
+                },
+                tokens: approvedTokens
+            });
+        }
+
+        // Enviar aviso de cancelación a los que se quedaron a medias
+        if (cancelledTokens.length > 0) {
+            await admin.messaging().sendEachForMulticast({
+                notification: {
+                    title: "Examen cancelado",
+                    body: "El proceso de examen ha sido cancelado por el administrador."
+                },
+                tokens: cancelledTokens
+            });
+        }
+    }
+
     return null;
 });
 
 /**
  * CASOS 2, 3, 4 y 5: CAMBIOS INDIVIDUALES (users/{userId})
+ * Notifica inmediatamente en cambios de estado, excepto para APPROVED que espera al cierre.
  */
 exports.notifyStudentExamStatus = onDocumentWritten("users/{userId}", async (event) => {
     const beforeData = event.data.before ? event.data.before.data() : null;
@@ -87,39 +114,31 @@ exports.notifyStudentExamStatus = onDocumentWritten("users/{userId}", async (eve
     let body = "";
 
     switch (newStatus) {
-        case "CANDIDATE": // SOLICITUD APROBADA
+        case "CANDIDATE": // SOLICITUD APROBADA (Individual)
             title = "¡Solicitud aprobada!";
             body = "Se ha aprobado tu solicitud. ¡El examen está a punto de empezar!";
             break;
-        case "REFUSED": // SOLICITUD RECHAZADA
+        case "REFUSED": // SOLICITUD RECHAZADA (Individual)
             title = "Solicitud rechazada";
             body = "Tu solicitud de examen no ha sido aprobada en esta ocasión.";
             break;
-        case "APPROVED": // EXAMEN APROBADO (CASO ESPECIAL)
-            // Verificamos si el examen ya terminó
-            const examDoc = await admin.firestore().collection("exam").doc(afterData.centerId).get();
-            if (examDoc.exists && examDoc.data().currentStatus === "IN_PROGRESS") {
-                console.log("Alumno aprobado individualmente pero examen sigue IN_PROGRESS. No notificamos aún.");
-                return null;
-            }
-            title = "¡Enhorabuena, has aprobado!";
-            body = "Has superado el examen. ¡Revisa tu nuevo cinturón en la App!";
-            break;
-        case "FAILED": // EXAMEN SUSPENSO
+        case "FAILED": // EXAMEN SUSPENSO (Individual)
             title = "Examen no superado";
             body = "No has superado el examen esta vez. ¡Sigue entrenando duro!";
             break;
+        case "APPROVED":
+            // Para el caso APPROVED, no hacemos nada aquí.
+            // Esperamos a que el examen pase a CLOSED para que lo gestione la función de arriba.
+            return null;
         default:
             return null;
     }
 
-    const message = {
-        notification: { title, body },
-        token: fcmToken
-    };
-
     try {
-        await admin.messaging().send(message);
+        await admin.messaging().send({
+            notification: { title, body },
+            token: fcmToken
+        });
     } catch (error) {
         if (error.code === 'messaging/registration-token-not-registered') {
             await admin.firestore().collection("users").doc(event.params.userId).update({ fcmToken: admin.firestore.FieldValue.delete() });

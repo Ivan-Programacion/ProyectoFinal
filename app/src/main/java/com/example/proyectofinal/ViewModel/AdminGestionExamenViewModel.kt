@@ -209,6 +209,7 @@ class AdminGestionExamenViewModel(
             }
             // 2. Cerrar el examen y resetear estados
             examRepository.updateExamStatus(centerId, "CLOSED", "")
+            //kotlinx.coroutines.delay(2000)
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "FAILED", "NONE", "")

@@ -4,6 +4,7 @@ import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -85,7 +86,7 @@ class UserRepositoryImpl(
             // Firestore espera infinitamente si no hay internet al hacer .await(). 
             // Por ello, le ponemos un límite de 5 segundos. Si en 5s no se ha conectado, consideramos fallo de red.
             val result = withTimeoutOrNull(5000) {
-                userCollection.document(user.id).set(user).await()
+                userCollection.document(user.id).set(user, SetOptions.merge()).await()
                 true
             }
             result ?: true // Siempre true aunque haya fallo de conexión porque cuando recupere la conexión, se producirá el cambio

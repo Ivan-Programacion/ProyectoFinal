@@ -32,6 +32,9 @@ data class User(
     val examStatus: String = "NONE", // "NONE", "APPLICANT", "REFUSED", "CANDIDATE", "APPROVED", "FAILED"
     val examText: String = "",
 
+    // Gestion de notificaciones
+    val fcmToken: String? = null,
+
     // Listas de favoritos (IDs de los elementos)
     val favoritesTech: List<String> = emptyList(),
     val favoritesForms: List<String> = emptyList(),

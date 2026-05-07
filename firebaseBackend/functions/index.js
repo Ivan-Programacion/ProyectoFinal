@@ -1,4 +1,4 @@
-const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onDocumentWritten, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
@@ -8,19 +8,25 @@ admin.initializeApp();
  * Escucha cambios en la colección "exam". Si currentStatus cambia a "OPEN_REQUESTS",
  * busca a todos los alumnos de ese centerId con fcmToken válido y les manda una notificación.
  */
-exports.notifyExamActivated = onDocumentUpdated("exam/{examId}", async (event) => {
-    const beforeData = event.data.before.data();
-    const afterData = event.data.after.data();
+exports.notifyExamActivated = onDocumentWritten("exam/{examId}", async (event) => {
+    const beforeData = event.data.before ? event.data.before.data() : null;
+    const afterData = event.data.after ? event.data.after.data() : null;
+
+    // Si ha sido borrado, no hacemos nada
+    if (!afterData) return null;
+
+    const oldStatus = beforeData ? beforeData.currentStatus : "CLOSED";
+    const newStatus = afterData.currentStatus;
 
     // Verificamos que el examen ha cambiado de estado y ahora es "OPEN_REQUESTS"
-    if (beforeData.currentStatus !== "OPEN_REQUESTS" && afterData.currentStatus === "OPEN_REQUESTS") {
+    if (oldStatus !== "OPEN_REQUESTS" && newStatus === "OPEN_REQUESTS") {
         const centerId = event.params.examId; // El ID del doc coincide con el centerId
         console.log(`Examen abierto para el centro: ${centerId}`);
 
         // Buscamos a los alumnos activos del centro que tengan fcmToken
         const usersSnapshot = await admin.firestore().collection("users")
             .where("centerId", "==", centerId)
-            .where("isActive", "==", true)
+            .where("active", "==", true)
             .where("clientApproved", "==", true)
             .get();
 
@@ -65,15 +71,18 @@ exports.notifyExamActivated = onDocumentUpdated("exam/{examId}", async (event) =
  * CASOS 2, 3, 4 y 5: CAMBIOS DE ESTADO INDIVIDUAL DEL ALUMNO
  * Escucha cambios en la colección "users" y evalúa "examStatus".
  */
-exports.notifyStudentExamStatus = onDocumentUpdated("users/{userId}", async (event) => {
-    const beforeData = event.data.before.data();
-    const afterData = event.data.after.data();
+exports.notifyStudentExamStatus = onDocumentWritten("users/{userId}", async (event) => {
+    const beforeData = event.data.before ? event.data.before.data() : null;
+    const afterData = event.data.after ? event.data.after.data() : null;
 
-    const oldStatus = beforeData.examStatus;
+    if (!afterData) return null; // El usuario fue borrado
+
+    const oldStatus = beforeData ? beforeData.examStatus : "NONE";
     const newStatus = afterData.examStatus;
 
-    // Si el estado del examen no ha cambiado, no hacemos nada
     if (oldStatus === newStatus) return null;
+
+    console.log(`Evaluando cambio de estado para ${event.params.userId}: ${oldStatus} -> ${newStatus}`);
 
     const fcmToken = afterData.fcmToken;
     if (!fcmToken) {
@@ -88,7 +97,7 @@ exports.notifyStudentExamStatus = onDocumentUpdated("users/{userId}", async (eve
     switch (newStatus) {
         case "CANDIDATE": // SOLICITUD APROBADA
             title = "¡Solicitud de examen aprobada!";
-            body = "Se ha aprobado tu solicitud. ¡Prepárate bien para el examen!.";
+            body = "Se ha aprobado tu solicitud. ¡Prepárate bien para el examen!";
             break;
         case "REFUSED": // SOLICITUD RECHAZADA
             title = "Solicitud rechazada";

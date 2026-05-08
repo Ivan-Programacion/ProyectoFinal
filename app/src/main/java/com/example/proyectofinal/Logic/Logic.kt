@@ -10,13 +10,13 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 
 // Función que cambia el titulo del TopBar según la pantalla en la que esté
-fun tituloTopBar(screen: String?): String {
+fun tituloTopBar(screen: String?, beltName: String = ""): String {
     when (screen) {
-        StateNavigate.contenido.value -> return ScreenTitle.contenido.value
+        StateNavigate.contenido.value -> return if (beltName.isNotEmpty()) "Cinturón: $beltName" else ScreenTitle.contenido.value
         StateNavigate.listaCinturones.value -> return ScreenTitle.listaCinturones.value
         StateNavigate.perfil.value -> return ScreenTitle.perfil.value
         StateNavigate.favoritos.value -> return ScreenTitle.favoritos.value
-        StateNavigate.listaContenido.value -> return ScreenTitle.listaContenido.value
+        StateNavigate.listaContenido.value -> return if (beltName.isNotEmpty()) "Cinturón: $beltName" else ScreenTitle.listaContenido.value
         StateNavigate.adminListaClientes.value -> return ScreenTitle.adminListaClientes.value
         StateNavigate.adminGestionExamen.value -> return ScreenTitle.adminGestionExamen.value
         StateNavigate.adminPerfilCliente.value -> return ScreenTitle.adminPerfilCliente.value

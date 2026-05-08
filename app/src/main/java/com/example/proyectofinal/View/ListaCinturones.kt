@@ -35,19 +35,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectofinal.Logic.belts
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.ViewModel.BeltsViewModel
+import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
-import java.util.Locale
 
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun ListaCinturones(
     paddingValues: PaddingValues = PaddingValues(),
     viewModel: BeltsViewModel = viewModel(),
+    contentViewModel: ContentViewModel = viewModel(),
     controller: (String) -> Unit
 ) {
     // Para botón atrás del móvil
@@ -96,6 +96,7 @@ fun ListaCinturones(
                             isEnabled = beltState.isEnabled
                         ) {
                             if (beltState.isEnabled) {
+                                contentViewModel.setSelectedBeltId(beltState.belt.id)
                                 controller(StateNavigate.listaContenido.value)
                             }
                         }

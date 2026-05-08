@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -30,15 +31,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Logic.mapBeltColor
-import com.example.proyectofinal.Logic.provisionalContentFormBeltList
-import com.example.proyectofinal.Logic.provisionalContentSetBeltList
-import com.example.proyectofinal.Logic.provisionalContentTecBeltList
+import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
+import com.example.proyectofinal.Model.Content
 
 @Composable
-fun ListaContenido(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
+fun ListaContenido(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: ContentViewModel = viewModel(),
+    controller: (String) -> Unit
+) {
+    val contentList by viewModel.contentList.collectAsStateWithLifecycle()
+    val selectedBeltId by viewModel.selectedBeltId.collectAsStateWithLifecycle()
+    
+    // Filtramos los contenidos por tipo
+    val tecnicas = contentList.filter { it.contentType == "TECH" }
+    val formas = contentList.filter { it.contentType == "FORM" }
+    val sets = contentList.filter { it.contentType == "SET" }
+
     // Contenedor principal que usa el color del cinturón como fondo
     Box(
         modifier = Modifier
@@ -48,7 +63,7 @@ fun ListaContenido(paddingValues: PaddingValues = PaddingValues(), controller: (
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        mapBeltColor.getValue("brown3"), // Color cinturón
+                        mapBeltColor[selectedBeltId] ?: MaterialTheme.colorScheme.background, // Color cinturón (si no se lee, color de fondo normal)
                         MaterialTheme.colorScheme.background // Color de fondo predeterminado
                     ),
                     startY = 0f,
@@ -64,35 +79,44 @@ fun ListaContenido(paddingValues: PaddingValues = PaddingValues(), controller: (
             contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp)
         ) {
             // SECCIÓN TÉCNICAS
-            item {
-                ContenedorContenido(
-                    titulo = "Técnicas",
-                    items = provisionalContentTecBeltList
-                ) {
-                    // Añadimos la navegación al contenido de cada contenido
-                    controller(StateNavigate.contenido.value)
+            if (tecnicas.isNotEmpty()) {
+                item {
+                    ContenedorContenido(
+                        titulo = "Técnicas",
+                        items = tecnicas
+                    ) {
+                        // Cambiamos el valor del id del contenido según el que se seleccione, y se navega a la pantalla después
+                        viewModel.setSelectedContentId(it.id)
+                        controller(StateNavigate.contenido.value)
+                    }
                 }
             }
 
             // SECCIÓN FORMA (KATA)
-            item {
-                ContenedorContenido(
-                    titulo = "Forma (Kata)",
-                    items = provisionalContentFormBeltList
-                ) {
-                    // Añadimos la navegación al contenido de cada contenido
-                    controller(StateNavigate.contenido.value)
+            if (formas.isNotEmpty()) {
+                item {
+                    ContenedorContenido(
+                        titulo = "Forma (Kata)",
+                        items = formas
+                    ) {
+                        // Cambiamos el valor del id del contenido según el que se seleccione, y se navega a la pantalla después
+                        viewModel.setSelectedContentId(it.id)
+                        controller(StateNavigate.contenido.value)
+                    }
                 }
             }
 
             // SECCIÓN SET
-            item {
-                ContenedorContenido(
-                    titulo = "Set",
-                    items = provisionalContentSetBeltList
-                ) {
-                    // Añadimos la navegación al contenido de cada contenido
-                    controller(StateNavigate.contenido.value)
+            if (sets.isNotEmpty()) {
+                item {
+                    ContenedorContenido(
+                        titulo = "Set",
+                        items = sets
+                    ) {
+                        // Cambiamos el valor del id del contenido según el que se seleccione, y se navega a la pantalla después
+                        viewModel.setSelectedContentId(it.id)
+                        controller(StateNavigate.contenido.value)
+                    }
                 }
             }
         }
@@ -100,7 +124,7 @@ fun ListaContenido(paddingValues: PaddingValues = PaddingValues(), controller: (
 }
 
 @Composable
-fun ContenedorContenido(titulo: String, items: List<String>, controller: () -> Unit) {
+fun ContenedorContenido(titulo: String, items: List<Content>, controller: (Content) -> Unit) {
     // Tarjeta clara que agrupa los elementos
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -121,8 +145,12 @@ fun ContenedorContenido(titulo: String, items: List<String>, controller: () -> U
             )
 
             // Generamos una fila por cada elemento de la lista
-            items.forEach { nombreItem ->
-                SubcontenedorContenido(nombre = nombreItem) { controller() }
+            items.forEach { content ->
+                // Ponemos name según el idioma del dispositov (locale)
+                val nombreItem = "${content.number}. ${content.name[locale] ?: ""}"
+                SubcontenedorContenido(
+                    nombre = nombreItem
+                ) { controller(content) }
             }
         }
     }
@@ -158,7 +186,7 @@ fun SubcontenedorContenido(nombre: String, controller: () -> Unit) {
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     modifier = Modifier.padding(4.dp)
                 )

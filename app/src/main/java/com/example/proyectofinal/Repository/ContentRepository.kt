@@ -15,6 +15,9 @@ interface ContentRepository {
     // Obtiene todos los cinturones en tiempo real (Stream) ordenados
     fun getBeltsStream(): Flow<List<Belt>>
 
+    // Obtiene el contenido de un cinturón en tiempo real (Stream)
+    fun getContentStream(beltId: String): Flow<List<Content>>
+
     // Obtiene el contenido según lo que nos interesa: técnica, forma o set
     suspend fun getContentByBelt(beltId: String, collectionName: String): List<Content>
 }

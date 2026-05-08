@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         // Para la pantalla de carga
-        val splasScreen = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // Comprobación de token para login automático o no
@@ -110,7 +110,6 @@ class MainActivity : ComponentActivity() {
 fun App(startDestination: String = "login") {
     // Creamos la factoría y el ViewModel para poder usar AuthRepository y UserRepository en cada
     // uno de los ViewModel que utilicemos
-    val context = LocalContext.current
     val userRepository = UserRepositoryImpl()
     val authRepository = AuthRepositoryImpl()
     val contentRepository = ContentRepositoryImpl()
@@ -128,6 +127,12 @@ fun App(startDestination: String = "login") {
         factory = BeltsViewModelFactory(
             authRepository = authRepository,
             userRepository = userRepository,
+            contentRepository = contentRepository
+        )
+    )
+
+    val contentViewModel: ContentViewModel = viewModel(
+        factory = ContentViewModelFactory(
             contentRepository = contentRepository
         )
     )
@@ -170,6 +175,11 @@ fun App(startDestination: String = "login") {
 
     val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
     val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
+
+    val beltsState by beltsViewModel.beltsUiState.collectAsStateWithLifecycle()
+    val selectedBeltId by contentViewModel.selectedBeltId.collectAsStateWithLifecycle()
+    // Para guardar el nombre del cinturon seleccionado (según el idioma)
+    val selectedBeltName = beltsState.find { it.belt.id == selectedBeltId }?.belt?.name?.get(com.example.proyectofinal.Logic.locale) ?: ""
 
     // Permisos de notificación y guardar el token FCM de Firebase en el documento del usuario actual
     NotificationPermissionAndTokenSetup(currentUser?.id)
@@ -235,7 +245,8 @@ fun App(startDestination: String = "login") {
         topBar = {
             // Si NO estamos navegando antes de entrar en la aplicación por las pantallas login, registro, etc
             // controller.popBackStack() --> Para volver atrás en caso de que la pantalla tenga flecha hacia atrás
-            if (currentRoute !in pantallasIniciales) TopBar(currentRoute) {
+            // Pasamos el nombre del cinturón para que se muestre cuando estemos en ListaContenido o Contenido
+            if (currentRoute !in pantallasIniciales) TopBar(currentRoute, selectedBeltName) {
                 controller.popBackStack()
                 // Reseteamos los campos de AdminPerfilCliente a lo que ya exisitian, por si se habían cambiado sin Actualizar
                 //if(currentRoute == StateNavigate.adminPerfilCliente.value) adminPerfilClienteViewModel.resetViewModelsStatesAdmin()
@@ -335,7 +346,8 @@ fun App(startDestination: String = "login") {
             composable(StateNavigate.listaCinturones.value) {
                 ListaCinturones(
                     paddingValues = innerPadding,
-                    viewModel = beltsViewModel
+                    viewModel = beltsViewModel,
+                    contentViewModel = contentViewModel
                 ) { controller.navigate(it) }
             }
             composable(StateNavigate.perfil.value) {
@@ -371,13 +383,21 @@ fun App(startDestination: String = "login") {
                     { controller.popBackStack() }) { controller.navigate(it) }
             }
             composable(StateNavigate.listaContenido.value) {
-                ListaContenido(innerPadding) {
+                ListaContenido(
+                    paddingValues = innerPadding,
+                    viewModel = contentViewModel
+                ) {
                     controller.navigate(
                         it
                     )
                 }
             }
-            composable(StateNavigate.contenido.value) { Contenido(innerPadding) }
+            composable(StateNavigate.contenido.value) { 
+                Contenido(
+                    paddingValues = innerPadding,
+                    viewModel = contentViewModel
+                ) 
+            }
             composable(StateNavigate.adminListaClientes.value) {
                 AdminListaClientes(
                     innerPadding,
@@ -405,9 +425,9 @@ fun App(startDestination: String = "login") {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(currentRoute: String?, backNavigation: () -> Unit = {}) {
+fun TopBar(currentRoute: String?, beltName: String = "", backNavigation: () -> Unit = {}) {
     TopAppBar(
-        { Text(tituloTopBar(currentRoute), style = MaterialTheme.typography.titleMedium) },
+        { Text(tituloTopBar(currentRoute, beltName), style = MaterialTheme.typography.titleMedium) },
         navigationIcon = {
             // Si es una pantalla secundaría que proviene de una principal:
             /*

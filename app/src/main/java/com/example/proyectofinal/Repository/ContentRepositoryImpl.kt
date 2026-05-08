@@ -60,14 +60,32 @@ class ContentRepositoryImpl(
         awaitClose { listener.remove() }
     }
 
+    override fun getContentStream(beltId: String): Flow<List<Content>> = callbackFlow {
+        val listener = contentCollections("content")
+            .whereEqualTo("beltId", beltId)
+            // Eliminamos orderBy de la query de BD para evitar que requiera un índice compuesto
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    // Ordenamos localmente por la propiedad number
+                    val contentList = snapshot.toObjects(Content::class.java).sortedBy { it.number }
+                    trySend(contentList)
+                }
+            }
+        awaitClose { listener.remove() }
+    }
+
     override suspend fun getContentByBelt(beltId: String, collectionName: String): List<Content> {
         return try {
             val snapshot = contentCollections(collectionName)
                 .whereEqualTo("beltId", beltId)
-                .orderBy("number", Query.Direction.ASCENDING)
                 .get()
                 .await()
-            snapshot.toObjects(Content::class.java)
+            // Ordenamos localmente por la propiedad number
+            snapshot.toObjects(Content::class.java).sortedBy { it.number }
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()

@@ -30,13 +30,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.mapBeltColor
+import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @Composable
-fun Contenido(paddingValues: PaddingValues = PaddingValues()) {
+fun Contenido(
+    paddingValues: PaddingValues = PaddingValues(),
+    viewModel: ContentViewModel = viewModel()
+) {
+    val selectedBeltId by viewModel.selectedBeltId.collectAsStateWithLifecycle()
+
     // isFavorite -> Logica provisional para hacer cambiar el icono de favorito de gris a amarillo
     var isFavorite by remember { mutableStateOf(false) }
     // Contenedor principal con el MISMO gradiente que ListaContenido
@@ -47,7 +56,7 @@ fun Contenido(paddingValues: PaddingValues = PaddingValues()) {
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        mapBeltColor.getValue("brown3"), // Mismo color dinámico arriba
+                        mapBeltColor[selectedBeltId] ?: Color.White, // Mismo color dinámico arriba
                         MaterialTheme.colorScheme.background // Tu color base abajo
                     ),
                     startY = 0f,

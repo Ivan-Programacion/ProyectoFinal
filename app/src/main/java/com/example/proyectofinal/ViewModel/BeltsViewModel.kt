@@ -40,7 +40,14 @@ class BeltsViewModel(
         }
 
     // 2. Obtener lista de cinturones de forma reactiva
-    private val beltsStream: Flow<List<Belt>> = contentRepository.getBeltsStream()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val beltsStream: Flow<List<Belt>> = authRepository.getAuthStateStream().flatMapLatest { uid ->
+        if (uid != null) {
+            contentRepository.getBeltsStream()
+        } else {
+            flowOf(emptyList())
+        }
+    }
 
     // 3. Combinar usuario + cinturones para aplicar lógica de muestra de cinturones
     val beltsUiState: StateFlow<List<BeltItemUiState>> =

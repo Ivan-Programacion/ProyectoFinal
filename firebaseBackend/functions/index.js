@@ -15,6 +15,7 @@ exports.notifyExamStatusChange = onDocumentWritten("exam/{centerId}", async (eve
 
     const oldStatus = beforeData.currentStatus;
     const newStatus = afterData.currentStatus;
+    const infoMessage = afterData.infoMessage;
     const centerId = event.params.centerId;
 
     if (oldStatus === newStatus) return null;
@@ -48,24 +49,32 @@ exports.notifyExamStatusChange = onDocumentWritten("exam/{centerId}", async (eve
     else if (newStatus === "CLOSED") {
         const usersSnapshot = await admin.firestore().collection("users")
             .where("centerId", "==", centerId)
+            .where("active", "==", true)
+            .where("clientApproved", "==", true)
             .get();
 
         const approvedTokens = [];
         const cancelledTokens = [];
 
+        const isCancellation = (infoMessage === "CANCELLED");
+
         usersSnapshot.forEach(doc => {
             const user = doc.data();
             if (!user.fcmToken) return;
 
-            // CASO 4: APROBADO INDIVIDUALMENTE (Ahora que el examen es CLOSED, le felicitamos)
-            if (user.examStatus === "APPROVED") {
-                approvedTokens.push(user.fcmToken);
+            if (isCancellation) {
+            // Si el admin canceló, todos los que estaban en el proceso reciben "Cancelado"
+                if (user.examStatus !== "NONE") {
+                    cancelledTokens.push(user.fcmToken);
+                }
+            } else {
+            // Si NO es cancelación (Cierre normal), seguimos la lógica anterior
+                if (user.examStatus === "APPROVED") {
+                    approvedTokens.push(user.fcmToken);
+                } else if (user.examStatus === "CANDIDATE" || user.examStatus === "APPLICANT") {
+                    cancelledTokens.push(user.fcmToken);
+                }
             }
-            // CASO 6: CANCELACIÓN (Solo para los que estaban esperando y no fueron procesados)
-            else if (user.examStatus === "CANDIDATE" || user.examStatus === "APPLICANT") {
-                cancelledTokens.push(user.fcmToken);
-            }
-            // CASOS REFUSED Y FAILED: No se añaden a ninguna lista (Ya fueron notificados o no deben recibir nada más)
         });
 
         // Enviar felicitaciones a los aprobados
@@ -95,8 +104,8 @@ exports.notifyExamStatusChange = onDocumentWritten("exam/{centerId}", async (eve
 });
 
 /**
- * CASOS 2, 3, 4 y 5: CAMBIOS INDIVIDUALES (users/{userId})
- * Notifica inmediatamente en cambios de estado, excepto para APPROVED que espera al cierre.
+ * CASOS 2, 3: CAMBIOS INDIVIDUALES (users/{userId})
+ * Notifica inmediatamente en cambios de estado
  */
 exports.notifyStudentExamStatus = onDocumentWritten("users/{userId}", async (event) => {
     const beforeData = event.data.before ? event.data.before.data() : null;

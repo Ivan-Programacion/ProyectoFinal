@@ -223,7 +223,7 @@ class AdminGestionExamenViewModel(
     fun cancelExam() = viewModelScope.launch {
         val centerId = currentTeacher.value?.centerId ?: return@launch
         authViewModel.setUiState(AuthUiState.Success("Examen cancelado correctamente"))
-        examRepository.updateExamStatus(centerId, "CLOSED", "")
+        examRepository.updateExamStatus(centerId, "CLOSED", "CANCELLED")
         
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPROVED", "NONE", "")

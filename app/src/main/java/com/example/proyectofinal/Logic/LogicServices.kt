@@ -1,6 +1,7 @@
 package com.example.proyectofinal.Logic
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.messaging.FirebaseMessaging
 
 // Función que actualiza el token del usuario en la BD en caso de que fuera necesario.
@@ -10,7 +11,8 @@ fun updateFcmTokenInFirestore(userId: String?) {
         if (task.isSuccessful) {
             val token = task.result
             val db = FirebaseFirestore.getInstance()
-            db.collection("users").document(userId).update("fcmToken", token)
+            // Guardamos el token en la BD y lo añadimos al array de tokens (dispositivos iniciados)
+            db.collection("users").document(userId).update("fcmTokens", FieldValue.arrayUnion(token))
         }
     }
 }
@@ -22,12 +24,20 @@ fun removeFcmTokenOnLogout(userId: String?, onComplete: () -> Unit) {
         return
     }
 
-    val db = FirebaseFirestore.getInstance()
-    // Ponemos el campo como null o una cadena vacía
-    db.collection("users").document(userId)
-        .update("fcmToken", null)
-        .addOnCompleteListener {
-            // Una vez borrado de la base de datos, procedemos al signOut
+    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val token = task.result
+            val db = FirebaseFirestore.getInstance()
+            // Eliminamos solo el token del dispositivo actual de la lista de tokens
+            db.collection("users").document(userId)
+                .update("fcmTokens", FieldValue.arrayRemove(token))
+                .addOnCompleteListener {
+                    // Una vez borrado de la base de datos, procedemos al signOut
+                    onComplete()
+                }
+        } else {
+            // Si falla obtener el token, continuamos con el logout
             onComplete()
         }
+    }
 }

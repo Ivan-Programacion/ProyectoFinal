@@ -9,6 +9,10 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.google.firebase.auth.FirebaseAuth
+import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 import com.example.proyectofinal.ViewModel.MainActivity
 import com.example.proyectofinal.R
 
@@ -18,6 +22,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         // El token se actualizará automáticamente desde Compose
+        // Pero si la sesión está iniciada lo guardamos en el array correspondiente
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val db = FirebaseFirestore.getInstance()
+            db.collection("users").document(userId).update("fcmTokens", FieldValue.arrayUnion(token))
+        }
     }
 
     // Se ejecuta cuando llega la notificación en primer plano (para permitir la notifiación en primer plano)

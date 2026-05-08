@@ -31,7 +31,7 @@ exports.notifyExamStatusChange = onDocumentWritten("exam/{centerId}", async (eve
         const tokens = [];
         usersSnapshot.forEach(doc => {
             const user = doc.data();
-            if (user.fcmToken) tokens.push(user.fcmToken);
+            if (user.fcmTokens && user.fcmTokens.length > 0) tokens.push(...user.fcmTokens);
         });
 
         if (tokens.length > 0) {
@@ -60,19 +60,19 @@ exports.notifyExamStatusChange = onDocumentWritten("exam/{centerId}", async (eve
 
         usersSnapshot.forEach(doc => {
             const user = doc.data();
-            if (!user.fcmToken) return;
+            if (!user.fcmTokens || user.fcmTokens.length === 0) return;
 
             if (isCancellation) {
             // Si el admin canceló, todos los que estaban en el proceso reciben "Cancelado"
                 if (user.examStatus !== "NONE") {
-                    cancelledTokens.push(user.fcmToken);
+                    cancelledTokens.push(...user.fcmTokens);
                 }
             } else {
             // Si NO es cancelación (Cierre normal), seguimos la lógica anterior
                 if (user.examStatus === "APPROVED") {
-                    approvedTokens.push(user.fcmToken);
+                    approvedTokens.push(...user.fcmTokens);
                 } else if (user.examStatus === "CANDIDATE" || user.examStatus === "APPLICANT") {
-                    cancelledTokens.push(user.fcmToken);
+                    cancelledTokens.push(...user.fcmTokens);
                 }
             }
         });
@@ -115,9 +115,9 @@ exports.notifyStudentExamStatus = onDocumentWritten("users/{userId}", async (eve
 
     const oldStatus = beforeData.examStatus;
     const newStatus = afterData.examStatus;
-    const fcmToken = afterData.fcmToken;
+    const fcmTokens = afterData.fcmTokens;
 
-    if (oldStatus === newStatus || !fcmToken) return null;
+    if (oldStatus === newStatus || !fcmTokens || fcmTokens.length === 0) return null;
 
     let title = "";
     let body = "";
@@ -144,14 +144,25 @@ exports.notifyStudentExamStatus = onDocumentWritten("users/{userId}", async (eve
     }
 
     try {
-        await admin.messaging().send({
+        const response = await admin.messaging().sendEachForMulticast({
             notification: { title, body },
-            token: fcmToken
+            tokens: fcmTokens
         });
-    } catch (error) {
-        if (error.code === 'messaging/registration-token-not-registered') {
-            await admin.firestore().collection("users").doc(event.params.userId).update({ fcmToken: admin.firestore.FieldValue.delete() });
+
+        const invalidTokens = [];
+        response.responses.forEach((res, idx) => {
+            if (!res.success && res.error && res.error.code === 'messaging/registration-token-not-registered') {
+                invalidTokens.push(fcmTokens[idx]);
+            }
+        });
+
+        if (invalidTokens.length > 0) {
+            await admin.firestore().collection("users").doc(event.params.userId).update({
+                fcmTokens: admin.firestore.FieldValue.arrayRemove(...invalidTokens)
+            });
         }
+    } catch (error) {
+        console.error("Error sending message:", error);
     }
     return null;
 });

@@ -245,14 +245,26 @@ fun App(startDestination: String = "login") {
         },
         bottomBar = {
             // Si NO estamos navegando antes de entrar en la aplicación por las pantallas login, registro, etc
-            if (currentRoute !in pantallasIniciales) NavBar(
-                currentRoute = currentRoute,
-                controller = {
-                    beforeRoute = it
-                    controller.navigate(it)
-                },
-                isAdmin = currentUser?.role == "TEACHER" || currentUser?.role == "SUPERADMIN"
-            )
+            if (currentRoute !in pantallasIniciales) {
+                // Determinamos qué ítem del menú debe estar activo basado en la pantalla secundaria
+                // Se divide la navegación entre los items del navBar y las pantallas dentro de cada uno de los items
+                // De tal forma que conseguimos que el item se quede seleccionado en el último item que se haya pulsado
+                val activeTab = if (currentRoute == StateNavigate.listaContenido.value || 
+                                    currentRoute == StateNavigate.contenido.value || 
+                                    currentRoute == StateNavigate.adminGestionExamen.value || 
+                                    currentRoute == StateNavigate.adminPerfilCliente.value) {
+                    beforeRoute 
+                } else currentRoute
+
+                NavBar(
+                    currentRoute = activeTab,
+                    controller = {
+                        beforeRoute = it
+                        controller.navigate(it)
+                    },
+                    isAdmin = currentUser?.role == "TEACHER" || currentUser?.role == "SUPERADMIN"
+                )
+            }
             // Si lo estamos, no añadimos el NavBar
             else Spacer(Modifier.padding(bottom = 104.dp))
         },

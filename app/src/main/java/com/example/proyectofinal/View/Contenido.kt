@@ -1,5 +1,6 @@
 package com.example.proyectofinal.View
 
+import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -148,7 +150,7 @@ fun Contenido(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f), // Esto empuja la caja para que ocupe todo el espacio sobrante hasta abajo
+                        .aspectRatio(16f / 9f), // Mantiene la proporción exacta del vídeo y elimina el hueco blanco restante
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         // Usamos onSecondary para mantener la estética de las tarjetas de ListaContenido
@@ -166,7 +168,12 @@ fun Contenido(
                                 modifier = Modifier.fillMaxSize(),
                                 factory = { context ->
                                     WebView(context).apply {
+                                        layoutParams = android.view.ViewGroup.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.MATCH_PARENT
+                                        )
                                         // Configuración necesaria para reproducir video de YouTube sin romper la app
+                                        setBackgroundColor(android.graphics.Color.TRANSPARENT) // Fondo transparente para que no salga blanco si carga lento
                                         settings.javaScriptEnabled = true
                                         // MUY IMPORTANTE para Youtube en WebViews (Evita el Error 152):
                                         // El error 152 es debido a que AndroidView necesita acceder al almacenamiento local del navegador
@@ -176,33 +183,65 @@ fun Contenido(
                                         settings.domStorageEnabled = true
                                         settings.mediaPlaybackRequiresUserGesture = false // Permite que opciones como el mute forzado no pidan interacción humana obligatoria
                                         settings.cacheMode = WebSettings.LOAD_NO_CACHE
-                                        webChromeClient = WebChromeClient()
-                                        webViewClient = WebViewClient()
+                                        // Para permitir el botón de ampliar a pantalla completa el video, se necesita hacer una configuración propia de webChromeClient
+                                        webChromeClient = object : WebChromeClient() {
+                                            private var customView: android.view.View? = null
+                                            private var customViewCallback: CustomViewCallback? = null
 
-                                        // HTML para incrustar el reproductor IFrame de YouTube con mute=1 para que no tenga audio por defecto
-                                        // controls=1 (muestra controles), playsinline=1 (para q no salte a pantalla completa dándole al play), modestbranding=1
-                                        // origin=https://www.youtube.com (Muy importante también para evitar el Error 152 cuando bloquea dominios extraños)
-                                        // Utilizamos youtube-nocookie.com que suele saltarse mejor las restricciones de WebViews para videos ocultos
-                                        val iframeHtml = """
-                                            <!DOCTYPE html>
-                                            <html>
-                                                <body style="margin:0;padding:0;">
-                                                    <iframe width="100%" height="100%" 
-                                                            src="https://www.youtube-nocookie.com/embed/$videoId?mute=1&playsinline=1&modestbranding=1" 
-                                                            frameborder="0" 
-                                                            allow="autoplay; encrypted-media" 
-                                                            allowfullscreen>
-                                                    </iframe>
-                                                </body>
-                                            </html>
-                                        """.trimIndent()
-                                        
-                                        loadDataWithBaseURL("https://www.youtube-nocookie.com", iframeHtml, "text/html", "utf-8", null)
+                                            override fun onShowCustomView(view: android.view.View?, callback: CustomViewCallback?) {
+                                                super.onShowCustomView(view, callback)
+                                                if (customView != null) {
+                                                    callback?.onCustomViewHidden()
+                                                    return
+                                                }
+                                                customView = view
+                                                customViewCallback = callback
+                                                
+                                                val activity = context.findActivity() ?: return
+                                                val decorView = activity.window.decorView as android.widget.FrameLayout
+                                                decorView.addView(customView, android.widget.FrameLayout.LayoutParams(
+                                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                                                ))
+                                            }
+
+                                            override fun onHideCustomView() {
+                                                super.onHideCustomView()
+                                                val activity = context.findActivity() ?: return
+                                                val decorView = activity.window.decorView as android.widget.FrameLayout
+                                                decorView.removeView(customView)
+                                                customView = null
+                                                customViewCallback?.onCustomViewHidden()
+                                            }
+                                        }
+                                        webViewClient = WebViewClient()
                                     }
                                 },
                                 update = { webView ->
-                                    // Si el iframeHtml cambiase al cambiar el videoId, se debería recargar aquí.
-                                    // Pero al estar en un contenedor reactivo si cambia la variable url se recargará la vista
+                                    // HTML para incrustar el reproductor IFrame de YouTube con mute=1 para que no tenga audio por defecto
+                                    // controls=1 (Controles por defecto), playsinline=1 (para que no salte a pantalal completa dándole al play), modestbranding=1
+                                    // Utilizamos youtube-nocookie.com que suele saltarse mejor las restricciones de WebViews para videos ocultos
+                                    val iframeHtml = """
+                                        <!DOCTYPE html>
+                                        <html>
+                                            <head>
+                                                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                                                <style>
+                                                    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: transparent; }
+                                                    iframe { width: 100%; height: 100%; display: block; }
+                                                </style>
+                                            </head>
+                                            <body>
+                                                <iframe src="https://www.youtube-nocookie.com/embed/$videoId?mute=1&playsinline=1&modestbranding=1&controls=1&rel=0" 
+                                                        frameborder="0" 
+                                                        allow="autoplay; encrypted-media" 
+                                                        allowfullscreen>
+                                                </iframe>
+                                            </body>
+                                        </html>
+                                    """.trimIndent()
+                                    
+                                    webView.loadDataWithBaseURL("https://www.youtube-nocookie.com", iframeHtml, "text/html", "utf-8", null)
                                 }
                             )
                         } else {
@@ -240,4 +279,14 @@ fun extractYouTubeId(url: String): String? {
     val regex = "v=([^&]+)|youtu\\.be/([^?&]+)|embed/([^?&]+)|shorts/([^?&]+)".toRegex()
     val matchResult = regex.find(url)
     return matchResult?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }
+}
+
+// Función auxiliar para poder obtener la Activity y lanzar el reproductor a pantalla completa
+fun android.content.Context.findActivity(): android.app.Activity? {
+    var context = this
+    while (context is android.content.ContextWrapper) {
+        if (context is android.app.Activity) return context
+        context = context.baseContext
+    }
+    return null
 }

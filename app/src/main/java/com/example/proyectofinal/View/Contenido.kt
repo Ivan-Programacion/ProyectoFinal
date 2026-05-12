@@ -1,5 +1,6 @@
 package com.example.proyectofinal.View
 
+import android.content.pm.ActivityInfo
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.extractYouTubeId
@@ -198,17 +202,38 @@ fun Contenido(
                                                 customViewCallback = callback
                                                 
                                                 val activity = context.findActivity() ?: return
-                                                val decorView = activity.window.decorView as android.widget.FrameLayout
-                                                decorView.addView(customView, android.widget.FrameLayout.LayoutParams(
-                                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                                                
+                                                // Desbloquea la orientación para permitir girar la pantalla libremente en modo fullscreen
+                                                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+
+                                                val window = activity.window
+                                                val decorView = window.decorView as FrameLayout
+
+                                                // Oculta la barra de notificaciones y barra de navegación (Immersive Mode)
+                                                val insetsController = WindowCompat.getInsetsController(window, decorView)
+                                                insetsController.hide(WindowInsetsCompat.Type.systemBars())
+                                                insetsController.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+                                                decorView.addView(customView, FrameLayout.LayoutParams(
+                                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                                    ViewGroup.LayoutParams.MATCH_PARENT
                                                 ))
                                             }
 
                                             override fun onHideCustomView() {
                                                 super.onHideCustomView()
                                                 val activity = context.findActivity() ?: return
-                                                val decorView = activity.window.decorView as android.widget.FrameLayout
+                                                
+                                                // Vuelve a bloquear la pantalla en vertical (portrait) al salir de fullscreen
+                                                activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                                                
+                                                val window = activity.window
+                                                val decorView = window.decorView as android.widget.FrameLayout
+
+                                                // Vuelve a mostrar las barras del sistema
+                                                val insetsController = androidx.core.view.WindowCompat.getInsetsController(window, decorView)
+                                                insetsController.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+
                                                 decorView.removeView(customView)
                                                 customView = null
                                                 customViewCallback?.onCustomViewHidden()

@@ -48,7 +48,7 @@ fun ListaContenido(
 ) {
     val contentList by viewModel.contentList.collectAsStateWithLifecycle()
     val selectedBeltId by viewModel.selectedBeltId.collectAsStateWithLifecycle()
-    
+
     // Filtramos los contenidos por tipo
     val tecnicas = contentList.filter { it.contentType == "TECH" }
     val formas = contentList.filter { it.contentType == "FORM" }
@@ -63,7 +63,8 @@ fun ListaContenido(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        mapBeltColor[selectedBeltId] ?: MaterialTheme.colorScheme.background, // Color cinturón (si no se lee, color de fondo normal)
+                        mapBeltColor[selectedBeltId]
+                            ?: MaterialTheme.colorScheme.background, // Color cinturón (si no se lee, color de fondo normal)
                         MaterialTheme.colorScheme.background // Color de fondo predeterminado
                     ),
                     startY = 0f,
@@ -147,7 +148,8 @@ fun ContenedorContenido(titulo: String, items: List<Content>, controller: (Conte
             // Generamos una fila por cada elemento de la lista
             items.forEach { content ->
                 // Ponemos name según el idioma del dispositov (locale)
-                val nombreItem = "${content.number}. ${content.name[locale] ?: ""}"
+                val nombreItem = if (content.contentType != "TECH") content.name[locale]
+                    ?: "" else "${content.number}. ${content.name[locale] ?: ""}"
                 SubcontenedorContenido(
                     nombre = nombreItem
                 ) { controller(content) }

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.mapBeltColor
+import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
@@ -44,7 +45,15 @@ fun Contenido(
     paddingValues: PaddingValues = PaddingValues(),
     viewModel: ContentViewModel = viewModel()
 ) {
+    // Recogemos el cinturon seleccionado
     val selectedBeltId by viewModel.selectedBeltId.collectAsStateWithLifecycle()
+    // Recogemos el contenido seleccionado
+    val selectedContent by viewModel.selectedContent.collectAsStateWithLifecycle()
+
+    val contentName = selectedContent?.name?.get(locale) ?: ""
+    val contentDescription = selectedContent?.description?.get(locale) ?: ""
+    val contentNumber = selectedContent?.number ?: 1
+    val contentTitle = if(selectedContent?.contentType != "TECH")contentName else "$contentNumber. $contentName"
 
     // isFavorite -> Logica provisional para hacer cambiar el icono de favorito de gris a amarillo
     var isFavorite by remember { mutableStateOf(false) }
@@ -89,7 +98,7 @@ fun Contenido(
                 ) {
                     // Título de la Técnica / Kata / Set
                     Text(
-                        text = "Técnica 1",
+                        text = contentTitle,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     // Si es la pantalla contenido (-5 en función obtenerIndice(route))
@@ -123,9 +132,7 @@ fun Contenido(
                 }
                 // Descripción
                 Text(
-                    text = "Descripción completa de la técnica 1, explicando movimientos, detalles y " +
-                            "consejos de ejecución. Texto de ejemplo que ayuda a comprender la " +
-                            "intención y la mecánica general del movimiento antes de ver el vídeo.",
+                    text = contentDescription,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

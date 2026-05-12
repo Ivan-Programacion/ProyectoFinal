@@ -51,6 +51,7 @@ import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
+import androidx.core.net.toUri
 
 @Composable
 fun Contenido(
@@ -239,7 +240,29 @@ fun Contenido(
                                                 customViewCallback?.onCustomViewHidden()
                                             }
                                         }
-                                        webViewClient = WebViewClient()
+                                        // webViewClient -> hay que modificar esta función para que, cuando el usuario le de click a un enlace de YouTube, no abra el navegador
+                                        // directamente desde la aplicación, sino que te salga fuera de la aplicación para poder verlo.
+                                        webViewClient = object : WebViewClient() {
+                                            override fun shouldOverrideUrlLoading(view: WebView?, request: android.webkit.WebResourceRequest?): Boolean {
+                                                val url = request?.url?.toString() ?: return false
+                                                
+                                                // Si el usuario toca el enlace de YouTube o "Watch on YouTube", evitamos que el WebView navegue
+                                                // y redirigimos la petición a la aplicación de YouTube del dispositivo (o al navegador general).
+                                                if (url.contains("youtube.com") || url.contains("youtu.be")) {
+                                                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW,
+                                                        url.toUri())
+                                                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                                    
+                                                    try {
+                                                        context.startActivity(intent)
+                                                    } catch (e: Exception) {
+                                                        // Si por algún motivo no hay app capaz de abrir el link, no hacemos nada o lo dejamos estar
+                                                    }
+                                                    return true // true significa "Nosotros hemos gestionado la URL, que el WebView no cargue nada"
+                                                }
+                                                return super.shouldOverrideUrlLoading(view, request)
+                                            }
+                                        }
                                     }
                                 },
                                 update = { webView ->

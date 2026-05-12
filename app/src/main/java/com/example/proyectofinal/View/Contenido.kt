@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -102,7 +104,8 @@ fun Contenido(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp), // Padding interno de la tarjeta
+                    .padding(24.dp) // Padding interno de la tarjeta
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
@@ -114,6 +117,7 @@ fun Contenido(
                     Text(
                         text = contentTitle,
                         style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f)
                     )
                     // Si es la pantalla contenido (-5 en función obtenerIndice(route))
                     IconButton(onClick = { isFavorite = !isFavorite }) {
@@ -280,7 +284,7 @@ fun Contenido(
                                                 </style>
                                             </head>
                                             <body>
-                                                <iframe src="https://www.youtube-nocookie.com/embed/$videoId?mute=1&playsinline=1&modestbranding=1&controls=1&rel=0" 
+                                                <iframe src="https://www.youtube-nocookie.com/embed/$videoId?mute=1&playsinline=1&modestbranding=1&controls=1&rel=0"
                                                         frameborder="0" 
                                                         allow="autoplay; encrypted-media" 
                                                         allowfullscreen>

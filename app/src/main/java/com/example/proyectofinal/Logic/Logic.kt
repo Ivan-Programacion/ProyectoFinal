@@ -82,3 +82,10 @@ fun isNetworkAvailable(context: Context): Boolean {
     return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
 }
+
+// Función auxiliar para extraer el ID del video de YouTube a partir de la URL compartida
+fun extractYouTubeId(url: String): String? {
+    val regex = "v=([^&]+)|youtu\\.be/([^?&]+)|embed/([^?&]+)".toRegex()
+    val matchResult = regex.find(url)
+    return matchResult?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }
+}

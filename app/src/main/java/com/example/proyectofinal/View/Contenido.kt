@@ -33,8 +33,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.Logic.extractYouTubeId
 import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.ViewModel.ContentViewModel
@@ -54,6 +60,7 @@ fun Contenido(
     val contentDescription = selectedContent?.description?.get(locale) ?: ""
     val contentNumber = selectedContent?.number ?: 1
     val contentTitle = if(selectedContent?.contentType != "TECH")contentName else "$contentNumber. $contentName"
+    val contentUrl = selectedContent?.url ?: ""
 
     // isFavorite -> Logica provisional para hacer cambiar el icono de favorito de gris a amarillo
     var isFavorite by remember { mutableStateOf(false) }
@@ -137,7 +144,7 @@ fun Contenido(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Placeholder del Vídeo
+                // Reproductor del Vídeo o Placeholder si no hay URL
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -148,14 +155,71 @@ fun Contenido(
                         containerColor = MaterialTheme.colorScheme.onSecondary
                     )
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Video no disponible",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
+                    if (contentUrl.isNotEmpty()) {
+                        val videoId = extractYouTubeId(contentUrl)
+                        if (videoId != null) {
+                            // AndroidView -> Compose aún no tiene un "YouTube Player" nativo, he utilizado un AndroidView.
+                            // Este componente permite incrustar vistas nativas antiguas de Android en un entorno Jetpack Compose
+                            // Con ello, inyecto un WebView (el equivalente a un navegador pequeñito) que carga un código <html> simple
+                            // con un reproductor IFrame de YouTube.
+                            AndroidView(
+                                modifier = Modifier.fillMaxSize(),
+                                factory = { context ->
+                                    WebView(context).apply {
+                                        // Configuración necesaria para reproducir video de YouTube sin romper la app
+                                        settings.javaScriptEnabled = true
+                                        // MUY IMPORTANTE para Youtube en WebViews (Evita el Error 152):
+                                        // El error 152 es debido a que AndroidView necesita acceder al almacenamiento local del navegador
+                                        // (LocalStorage del DOM) para guardar el estado de sus preferencias (volumen, tokens de sesión anónimos, tracking, etc.),
+                                        // y los WebViews de Android por defecto tienen esta característica desactivada
+                                        // Asi que -> domStroageEnabled = true
+                                        settings.domStorageEnabled = true
+                                        settings.mediaPlaybackRequiresUserGesture = false // Permite que opciones como el mute forzado no pidan interacción humana obligatoria
+                                        settings.cacheMode = WebSettings.LOAD_NO_CACHE
+                                        webChromeClient = WebChromeClient()
+                                        webViewClient = WebViewClient()
+
+                                        // HTML para incrustar el reproductor IFrame de YouTube con mute=1 para que no tenga audio por defecto
+                                        // controls=1 (muestra controles), playsinline=1 (para q no salte a pantalla completa dándole al play), modestbranding=1
+                                        // origin=https://www.youtube.com (Muy importante también para evitar el Error 152 cuando bloquea dominios extraños)
+                                        // Utilizamos youtube-nocookie.com que suele saltarse mejor las restricciones de WebViews para videos ocultos
+                                        val iframeHtml = """
+                                            <!DOCTYPE html>
+                                            <html>
+                                                <body style="margin:0;padding:0;">
+                                                    <iframe width="100%" height="100%" 
+                                                            src="https://www.youtube-nocookie.com/embed/$videoId?mute=1&playsinline=1&modestbranding=1" 
+                                                            frameborder="0" 
+                                                            allow="autoplay; encrypted-media" 
+                                                            allowfullscreen>
+                                                    </iframe>
+                                                </body>
+                                            </html>
+                                        """.trimIndent()
+                                        
+                                        loadDataWithBaseURL("https://www.youtube-nocookie.com", iframeHtml, "text/html", "utf-8", null)
+                                    }
+                                },
+                                update = { webView ->
+                                    // Si el iframeHtml cambiase al cambiar el videoId, se debería recargar aquí.
+                                    // Pero al estar en un contenedor reactivo si cambia la variable url se recargará la vista
+                                }
+                            )
+                        } else {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text(text = "Formato de URL no válido")
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Video no disponible",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                        }
                     }
                 }
             }
@@ -169,4 +233,11 @@ fun Contenidodopreview() {
     ProyectoFinalTheme {
         Contenido()
     }
+}
+
+// Función auxiliar para extraer el ID del video de YouTube a partir de la URL compartida
+fun extractYouTubeId(url: String): String? {
+    val regex = "v=([^&]+)|youtu\\.be/([^?&]+)|embed/([^?&]+)|shorts/([^?&]+)".toRegex()
+    val matchResult = regex.find(url)
+    return matchResult?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }
 }

@@ -4,6 +4,8 @@
 
     <!-- Permisos para que Android 13 en adelante permita notificaciones -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Permisos para que Android pueda acceder a internet (para los videos) -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"

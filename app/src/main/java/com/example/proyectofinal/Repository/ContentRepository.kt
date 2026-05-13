@@ -20,4 +20,7 @@ interface ContentRepository {
 
     // Obtiene el contenido según lo que nos interesa: técnica, forma o set
     suspend fun getContentByBelt(beltId: String, collectionName: String): List<Content>
+
+    // Obtiene todo el contenido general
+    fun getAllContentStream(): Flow<List<Content>>
 }

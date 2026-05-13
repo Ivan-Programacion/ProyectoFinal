@@ -51,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.extractYouTubeId
 import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.locale
+import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import androidx.core.net.toUri
@@ -58,7 +59,8 @@ import androidx.core.net.toUri
 @Composable
 fun Contenido(
     paddingValues: PaddingValues = PaddingValues(),
-    viewModel: ContentViewModel = viewModel()
+    viewModel: ContentViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel()
 ) {
     // Recogemos el cinturon seleccionado
     val selectedBeltId by viewModel.selectedBeltId.collectAsStateWithLifecycle()
@@ -71,8 +73,18 @@ fun Contenido(
     val contentTitle = if(selectedContent?.contentType != "TECH")contentName else "$contentNumber. $contentName"
     val contentUrl = selectedContent?.url ?: ""
 
-    // isFavorite -> Logica provisional para hacer cambiar el icono de favorito de gris a amarillo
-    var isFavorite by remember { mutableStateOf(false) }
+    // User actual para comprobar si tiene que modificar algo en la lista de favoritos.
+    val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
+    val isFavorite = currentUser?.let { user ->
+        val contentId = selectedContent?.id ?: return@let false
+        when (selectedContent?.contentType) {
+            "TECH" -> user.favoritesTech.contains(contentId)
+            "FORM" -> user.favoritesForms.contains(contentId)
+            "SET" -> user.favoritesSets.contains(contentId)
+            else -> false
+        }
+    } ?: false
+
     // Contenedor principal con el MISMO gradiente que ListaContenido
     Box(
         modifier = Modifier
@@ -118,8 +130,11 @@ fun Contenido(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f)
                     )
-                    // Si es la pantalla contenido (-5 en función obtenerIndice(route))
-                    IconButton(onClick = { isFavorite = !isFavorite }) {
+                    IconButton(onClick = { 
+                        selectedContent?.let { content ->
+                            authViewModel.toggleFavorite(content.id, content.contentType)
+                        } 
+                    }) {
                         if (isFavorite) {
                             // Si ES favorito: Apilamos relleno amarillo + borde marrón
                             Box(contentAlignment = Alignment.Center) {
@@ -297,7 +312,7 @@ fun Contenido(
                             )
                         } else {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text(text = "Formato de URL no válido")
+                                Text(text = "Video no disponible")
                             }
                         }
                     } else {

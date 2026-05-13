@@ -51,12 +51,19 @@ class ContentViewModel(
     )
 
     // Contenido seleccionado actualizado
-    val selectedContent: StateFlow<Content?> = combine(_selectedContentId, contentList) { id, list ->
+    val selectedContent: StateFlow<Content?> = combine(_selectedContentId, contentRepository.getAllContentStream()) { id, list ->
         list.find { it.id == id }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null
+    )
+
+    // Toda la lista de contenidos sin importar el cinturón
+    val allContentList: StateFlow<List<Content>> = contentRepository.getAllContentStream().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
     )
 }
 

@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withTimeoutOrNull
 
+// Clase de estados
 sealed class AuthUiState {
     object Idle : AuthUiState()
     object Loading : AuthUiState()
@@ -378,6 +379,30 @@ class AuthViewModel(
                 } else {
                     _uiState.value = AuthUiState.Error("Error al enviar la solicitud de examen")
                 }
+            }
+        }
+    }
+
+    fun toggleFavorite(contentId: String, contentType: String) {
+        viewModelScope.launch {
+            val currentUser = currentUserState.value
+            if (currentUser != null) {
+                val newTech = currentUser.favoritesTech.toMutableList()
+                val newForms = currentUser.favoritesForms.toMutableList()
+                val newSets = currentUser.favoritesSets.toMutableList()
+
+                when(contentType) {
+                    "TECH" -> if (newTech.contains(contentId)) newTech.remove(contentId) else newTech.add(contentId)
+                    "FORM" -> if (newForms.contains(contentId)) newForms.remove(contentId) else newForms.add(contentId)
+                    "SET" -> if (newSets.contains(contentId)) newSets.remove(contentId) else newSets.add(contentId)
+                }
+
+                val updatedUser = currentUser.copy(
+                    favoritesTech = newTech,
+                    favoritesForms = newForms,
+                    favoritesSets = newSets
+                )
+                userRepository.updateUser(updatedUser)
             }
         }
     }

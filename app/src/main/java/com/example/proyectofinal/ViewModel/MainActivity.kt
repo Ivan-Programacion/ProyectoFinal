@@ -370,7 +370,12 @@ fun App(startDestination: String = "login") {
                 }
             }
             composable(StateNavigate.favoritos.value) {
-                Favoritos(innerPadding) {
+                Favoritos(
+                    innerPadding,
+                    authViewModel,
+                    contentViewModel,
+                    beltsViewModel
+                ) {
                     controller.navigate(
                         it
                     )
@@ -395,7 +400,8 @@ fun App(startDestination: String = "login") {
             composable(StateNavigate.contenido.value) { 
                 Contenido(
                     paddingValues = innerPadding,
-                    viewModel = contentViewModel
+                    viewModel = contentViewModel,
+                    authViewModel = authViewModel
                 ) 
             }
             composable(StateNavigate.adminListaClientes.value) {

@@ -38,23 +38,45 @@ import com.example.proyectofinal.Logic.belts
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import com.example.proyectofinal.ui.theme.coloresCinturones
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.ViewModel.AuthViewModel
+import com.example.proyectofinal.ViewModel.ContentViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
+import com.example.proyectofinal.Logic.locale
+import com.example.proyectofinal.ViewModel.BeltsViewModel
+import com.example.proyectofinal.Logic.mapBeltColor
+import com.example.proyectofinal.Model.Belt
+import com.example.proyectofinal.Model.Content
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun Favoritos(paddingValues: PaddingValues = PaddingValues(), controller: (String) -> Unit) {
-    //*********************** LOGICA DE PRUEBA *******************************//
-    // Datos ejemplos que luego vendrán de la API
-    val tecnicasFavoritas = listOf(
-        "Técnica 3" to coloresCinturones().Amarillo,
-        "Técnica 1" to coloresCinturones().Marron
-    )
-    val formasFavoritas = listOf(
-        "Forma cinturón" to coloresCinturones().Azul
-    )
-    val setsFavoritos = listOf(
-        "Set cinturón" to coloresCinturones().Verde
-    )
-    //*********************** LOGICA DE PRUEBA *******************************//
+fun Favoritos(
+    paddingValues: PaddingValues = PaddingValues(),
+    authViewModel: AuthViewModel = viewModel(),
+    contentViewModel: ContentViewModel = viewModel(),
+    beltsViewModel: BeltsViewModel = viewModel(),
+    controller: (String) -> Unit
+) {
+    val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
+    val allContentList by contentViewModel.allContentList.collectAsStateWithLifecycle()
+    val allBelts by beltsViewModel.beltsUiState.collectAsStateWithLifecycle()
+
+    // Recogemos todos los contenidos que coincidan con los IDs de favoritos del usuario
+    val userFavoritesTech = allContentList.filter { currentUser?.favoritesTech?.contains(it.id) == true }
+    val userFavoritesForms = allContentList.filter { currentUser?.favoritesForms?.contains(it.id) == true }
+    val userFavoritesSets = allContentList.filter { currentUser?.favoritesSets?.contains(it.id) == true }
+
+    // Función para obtener el orden de un cinturón dado su ID
+    fun getBeltOrder(beltId: String): Int {
+        return allBelts.find { it.belt.id == beltId }?.belt?.order ?: 0
+    }
+
+    // Ordenamos por cinturón (order) y luego por número
+    val sortedTech = userFavoritesTech.sortedWith(compareBy({ getBeltOrder(it.beltId) }, { it.number }))
+    val sortedForms = userFavoritesForms.sortedWith(compareBy({ getBeltOrder(it.beltId) }, { it.number }))
+    val sortedSets = userFavoritesSets.sortedWith(compareBy({ getBeltOrder(it.beltId) }, { it.number }))
+
     // Para botón atrás del móvil
     val context = LocalContext.current as? Activity
 
@@ -73,38 +95,50 @@ fun Favoritos(paddingValues: PaddingValues = PaddingValues(), controller: (Strin
         item {
             SeccionFavoritos(
                 titulo = "Técnicas",
-                items = tecnicasFavoritas
-            ) { controller(StateNavigate.contenido.value) }
+                items = sortedTech,
+                beltsList = allBelts.map { it.belt }
+            ) { content ->
+                contentViewModel.setSelectedBeltId(content.beltId)
+                contentViewModel.setSelectedContentId(content.id)
+                controller(StateNavigate.contenido.value)
+            }
         }
 
         // SECCIÓN FORMA (KATA)
         item {
             SeccionFavoritos(
-                titulo = "Forma (Kata)",
-                items = formasFavoritas,
-            ) { controller(StateNavigate.contenido.value) }
+                titulo = "Formas (Kata)",
+                items = sortedForms,
+                beltsList = allBelts.map { it.belt }
+            ) { content ->
+                contentViewModel.setSelectedBeltId(content.beltId)
+                contentViewModel.setSelectedContentId(content.id)
+                controller(StateNavigate.contenido.value)
+            }
         }
 
         // SECCIÓN SET
         item {
             SeccionFavoritos(
-                titulo = "Set",
-                items = setsFavoritos,
-            ) { controller(StateNavigate.contenido.value) }
+                titulo = "Sets",
+                items = sortedSets,
+                beltsList = allBelts.map { it.belt }
+            ) { content ->
+                contentViewModel.setSelectedBeltId(content.beltId)
+                contentViewModel.setSelectedContentId(content.id)
+                controller(StateNavigate.contenido.value)
+            }
         }
     }
 }
 
 @Composable
-// En el parametro esta puesto andropidx.compuse.ui.graphics.Color para poder acceder a la lista de colores de cinturones
-// Esto al final se hará con la api
-// Añadimos la lista de cinturones como Map para poder trabajar con el de forma temporal hasta hacer la api
 fun SeccionFavoritos(
     titulo: String,
-    items: List<Pair<String, Color>>,
-    controller: () -> Unit
+    items: List<Content>,
+    beltsList: List<Belt>,
+    controller: (Content) -> Unit
 ) {
-    val cinturonesMap = belts.toMap()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,18 +164,17 @@ fun SeccionFavoritos(
                     modifier = Modifier.padding(start = 4.dp)
                 )
             } else {
-                items.forEach { (nombreTecnica, colorCinturon) ->
-                    // Para añadir el nombre del cinturón (momentaneo hasta que tengamos la api)
-                    // con .find para encontrar la priemra coincidencia
-                    // Es como utilizar un forMap de Java (foreach y entryset)
-                    val nombreCinturon =
-                        cinturonesMap.entries.find { it.value == colorCinturon }?.key
-                            ?: "Desconocido"
+                items.forEach { content ->
+                    val beltName = beltsList.find { it.id == content.beltId }?.name?.get(locale) ?: "Desconocido"
+                    val contentName = content.name[locale] ?: ""
+                    val title = if (content.contentType == "TECH") "${content.number}. $contentName" else contentName
+                    val beltColor = mapBeltColor[content.beltId] ?: Color.Gray
+
                     ItemFavorito(
-                        nombreTecnica = nombreTecnica,
-                        nombreCinturon = nombreCinturon,
-                        colorCinturon = colorCinturon
-                    ) { controller() }
+                        nombreTecnica = title,
+                        nombreCinturon = beltName,
+                        colorCinturon = beltColor
+                    ) { controller(content) }
                 }
             }
         }

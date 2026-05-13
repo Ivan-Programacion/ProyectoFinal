@@ -91,4 +91,19 @@ class ContentRepositoryImpl(
             emptyList()
         }
     }
+
+    override fun getAllContentStream(): Flow<List<Content>> = callbackFlow {
+        val listener = contentCollections("content")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val contentList = snapshot.toObjects(Content::class.java).sortedBy { it.number }
+                    trySend(contentList)
+                }
+            }
+        awaitClose { listener.remove() }
+    }
 }

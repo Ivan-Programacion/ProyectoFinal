@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -164,7 +165,7 @@ fun SubcontenedorContenido(nombre: String, controller: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .defaultMinSize(minHeight = 80.dp)
             .clickable { controller() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSecondary)
@@ -179,6 +180,7 @@ fun SubcontenedorContenido(nombre: String, controller: () -> Unit) {
             Text(
                 text = nombre,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
             )
 
             // Botón de flecha a la derecha

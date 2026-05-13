@@ -221,7 +221,8 @@ class AdminPerfilClienteViewModel(
                     teacherIds = profesoresSeleccionados.value.toList(),
                     beltId = beltId.value,
                     isActive = isActive.value,
-                    examStatus = newExamStatus
+                    examStatus = newExamStatus,
+                    examText = if (userBase.centerId == centroSeleccionado.value) userBase.examText else ""
                 )
             } else {
                 userBase.copy(
@@ -237,7 +238,8 @@ class AdminPerfilClienteViewModel(
                     teacherIds = profesoresSeleccionados.value.toList(),
                     beltId = beltId.value,
                     isActive = isActive.value,
-                    examStatus = newExamStatus
+                    examStatus = newExamStatus,
+                    examText = if (userBase.centerId == centroSeleccionado.value) userBase.examText else ""
                 )
             }
 

@@ -220,6 +220,7 @@ fun AdminListaClientes(
                                 Text(
                                     text = "${alumno.name} ${alumno.lastName}",
                                     fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f)
                                 )
                                 Surface(
                                     shape = RoundedCornerShape(8.dp),

@@ -92,8 +92,9 @@ fun Contenido(
         // Tarjeta blanca/clara gigante que contiene la info
         Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+                .fillMaxWidth()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             shape = RoundedCornerShape(28.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -103,9 +104,7 @@ fun Contenido(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp) // Padding interno de la tarjeta
-                    .verticalScroll(rememberScrollState()),
+                    .padding(24.dp), // Padding interno de la tarjeta
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(

@@ -202,11 +202,12 @@ fun App(startDestination: String = "login") {
 
             is AuthUiState.Success -> {
                 val message = (authUiState as AuthUiState.Success).message
-                // Solo lo enseñamos si hay mensaje y estamos en el perfil o en el perfil de administración del cliente
+                // Solo lo enseñamos si hay mensaje y estamos en las pantallas indicadas
                 if (message.isNotEmpty() && (
                             currentRoute == StateNavigate.perfil.value ||
                                     currentRoute == StateNavigate.adminPerfilCliente.value ||
-                                    currentRoute == StateNavigate.adminGestionExamen.value
+                                    currentRoute == StateNavigate.adminGestionExamen.value ||
+                                    currentRoute == StateNavigate.contenido.value
                             )
                 ) {
                     isErrorSnackbar = false

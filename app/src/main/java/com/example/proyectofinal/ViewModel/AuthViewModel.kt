@@ -387,14 +387,33 @@ class AuthViewModel(
         viewModelScope.launch {
             val currentUser = currentUserState.value
             if (currentUser != null) {
+                var isAdding = false
                 val newTech = currentUser.favoritesTech.toMutableList()
                 val newForms = currentUser.favoritesForms.toMutableList()
                 val newSets = currentUser.favoritesSets.toMutableList()
 
                 when(contentType) {
-                    "TECH" -> if (newTech.contains(contentId)) newTech.remove(contentId) else newTech.add(contentId)
-                    "FORM" -> if (newForms.contains(contentId)) newForms.remove(contentId) else newForms.add(contentId)
-                    "SET" -> if (newSets.contains(contentId)) newSets.remove(contentId) else newSets.add(contentId)
+                    "TECH" -> if (newTech.contains(contentId)) {
+                        newTech.remove(contentId)
+                        isAdding = false
+                    } else {
+                        newTech.add(contentId)
+                        isAdding = true
+                    }
+                    "FORM" -> if (newForms.contains(contentId)) {
+                        newForms.remove(contentId)
+                        isAdding = false
+                    } else {
+                        newForms.add(contentId)
+                        isAdding = true
+                    }
+                    "SET" -> if (newSets.contains(contentId)) {
+                        newSets.remove(contentId)
+                        isAdding = false
+                    } else {
+                        newSets.add(contentId)
+                        isAdding = true
+                    }
                 }
 
                 val updatedUser = currentUser.copy(
@@ -403,6 +422,13 @@ class AuthViewModel(
                     favoritesSets = newSets
                 )
                 userRepository.updateUser(updatedUser)
+                // Si se ha agregado/eliminado, avisamos al usuario
+
+                if (isAdding) {
+                    setUiState(AuthUiState.Success("Contenido agregado a favoritos"))
+                } else {
+                    setUiState(AuthUiState.Success("Contenido eliminado de favoritos"))
+                }
             }
         }
     }

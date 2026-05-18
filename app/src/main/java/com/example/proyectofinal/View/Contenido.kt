@@ -52,6 +52,7 @@ import com.example.proyectofinal.Logic.extractYouTubeId
 import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.ViewModel.AuthViewModel
+import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 import androidx.core.net.toUri
@@ -66,6 +67,9 @@ fun Contenido(
     val selectedBeltId by viewModel.selectedBeltId.collectAsStateWithLifecycle()
     // Recogemos el contenido seleccionado
     val selectedContent by viewModel.selectedContent.collectAsStateWithLifecycle()
+
+    val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading = authUiState is AuthUiState.Loading
 
     val contentName = selectedContent?.name?.get(locale) ?: ""
     val contentDescription = selectedContent?.description?.get(locale) ?: ""
@@ -130,11 +134,14 @@ fun Contenido(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f)
                     )
-                    IconButton(onClick = { 
-                        selectedContent?.let { content ->
-                            authViewModel.toggleFavorite(content.id, content.contentType)
-                        } 
-                    }) {
+                    IconButton(
+                        onClick = { 
+                            selectedContent?.let { content ->
+                                authViewModel.toggleFavorite(content.id, content.contentType)
+                            } 
+                        },
+                        enabled = !isLoading
+                    ) {
                         if (isFavorite) {
                             // Si ES favorito: Apilamos relleno amarillo + borde marrón
                             Box(contentAlignment = Alignment.Center) {

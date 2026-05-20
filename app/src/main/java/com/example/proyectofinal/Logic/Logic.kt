@@ -42,10 +42,11 @@ val belts = listOf(
 // para lógica de transiciones de cambio entre pantallas o añadir iconos en el TopBar
 fun obtenerIndice (ruta: String?): Int {
     return when (ruta) {
-        "adminPerfilCliente" -> -7
-        "adminGestionExamen" -> -6
-        "contenido" -> -5
-        "listaContenido" -> -4
+        "adminPerfilCliente" -> -8
+        "adminGestionExamen" -> -7
+        "contenido" -> -6
+        "listaContenido" -> -5
+        "olvidoPass" -> -4
         "registroPass" -> -3
         "registro" -> -2
         "login" -> -1
@@ -61,7 +62,8 @@ fun obtenerIndice (ruta: String?): Int {
 val pantallasIniciales = listOf(
     StateNavigate.login.value,
     StateNavigate.registro.value,
-    StateNavigate.registroPass.value
+    StateNavigate.registroPass.value,
+    StateNavigate.olvidoPass.value
 )
 
 // Lógica para obtener el nombre del UI dependiendo del locale (i18n)

@@ -49,7 +49,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -80,6 +79,7 @@ import com.example.proyectofinal.Repository.ExamRepositoryImpl
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
+import com.example.proyectofinal.View.OlvidoPass
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -179,7 +179,9 @@ fun App(startDestination: String = "login") {
     val beltsState by beltsViewModel.beltsUiState.collectAsStateWithLifecycle()
     val selectedBeltId by contentViewModel.selectedBeltId.collectAsStateWithLifecycle()
     // Para guardar el nombre del cinturon seleccionado (según el idioma)
-    val selectedBeltName = beltsState.find { it.belt.id == selectedBeltId }?.belt?.name?.get(com.example.proyectofinal.Logic.locale) ?: ""
+    val selectedBeltName =
+        beltsState.find { it.belt.id == selectedBeltId }?.belt?.name?.get(com.example.proyectofinal.Logic.locale)
+            ?: ""
 
     // Permisos de notificación y guardar el token FCM de Firebase en el documento del usuario actual
     NotificationPermissionAndTokenSetup(currentUser?.id)
@@ -261,11 +263,12 @@ fun App(startDestination: String = "login") {
                 // Determinamos qué ítem del menú debe estar activo basado en la pantalla secundaria
                 // Se divide la navegación entre los items del navBar y las pantallas dentro de cada uno de los items
                 // De tal forma que conseguimos que el item se quede seleccionado en el último item que se haya pulsado
-                val activeTab = if (currentRoute == StateNavigate.listaContenido.value || 
-                                    currentRoute == StateNavigate.contenido.value || 
-                                    currentRoute == StateNavigate.adminGestionExamen.value || 
-                                    currentRoute == StateNavigate.adminPerfilCliente.value) {
-                    beforeRoute 
+                val activeTab = if (currentRoute == StateNavigate.listaContenido.value ||
+                    currentRoute == StateNavigate.contenido.value ||
+                    currentRoute == StateNavigate.adminGestionExamen.value ||
+                    currentRoute == StateNavigate.adminPerfilCliente.value
+                ) {
+                    beforeRoute
                 } else currentRoute
 
                 NavBar(
@@ -398,12 +401,12 @@ fun App(startDestination: String = "login") {
                     )
                 }
             }
-            composable(StateNavigate.contenido.value) { 
+            composable(StateNavigate.contenido.value) {
                 Contenido(
                     paddingValues = innerPadding,
                     viewModel = contentViewModel,
                     authViewModel = authViewModel
-                ) 
+                )
             }
             composable(StateNavigate.adminListaClientes.value) {
                 AdminListaClientes(
@@ -425,6 +428,9 @@ fun App(startDestination: String = "login") {
                     viewModel = adminPerfilClienteViewModel
                 ) { controller.navigate(it) }
             }
+            composable(StateNavigate.olvidoPass.value) {
+                OlvidoPass(innerPadding, { controller.popBackStack() }) {}
+            }
         }
     }
 }
@@ -434,16 +440,21 @@ fun App(startDestination: String = "login") {
 @Composable
 fun TopBar(currentRoute: String?, beltName: String = "", backNavigation: () -> Unit = {}) {
     TopAppBar(
-        { Text(tituloTopBar(currentRoute, beltName), style = MaterialTheme.typography.titleMedium) },
+        {
+            Text(
+                tituloTopBar(currentRoute, beltName),
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
         navigationIcon = {
             // Si es una pantalla secundaría que proviene de una principal:
             /*
             Función "obtenerIndice(route)":
             - Principales de 0 a 3
-            - Inciales de -1 a -3
+            - Inciales de -1 a -4
             - Auxiliares de -4 para abajo
              */
-            if (obtenerIndice(currentRoute) < -3) {
+            if (obtenerIndice(currentRoute) < -4) {
                 // Flecha para atrás de navegación
                 IconButton(onClick = { backNavigation() }) {
                     Icon(
@@ -506,13 +517,6 @@ fun NavBar(currentRoute: String?, controller: (route: String) -> Unit, isAdmin: 
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ProyectoFinalTheme { App() }
-}
-
 // Notificación push (componente)
 @Composable
 fun NotificationPermissionAndTokenSetup(currentUserId: String?) {
@@ -530,4 +534,11 @@ fun NotificationPermissionAndTokenSetup(currentUserId: String?) {
             updateFcmTokenInFirestore(currentUserId)
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    ProyectoFinalTheme { App() }
 }

@@ -105,7 +105,7 @@ class AuthViewModel(
                     userRepository.getCenters()
                 }
                 // Si la respuesta no es null y la lista NO está vacía (tenemos centros), hay conexión
-                if (result != null && result.isNotEmpty()) { 
+                if (result != null && result.isNotEmpty()) {
                     _uiState.value = AuthUiState.Idle
                     onSuccess()
                 } else {
@@ -422,8 +422,8 @@ class AuthViewModel(
                     favoritesSets = newSets
                 )
                 userRepository.updateUser(updatedUser)
-                // Si se ha agregado/eliminado, avisamos al usuario
 
+                // Si se ha agregado/eliminado, avisamos al usuario
                 if (isAdding) {
                     setUiState(AuthUiState.Success("Contenido agregado a favoritos"))
                 } else {

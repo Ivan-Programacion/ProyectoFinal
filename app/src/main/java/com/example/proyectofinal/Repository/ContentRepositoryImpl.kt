@@ -63,7 +63,6 @@ class ContentRepositoryImpl(
     override fun getContentStream(beltId: String): Flow<List<Content>> = callbackFlow {
         val listener = contentCollections("content")
             .whereEqualTo("beltId", beltId)
-            // Eliminamos orderBy de la query de BD para evitar que requiera un índice compuesto
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     trySend(emptyList())

@@ -173,7 +173,7 @@ fun Login(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
-                        .clickable {},
+                        .clickable { controller(StateNavigate.olvidoPass.value) },
                     textAlign = TextAlign.End
                 )
 

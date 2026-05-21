@@ -216,7 +216,9 @@ fun App(startDestination: String = "login") {
                 ) {
                     isErrorSnackbar = false
                     snackbarHostState.showSnackbar(message)
-                    authViewModel.resetUiState()
+                    // Si es la pantalla de OlvidoPass, reseteamos la Ui cuando se salga de dicha pantalla
+                    if (currentRoute != StateNavigate.olvidoPass.value)
+                        authViewModel.resetUiState()
                 }
             }
 
@@ -431,7 +433,10 @@ fun App(startDestination: String = "login") {
                 ) { controller.navigate(it) }
             }
             composable(StateNavigate.olvidoPass.value) {
-                OlvidoPass(innerPadding, authViewModel, { controller.popBackStack() }) { controller.navigate(it) }
+                OlvidoPass(
+                    innerPadding,
+                    viewModel = authViewModel,
+                    { controller.popBackStack() }) { controller.navigate(it) }
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.example.proyectofinal.View
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,6 +32,12 @@ fun OlvidoPass(
     val isLoading = authUiState is AuthUiState.Loading
     var email by remember { mutableStateOf("") }
 
+    // Por si le da a volver atrás
+    BackHandler {
+        viewModel.resetUiState()
+        controller(StateNavigate.login.value)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -58,27 +66,30 @@ fun OlvidoPass(
                     )
                     Text(
                         text = "¡Enlace enviado!",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = "Revisa tu bandeja de entrada o la carpeta de correo no deseado.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    TextButton(
-                        onClick = {
-                            viewModel.resetUiState()
-                            controller(StateNavigate.login.value)
-                        }
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Volver al Inicio de sesión",
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            text = "Volver al ",
+                            modifier = Modifier.clickable {
+                                viewModel.resetUiState()
+                                controller(StateNavigate.login.value)
+                            }
                         )
+                        Text(
+                            text = "Inicio de sesión ",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.clickable {
+                                viewModel.resetUiState()
+                                controller(StateNavigate.login.value)
+                            })
                     }
                 } else {
                     Row(
@@ -98,8 +109,7 @@ fun OlvidoPass(
 
                         Text(
                             text = "Recuperar contraseña",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleMedium,
                         )
 
                     }

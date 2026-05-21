@@ -203,21 +203,27 @@ class AdminPerfilClienteViewModel(
     }
 
     fun updateStudent(onSuccess: () -> Unit) {
-        val userBase = currentUser ?: return
+        val userBaseId = currentUser?.id ?: return
 
         viewModelScope.launch {
             authViewModel.setUiState(AuthUiState.Loading)
-            val centerChanged = centroSeleccionado.value != userBase.centerId
-            val newExamStatus = if (centerChanged) "NONE" else userBase.examStatus
+            
+            // Obtenemos los datos más recientes de Firestore justo antes de actualizar
+            // para evitar sobrescribir campos volátiles como fcmTokens que hayan cambiado
+            // en segundo plano (inicio/cierre de sesión del alumno).
+            val freshUser = userRepository.getUser(userBaseId) ?: currentUser ?: return@launch
+            
+            val centerChanged = centroSeleccionado.value != freshUser.centerId
+            val newExamStatus = if (centerChanged) "NONE" else freshUser.examStatus
 
             val newRole = if (isTeacher.value) {
-                if (userBase.role == "SUPERADMIN") "SUPERADMIN" else "TEACHER"
+                if (freshUser.role == "SUPERADMIN") "SUPERADMIN" else "TEACHER"
             } else {
                 "STUDENT"
             }
 
             val updatedUser = if (esMenor.value) {
-                userBase.copy(
+                freshUser.copy(
                     name = nombreMenor.value,
                     lastName = apellidosMenor.value,
                     birthDate = formatDate(diaMenor.value, mesMenor.value, anioMenor.value),
@@ -232,10 +238,10 @@ class AdminPerfilClienteViewModel(
                     role = newRole,
                     isActive = isActive.value,
                     examStatus = newExamStatus,
-                    examText = if (userBase.centerId == centroSeleccionado.value) userBase.examText else ""
+                    examText = if (freshUser.centerId == centroSeleccionado.value) freshUser.examText else "",
                 )
             } else {
-                userBase.copy(
+                freshUser.copy(
                     name = nombre.value,
                     lastName = apellidos.value,
                     birthDate = formatDate(dia.value, mes.value, anio.value),
@@ -250,7 +256,7 @@ class AdminPerfilClienteViewModel(
                     role = newRole,
                     isActive = isActive.value,
                     examStatus = newExamStatus,
-                    examText = if (userBase.centerId == centroSeleccionado.value) userBase.examText else ""
+                    examText = if (freshUser.centerId == centroSeleccionado.value) freshUser.examText else ""
                 )
             }
 
@@ -265,14 +271,20 @@ class AdminPerfilClienteViewModel(
     }
 
     fun toggleUserActivation(onSuccess: () -> Unit) {
-        val userBase = currentUser ?: return
+        val userBaseId = currentUser?.id ?: return
         viewModelScope.launch {
             authViewModel.setUiState(AuthUiState.Loading)
+            
+            // Obtenemos los datos más recientes antes de modificar
+            val freshUser = userRepository.getUser(userBaseId) ?: currentUser ?: return@launch
+            
             val newActiveState = !isActive.value
-            val newExamStatus = if (!newActiveState) "NONE" else userBase.examStatus
-            val updatedUser = userBase.copy(
+            val newExamStatus = if (!newActiveState) "NONE" else freshUser.examStatus
+            val newExamText = if(!newActiveState) "" else freshUser.examText
+            val updatedUser = freshUser.copy(
                 isActive = newActiveState,
-                examStatus = newExamStatus
+                examStatus = newExamStatus,
+                examText = newExamText
             )
             if (userRepository.updateUser(updatedUser)) {
                 isActive.value = newActiveState

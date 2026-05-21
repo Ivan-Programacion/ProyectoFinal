@@ -429,7 +429,7 @@ fun App(startDestination: String = "login") {
                 ) { controller.navigate(it) }
             }
             composable(StateNavigate.olvidoPass.value) {
-                OlvidoPass(innerPadding, { controller.popBackStack() }) {}
+                OlvidoPass(innerPadding, authViewModel, { controller.popBackStack() }) { controller.navigate(it) }
             }
         }
     }

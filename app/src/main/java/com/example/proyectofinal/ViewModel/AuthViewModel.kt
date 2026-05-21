@@ -341,6 +341,23 @@ class AuthViewModel(
         }
     }
 
+    fun sendPasswordResetEmail(email: String) {
+        if (!isValidEmail(email)) {
+            _uiState.value = AuthUiState.Error("Introduce un email válido")
+            return
+        }
+        viewModelScope.launch {
+            _uiState.value = AuthUiState.Loading
+            var errorMessage = ""
+            val success = authRepository.sendPasswordResetEmail(email) { errorMessage = it }
+            if (success) {
+                _uiState.value = AuthUiState.Success("Correo enviado con éxito")
+            } else {
+                _uiState.value = AuthUiState.Error(errorMessage)
+            }
+        }
+    }
+
     fun updateUserProfile(name: String, lastName: String, phone: String, onUpdate: () -> Unit) {
         viewModelScope.launch {
             setUiState(AuthUiState.Loading)

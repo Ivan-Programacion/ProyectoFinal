@@ -17,4 +17,7 @@ interface AuthRepository {
 
     // Emite el UID actual cada vez que cambia el estado de la sesión
     fun getAuthStateStream(): Flow<String?>
+
+    // Enviar correo de recuperación de contraseña
+    suspend fun sendPasswordResetEmail(email: String, message: (String) -> Unit): Boolean
 }

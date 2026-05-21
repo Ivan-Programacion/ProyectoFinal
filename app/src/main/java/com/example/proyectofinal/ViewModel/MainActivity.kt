@@ -195,7 +195,8 @@ fun App(startDestination: String = "login") {
                     currentRoute == StateNavigate.perfil.value ||
                     currentRoute == StateNavigate.registro.value ||
                     currentRoute == StateNavigate.adminPerfilCliente.value ||
-                    currentRoute == StateNavigate.adminGestionExamen.value
+                    currentRoute == StateNavigate.adminGestionExamen.value ||
+                    currentRoute == StateNavigate.olvidoPass.value
                 ) {
                     snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
                     authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
@@ -209,7 +210,8 @@ fun App(startDestination: String = "login") {
                             currentRoute == StateNavigate.perfil.value ||
                                     currentRoute == StateNavigate.adminPerfilCliente.value ||
                                     currentRoute == StateNavigate.adminGestionExamen.value ||
-                                    currentRoute == StateNavigate.contenido.value
+                                    currentRoute == StateNavigate.contenido.value ||
+                                    currentRoute == StateNavigate.olvidoPass.value
                             )
                 ) {
                     isErrorSnackbar = false

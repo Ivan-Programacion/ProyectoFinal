@@ -129,15 +129,6 @@ fun OlvidoPass(
                         )
                     }
 
-                    if (authUiState is AuthUiState.Error) {
-                        Text(
-                            text = (authUiState as AuthUiState.Error).message,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.align(Alignment.Start)
-                        )
-                    }
-
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(

@@ -36,7 +36,7 @@ val aniosMenor = (anioActual downTo anioActual - 14).map { it.toString() }
 fun dayPerMonthFunction(indexMonth: Int): Pair<Int, List<String>> {
     var maxDay = 31
     if (indexMonth == 2) {
-        maxDay = 28
+        maxDay = 29
     } else if (indexMonth == 4 || indexMonth == 6 || indexMonth == 9 || indexMonth == 11) {
         maxDay = 30
     }

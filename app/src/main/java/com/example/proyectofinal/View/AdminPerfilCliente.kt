@@ -212,8 +212,12 @@ fun AdminPerfilCliente(
                             CampoDesplegableAdmin(
                                 label = "Mes",
                                 modifier = Modifier.weight(1f),
-                                seleccionado = meses[mes] ?: mes,
-                                opciones = meses.values.toList(),
+                                seleccionado = if (locale == "es") {
+                                    meses.entries.find {
+                                        it.value == mes
+                                    }?.key ?: mes
+                                } else meses[mes] ?: mes,
+                                opciones = if (locale == "es") meses.keys.toList() else meses.values.toList(),
                                 onValueChange = { valueSeleccionado, index ->
                                     val keyMes =
                                         meses.entries.find { it.value == valueSeleccionado }?.key
@@ -307,9 +311,13 @@ fun AdminPerfilCliente(
                                 )
                                 CampoDesplegableAdmin(
                                     label = "Mes",
-                                    seleccionado = meses[mesMenor] ?: mesMenor,
                                     modifier = Modifier.weight(1f),
-                                    opciones = meses.values.toList(),
+                                    seleccionado = if (locale == "es") {
+                                        meses.entries.find {
+                                            it.value == mesMenor
+                                        }?.key ?: mesMenor
+                                    } else meses[mesMenor] ?: mesMenor,
+                                    opciones = if (locale == "es") meses.keys.toList() else meses.values.toList(),
                                     onValueChange = { valueSeleccionado, index ->
                                         val keyMes =
                                             meses.entries.find { it.value == valueSeleccionado }?.key

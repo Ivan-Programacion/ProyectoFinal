@@ -58,6 +58,7 @@ import com.example.proyectofinal.Logic.aniosMenor
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.Logic.dayPerMonthFunction
+import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.ViewModel.AuthUiState
@@ -163,8 +164,12 @@ fun RegistroInfo(
                         )
                         CampoFecha(
                             label = "Mes",
-                            opciones = meses.values.toList(),
-                            seleccionado = meses[mes] ?: mes,
+                            seleccionado = if (locale == "es") {
+                                meses.entries.find {
+                                    it.value == mes
+                                }?.key ?: mes
+                            } else meses[mes] ?: mes,
+                            opciones = if (locale == "es") meses.keys.toList() else meses.values.toList(),
                             modifier = Modifier.weight(1.2f),
                             onValueChange = { valueSeleccionado, index ->
                                 // Buscamos la KEY correspondiente al VALUE seleccionado
@@ -290,8 +295,12 @@ fun RegistroInfo(
                             )
                             CampoFecha(
                                 label = "Mes",
-                                opciones = meses.values.toList(),
-                                seleccionado = meses[mesMenor] ?: mesMenor,
+                                seleccionado = if (locale == "es") {
+                                    meses.entries.find {
+                                        it.value == mesMenor
+                                    }?.key ?: mesMenor
+                                } else meses[mesMenor] ?: mesMenor,
+                                opciones = if (locale == "es") meses.keys.toList() else meses.values.toList(),
                                 modifier = Modifier.weight(1.2f),
                                 onValueChange = { valueSeleccionado, index ->
                                     val keyMes =

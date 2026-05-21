@@ -50,6 +50,7 @@ class AdminPerfilClienteViewModel(
     val profesoresSeleccionados = MutableStateFlow<Set<String>>(emptySet())
     val beltId = MutableStateFlow("white")
     val isActive = MutableStateFlow(true)
+    val isTeacher = MutableStateFlow(false)
 
     // Listas para desplegables
     private val _listaCentros = MutableStateFlow<List<Center>>(emptyList())
@@ -82,6 +83,7 @@ class AdminPerfilClienteViewModel(
         profesoresSeleccionados.value = emptySet()
         beltId.value = "white"
         isActive.value = true
+        isTeacher.value = false
         _listaCentros.value = emptyList()
         _profesoresDisponibles.value = emptyList()
         authViewModel.resetUiState()
@@ -165,6 +167,7 @@ class AdminPerfilClienteViewModel(
                 email.value = it.email
                 telefono.value = it.phone
                 esMenor.value = it.isMinor
+                isTeacher.value = it.role == "TEACHER" || it.role == "SUPERADMIN"
                 centroSeleccionado.value = it.centerId
                 profesoresSeleccionados.value = it.teacherIds.toSet()
                 beltId.value = it.beltId
@@ -207,6 +210,12 @@ class AdminPerfilClienteViewModel(
             val centerChanged = centroSeleccionado.value != userBase.centerId
             val newExamStatus = if (centerChanged) "NONE" else userBase.examStatus
 
+            val newRole = if (isTeacher.value) {
+                if (userBase.role == "SUPERADMIN") "SUPERADMIN" else "TEACHER"
+            } else {
+                "STUDENT"
+            }
+
             val updatedUser = if (esMenor.value) {
                 userBase.copy(
                     name = nombreMenor.value,
@@ -220,6 +229,7 @@ class AdminPerfilClienteViewModel(
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
                     beltId = beltId.value,
+                    role = newRole,
                     isActive = isActive.value,
                     examStatus = newExamStatus,
                     examText = if (userBase.centerId == centroSeleccionado.value) userBase.examText else ""
@@ -237,6 +247,7 @@ class AdminPerfilClienteViewModel(
                     centerId = centroSeleccionado.value,
                     teacherIds = profesoresSeleccionados.value.toList(),
                     beltId = beltId.value,
+                    role = newRole,
                     isActive = isActive.value,
                     examStatus = newExamStatus,
                     examText = if (userBase.centerId == centroSeleccionado.value) userBase.examText else ""
@@ -244,6 +255,7 @@ class AdminPerfilClienteViewModel(
             }
 
             if (userRepository.updateUser(updatedUser)) {
+                currentUser = updatedUser
                 authViewModel.setUiState(AuthUiState.Success("Alumno actualizado correctamente"))
                 onSuccess()
             } else {

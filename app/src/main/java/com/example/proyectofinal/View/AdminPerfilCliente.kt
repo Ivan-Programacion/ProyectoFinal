@@ -100,6 +100,7 @@ fun AdminPerfilCliente(
     val listaCentros by viewModel.listaCentros.collectAsStateWithLifecycle()
     val profesoresDisponibles by viewModel.profesoresDisponibles.collectAsStateWithLifecycle()
     val listaCinturones by viewModel.listaCinturones.collectAsStateWithLifecycle()
+    val isTeacher by viewModel.isTeacher.collectAsStateWithLifecycle()
 
     // Estados locales para la lógica de días de la UI
     var dayList by remember { mutableStateOf(dias) }
@@ -131,7 +132,6 @@ fun AdminPerfilCliente(
             onConfirm = {
                 viewModel.toggleUserActivation {
                     showStatusDialog = false
-                    // Opcionalmente podemos volver a la lista o quedarnos
                 }
             },
             onDismiss = { if (!isLoading) showStatusDialog = false }
@@ -379,6 +379,31 @@ fun AdminPerfilCliente(
                         )
                     }
 
+                    // --- CHECKBOX ES PROFESOR ---
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                viewModel.isTeacher.value = !isTeacher
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = isTeacher,
+                            onCheckedChange = { checked ->
+                                viewModel.isTeacher.value = checked
+                            },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.tertiary
+                            )
+                        )
+                        Text(
+                            text = "Es profesor del gimnasio",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
                     // BOTÓN ACTUALIZAR
                     Button(
                         onClick = { showConfirmDialog = true },
@@ -390,7 +415,7 @@ fun AdminPerfilCliente(
                         Text("Actualizar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
 
-                    // BOTÓN ELIMINAR/DESACTIVAR/ACTIVAR USUARIO
+                    // BOTÓN DESACTIVAR/ACTIVAR USUARIO
                     Button(
                         onClick = { showStatusDialog = true },
                         modifier = Modifier

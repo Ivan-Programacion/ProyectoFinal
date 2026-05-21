@@ -281,6 +281,7 @@ fun App(startDestination: String = "login") {
                         beforeRoute = it
                         controller.navigate(it)
                     },
+                    isActive = currentUser?.isActive ?: true, // Aplicamos fallback "true" para evitar parpadeos y desapariciones iniciales durante la carga de Firebase
                     isAdmin = currentUser?.role == "TEACHER" || currentUser?.role == "SUPERADMIN"
                 )
             }
@@ -476,10 +477,15 @@ fun TopBar(currentRoute: String?, beltName: String = "", backNavigation: () -> U
 }
 
 @Composable
-fun NavBar(currentRoute: String?, controller: (route: String) -> Unit, isAdmin: Boolean = false) {
+fun NavBar(
+    currentRoute: String?,
+    controller: (String) -> Unit,
+    isAdmin: Boolean = false,
+    isActive: Boolean = true
+) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-        // Si es admin, muestra este item
-        if (isAdmin) {
+        // Si es admin y está activo, muestra este item
+        if (isAdmin && isActive) {
             NavigationBarItem(
                 selected = currentRoute == StateNavigate.adminListaClientes.value,
                 { controller(StateNavigate.adminListaClientes.value) },
@@ -491,16 +497,19 @@ fun NavBar(currentRoute: String?, controller: (route: String) -> Unit, isAdmin: 
                 ),
                 label = { Text("Gestión") })
         }
-        NavigationBarItem(
-            selected = currentRoute == StateNavigate.favoritos.value,
-            { controller(StateNavigate.favoritos.value) },
-            icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.primary,
-                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                indicatorColor = MaterialTheme.colorScheme.onSecondary
-            ),
-            label = { Text("Favoritos") })
+        // Si está activo, puede ver favoritos. Si no, no puede.
+        if (isActive) {
+            NavigationBarItem(
+                selected = currentRoute == StateNavigate.favoritos.value,
+                { controller(StateNavigate.favoritos.value) },
+                icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.onSecondary
+                ),
+                label = { Text("Favoritos") })
+        }
         NavigationBarItem(
             selected = currentRoute == StateNavigate.listaCinturones.value,
             onClick = { controller(StateNavigate.listaCinturones.value) },

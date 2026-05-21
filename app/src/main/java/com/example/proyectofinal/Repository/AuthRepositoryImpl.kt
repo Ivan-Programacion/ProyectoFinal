@@ -1,6 +1,7 @@
 package com.example.proyectofinal.Repository
 
 import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -116,6 +117,10 @@ class AuthRepositoryImpl(
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             e.printStackTrace()
             message("Correo electrónico no válido")
+            false
+        } catch (e: FirebaseTooManyRequestsException) {
+            e.printStackTrace()
+            message("Demasiados intentos para restablecer la contraseña. Inténtalo más tarde.")
             false
         } catch (e: Exception) {
             e.printStackTrace()

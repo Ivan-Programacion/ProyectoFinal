@@ -78,6 +78,7 @@ import com.example.proyectofinal.Repository.ContentRepositoryImpl
 import com.example.proyectofinal.Repository.ExamRepositoryImpl
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.Logic.removeFcmTokenOnLogout
 import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
 import com.example.proyectofinal.View.OlvidoPass
 
@@ -186,6 +187,24 @@ fun App(startDestination: String = "login") {
     // Permisos de notificación y guardar el token FCM de Firebase en el documento del usuario actual
     NotificationPermissionAndTokenSetup(currentUser?.id)
 
+    // Si el usuario es desactivado (dado de baja), se le cierra la sesión
+    LaunchedEffect(currentUser?.isActive) {
+        if (currentUser?.isActive == false) {
+            // Añadimos un retraso para evitar falsos positivos provocados por un rebote
+            // de la persistencia de caché offline en Firestore al iniciar sesión tras un alta de admin.
+            //kotlinx.coroutines.delay(2000)
+            removeFcmTokenOnLogout(currentUser?.id) {
+                authViewModel.logoutUser()
+                authViewModel.resetUiState()
+                if (currentRoute != StateNavigate.login.value) {
+                    controller.navigate(StateNavigate.login.value) {
+                        popUpTo(0)
+                    }
+                }
+            }
+        }
+    }
+
     LaunchedEffect(authUiState) {
         when (authUiState) {
             is AuthUiState.Error -> {
@@ -281,7 +300,6 @@ fun App(startDestination: String = "login") {
                         beforeRoute = it
                         controller.navigate(it)
                     },
-                    isActive = currentUser?.isActive ?: true, // Aplicamos fallback "true" para evitar parpadeos y desapariciones iniciales durante la carga de Firebase
                     isAdmin = currentUser?.role == "TEACHER" || currentUser?.role == "SUPERADMIN"
                 )
             }
@@ -480,12 +498,11 @@ fun TopBar(currentRoute: String?, beltName: String = "", backNavigation: () -> U
 fun NavBar(
     currentRoute: String?,
     controller: (String) -> Unit,
-    isAdmin: Boolean = false,
-    isActive: Boolean = true
+    isAdmin: Boolean = false
 ) {
     NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         // Si es admin y está activo, muestra este item
-        if (isAdmin && isActive) {
+        if (isAdmin) {
             NavigationBarItem(
                 selected = currentRoute == StateNavigate.adminListaClientes.value,
                 { controller(StateNavigate.adminListaClientes.value) },
@@ -497,19 +514,16 @@ fun NavBar(
                 ),
                 label = { Text("Gestión") })
         }
-        // Si está activo, puede ver favoritos. Si no, no puede.
-        if (isActive) {
-            NavigationBarItem(
-                selected = currentRoute == StateNavigate.favoritos.value,
-                { controller(StateNavigate.favoritos.value) },
-                icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                label = { Text("Favoritos") })
-        }
+        NavigationBarItem(
+            selected = currentRoute == StateNavigate.favoritos.value,
+            { controller(StateNavigate.favoritos.value) },
+            icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = MaterialTheme.colorScheme.onSecondary
+            ),
+            label = { Text("Favoritos") })
         NavigationBarItem(
             selected = currentRoute == StateNavigate.listaCinturones.value,
             onClick = { controller(StateNavigate.listaCinturones.value) },

@@ -331,8 +331,19 @@ class AuthViewModel(
             _uiState.value = AuthUiState.Loading
             var errorMessage = ""
             val loginSuccess = authRepository.login(email, password) { errorMessage = it }
+
             if (loginSuccess) {
-                currentUserUid.value = authRepository.getCurrentUserUid() // Actualizamos al nuevo logueado
+                val uid = authRepository.getCurrentUserUid()
+                if (uid != null) {
+                    // Verificamos directamente con el servidor si el usuario sigue activo
+                    val user = userRepository.getUser(uid)
+                    if (user != null && !user.isActive) {
+                        authRepository.logout()
+                        _uiState.value = AuthUiState.Error("Su cuenta ha sido desactivada.")
+                        return@launch
+                    }
+                    currentUserUid.value = uid // Actualizamos al nuevo logueado
+                }
                 _uiState.value = AuthUiState.Success()
                 resetViewModelsStates()
             } else {

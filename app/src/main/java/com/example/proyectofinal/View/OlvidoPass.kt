@@ -70,7 +70,7 @@ fun OlvidoPass(
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Revisa tu bandeja de entrada o la carpeta de correo no deseado.",
+                        text = "Revisa tu bandeja de entrada, la carpeta de correo no deseado, o spam.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -115,7 +115,7 @@ fun OlvidoPass(
                     }
 
                     Text(
-                        text = "Introduce tu correo electrónico y te enviaremos un enlace para restablecerla.",
+                        text = "Introduce tu email de la cuenta y te enviaremos un enlace para restablecer la contraseña.",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .align(Alignment.Start)

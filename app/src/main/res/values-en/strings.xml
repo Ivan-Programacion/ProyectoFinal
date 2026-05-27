@@ -123,4 +123,11 @@
     <string name="content_section_tech">Techniques</string>
     <string name="content_section_forms">Form (Kata)</string>
     <string name="content_section_sets">Set</string>
+
+    <!-- Contenido -->
+    <string name="content_unmark_favorite">Unmark as favorite</string>
+    <string name="content_mark_favorite">Mark as favorite</string>
+    <string name="content_video_unavailable">Video not available</string>
+    <string name="success_add_favorite">Content added to favorites</string>
+    <string name="success_remove_favorite">Content removed from favorites</string>
 </resources>

@@ -469,9 +469,9 @@ class AuthViewModel(
 
                 // Si se ha agregado/eliminado, avisamos al usuario
                 if (isAdding) {
-                    setUiState(AuthUiState.Success("Contenido agregado a favoritos"))
+                    setUiState(AuthUiState.Success(messageRes = R.string.success_add_favorite))
                 } else {
-                    setUiState(AuthUiState.Success("Contenido eliminado de favoritos"))
+                    setUiState(AuthUiState.Success(messageRes = R.string.success_remove_favorite))
                 }
             }
         }

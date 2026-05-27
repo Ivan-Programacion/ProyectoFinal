@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -51,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.extractYouTubeId
 import com.example.proyectofinal.Logic.mapBeltColor
 import com.example.proyectofinal.Logic.locale
+import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -75,6 +77,7 @@ fun Contenido(
 
     // User actual para comprobar si tiene que modificar algo en la lista de favoritos.
     val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()
+    // Comprobamos si dicho contenido está agregado a favoritos
     val isFavorite = currentUser?.let { user ->
         val contentId = selectedContent?.id ?: return@let false
         when (selectedContent?.contentType) {
@@ -101,7 +104,6 @@ fun Contenido(
                 )
             )
     ) {
-        // Tarjeta blanca/clara gigante que contiene la info
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,8 +149,8 @@ fun Contenido(
                                 Icon(
                                     modifier = Modifier.size(32.dp), // Tamaño de estrella más grande
                                     imageVector = Icons.Default.StarBorder,
-                                    contentDescription = "Desmarcar como favorito",
-                                    tint = MaterialTheme.colorScheme.primary // Borde marrón de tu tema
+                                    contentDescription = stringResource(R.string.content_unmark_favorite),
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         } else {
@@ -156,7 +158,7 @@ fun Contenido(
                             Icon(
                                 modifier = Modifier.size(32.dp), // Tamaño de estrella más grande
                                 imageVector = Icons.Default.StarBorder,
-                                contentDescription = "Marcar como favorito",
+                                contentDescription = stringResource(R.string.content_mark_favorite),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -244,10 +246,10 @@ fun Contenido(
                                                 val activity = context.findActivity() ?: return
                                                 
                                                 // Vuelve a bloquear la pantalla en vertical (portrait) al salir de fullscreen
-                                                activity.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                                                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                                                 
                                                 val window = activity.window
-                                                val decorView = window.decorView as android.widget.FrameLayout
+                                                val decorView = window.decorView as FrameLayout
 
                                                 // Vuelve a mostrar las barras del sistema
                                                 val insetsController = androidx.core.view.WindowCompat.getInsetsController(window, decorView)
@@ -312,7 +314,7 @@ fun Contenido(
                             )
                         } else {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text(text = "Video no disponible")
+                                Text(text = stringResource(R.string.content_video_unavailable))
                             }
                         }
                     } else {
@@ -321,7 +323,7 @@ fun Contenido(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Video no disponible",
+                                text = stringResource(R.string.content_video_unavailable),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                         }

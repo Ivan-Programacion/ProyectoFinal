@@ -21,5 +21,6 @@ interface AuthRepository {
     fun getAuthStateStream(): Flow<String?>
 
     // Enviar correo de recuperación de contraseña
-    suspend fun sendPasswordResetEmail(email: String, message: (String) -> Unit): Boolean
+    // message lleva parametro Int para añadir el indice del texto de traducción
+    suspend fun sendPasswordResetEmail(email: String, message: (String?, Int?) -> Unit): Boolean
 }

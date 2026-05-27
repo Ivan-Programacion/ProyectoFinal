@@ -57,4 +57,21 @@
     <string name="error_register_invalid_password">Las contraseñas no coinciden o no es válida</string>
     <string name="error_register_generic">Error al registrar usuario</string>
     <string name="error_register_save_data">Error al guardar los datos del usuario. Inténtalo más tarde.</string>
+
+    <!-- Olvido Pass & Auth -->
+    <string name="olvido_pass_email_sent_desc">Correo enviado</string>
+    <string name="olvido_pass_sent_title">¡Enlace enviado!</string>
+    <string name="olvido_pass_sent_body">Revisa tu bandeja de entrada, la carpeta de correo no deseado, o spam.</string>
+    <string name="olvido_pass_back_to">Volver al</string>
+    <string name="olvido_pass_login">Inicio de sesión</string>
+    <string name="olvido_pass_title">Recuperar contraseña</string>
+    <string name="olvido_pass_instructions">Introduce tu email de la cuenta y te enviaremos un enlace para restablecer la contraseña.</string>
+    <string name="olvido_pass_email_label">Correo Electrónico</string>
+    <string name="olvido_pass_email_placeholder">ejemplo@gmail.com</string>
+    <string name="olvido_pass_send_button">Enviar</string>
+
+    <string name="error_invalid_email_input">Introduce un email válido</string>
+    <string name="success_reset_email_sent">Correo enviado con éxito</string>
+    <string name="error_too_many_requests">Demasiados intentos para restablecer la contraseña. Inténtalo más tarde.</string>
+    <string name="error_send_email_generic">Error al enviar el correo. Verifique la dirección.</string>
 </resources>

@@ -366,17 +366,21 @@ class AuthViewModel(
 
     fun sendPasswordResetEmail(email: String) {
         if (!isValidEmail(email)) {
-            _uiState.value = AuthUiState.Error("Introduce un email válido")
+            _uiState.value = AuthUiState.Error(messageRes = R.string.error_invalid_email_input)
             return
         }
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            var errorMessage = ""
-            val success = authRepository.sendPasswordResetEmail(email) { errorMessage = it }
+            var errorMessage: String? = null
+            var errorRes: Int? = null
+            val success = authRepository.sendPasswordResetEmail(email) { msg, res -> 
+                errorMessage = msg
+                errorRes = res
+            }
             if (success) {
-                _uiState.value = AuthUiState.Success("Correo enviado con éxito")
+                _uiState.value = AuthUiState.Success(messageRes = R.string.success_reset_email_sent)
             } else {
-                _uiState.value = AuthUiState.Error(errorMessage)
+                _uiState.value = AuthUiState.Error(message = errorMessage, messageRes = errorRes)
             }
         }
     }

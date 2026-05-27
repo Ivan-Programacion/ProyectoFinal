@@ -12,11 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -53,37 +55,37 @@ fun OlvidoPass(
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.fillMaxWidth().padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 if (authUiState is AuthUiState.Success) {
                     Icon(
                         imageVector = Icons.Default.MarkEmailRead,
-                        contentDescription = "Correo enviado",
+                        contentDescription = stringResource(id = R.string.olvido_pass_email_sent_desc),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(64.dp)
                     )
                     Text(
-                        text = "¡Enlace enviado!",
+                        text = stringResource(id = R.string.olvido_pass_sent_title),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Revisa tu bandeja de entrada, la carpeta de correo no deseado, o spam.",
+                        text = stringResource(id = R.string.olvido_pass_sent_body),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "Volver al ",
+                            text = stringResource(id = R.string.olvido_pass_back_to) + " ",
                             modifier = Modifier.clickable {
                                 viewModel.resetUiState()
                                 controller(StateNavigate.login.value)
                             }
                         )
                         Text(
-                            text = "Inicio de sesión ",
+                            text = stringResource(id = R.string.olvido_pass_login) + " ",
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.clickable {
@@ -102,20 +104,20 @@ fun OlvidoPass(
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Volver atrás",
+                                contentDescription = stringResource(id = R.string.back_description),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
 
                         Text(
-                            text = "Recuperar contraseña",
+                            text = stringResource(id = R.string.olvido_pass_title),
                             style = MaterialTheme.typography.titleMedium,
                         )
 
                     }
 
                     Text(
-                        text = "Introduce tu email de la cuenta y te enviaremos un enlace para restablecer la contraseña.",
+                        text = stringResource(id = R.string.olvido_pass_instructions),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .align(Alignment.Start)
@@ -124,7 +126,7 @@ fun OlvidoPass(
 
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Correo Electrónico",
+                            text = stringResource(id = R.string.olvido_pass_email_label),
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
@@ -132,7 +134,7 @@ fun OlvidoPass(
                             value = email,
                             onValueChange = { email = it },
                             modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text("ejemplo@gmail.com") },
+                            placeholder = { Text(stringResource(id = R.string.olvido_pass_email_placeholder)) },
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
@@ -158,7 +160,7 @@ fun OlvidoPass(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Enviar", fontWeight = FontWeight.Bold)
+                            Text(stringResource(id = R.string.olvido_pass_send_button), fontWeight = FontWeight.Bold)
                         }
                     }
                 }

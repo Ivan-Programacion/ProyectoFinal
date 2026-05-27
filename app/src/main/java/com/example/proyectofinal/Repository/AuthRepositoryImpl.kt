@@ -103,29 +103,29 @@ class AuthRepositoryImpl(
         awaitClose { auth.removeAuthStateListener(authStateListener) }
     }
 
-    override suspend fun sendPasswordResetEmail(email: String, message: (String) -> Unit): Boolean {
+    override suspend fun sendPasswordResetEmail(email: String, message: (String?, Int?) -> Unit): Boolean {
         return try {
             auth.sendPasswordResetEmail(email).await()
             true
         } catch (e: FirebaseNetworkException) {
             e.printStackTrace()
-            message("Error de conexión. Inténtelo más tarde")
+            message(null, R.string.error_connection)
             false
         } catch (e: ConnectException) {
             e.printStackTrace()
-            message("Error de conexión. Inténtelo más tarde")
+            message(null, R.string.error_connection)
             false
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             e.printStackTrace()
-            message("Correo electrónico no válido")
+            message(null, R.string.error_invalid_email)
             false
         } catch (e: FirebaseTooManyRequestsException) {
             e.printStackTrace()
-            message("Demasiados intentos para restablecer la contraseña. Inténtalo más tarde.")
+            message(null, R.string.error_too_many_requests)
             false
         } catch (e: Exception) {
             e.printStackTrace()
-            message("Error al enviar el correo. Verifique la dirección.")
+            message(null, R.string.error_send_email_generic)
             false
         }
     }

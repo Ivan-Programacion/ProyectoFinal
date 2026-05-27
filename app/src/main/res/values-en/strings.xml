@@ -58,4 +58,21 @@
     <string name="error_register_invalid_password">Passwords do not match or are invalid</string>
     <string name="error_register_generic">Error registering user</string>
     <string name="error_register_save_data">Error saving user data. Please try again later.</string>
+
+    <!-- Olvido Pass & Auth -->
+    <string name="olvido_pass_email_sent_desc">Email sent</string>
+    <string name="olvido_pass_sent_title">Link sent!</string>
+    <string name="olvido_pass_sent_body">Check your inbox, junk folder, or spam.</string>
+    <string name="olvido_pass_back_to">Back to</string>
+    <string name="olvido_pass_login">Log in</string>
+    <string name="olvido_pass_title">Recover password</string>
+    <string name="olvido_pass_instructions">Enter your account email and we will send you a link to reset your password.</string>
+    <string name="olvido_pass_email_label">Email address</string>
+    <string name="olvido_pass_email_placeholder">example@gmail.com</string>
+    <string name="olvido_pass_send_button">Send</string>
+
+    <string name="error_invalid_email_input">Enter a valid email</string>
+    <string name="success_reset_email_sent">Email sent successfully</string>
+    <string name="error_too_many_requests">Too many attempts to reset your password. Please try again later.</string>
+    <string name="error_send_email_generic">Error sending email. Please check the address.</string>
 </resources>

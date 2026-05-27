@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.proyectofinal.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.removeFcmTokenOnLogout
@@ -156,7 +158,7 @@ fun Perfil(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = "Datos perfil", style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(R.string.perfil_datos_titulo), style = MaterialTheme.typography.titleMedium)
 
                     // AVATAR
                     Surface(
@@ -174,16 +176,17 @@ fun Perfil(
                         }
                     }
 
-                    CampoPerfil(label = "Nombre", value = nombre, onValueChange = { nombre = it })
+                    CampoPerfil(label = stringResource(R.string.perfil_nombre_label), value = nombre, onValueChange = { nombre = it })
                     CampoPerfil(
-                        label = "Apellidos",
+                        label = stringResource(R.string.perfil_apellidos_label),
                         value = apellidos,
                         onValueChange = { apellidos = it })
                     CampoPerfil(
-                        label = "Teléfono",
+                        label = stringResource(R.string.perfil_telefono_label),
                         value = telefono,
-                        onValueChange = { telefono = it })
-                    CampoPerfil(label = "Email", value = email, onValueChange = {}, enabled = false)
+                        onValueChange = { telefono = it },
+                        isPhone = true)
+                    CampoPerfil(label = stringResource(R.string.perfil_email_label), value = email, onValueChange = {}, enabled = false)
 
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -196,7 +199,7 @@ fun Perfil(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D0C03))
                     ) {
-                        Text("Actualizar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(stringResource(R.string.perfil_actualizar_btn), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                 }
             }
@@ -223,7 +226,7 @@ fun Perfil(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Solicitar examen",
+                        text = stringResource(R.string.perfil_solicitar_examen_titulo),
                         style = MaterialTheme.typography.titleMedium,
                     )
 
@@ -269,7 +272,7 @@ fun Perfil(
                         )
                     ) {
                         Text(
-                            text = "Acceder al examen",
+                            text = stringResource(R.string.perfil_acceder_examen_btn),
                             fontWeight = if (botonHabilitado) FontWeight.Bold else FontWeight.Normal,
                             fontSize = 18.sp,
                             color = if (botonHabilitado) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
@@ -290,7 +293,7 @@ fun Perfil(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = "Salir",
+                    contentDescription = stringResource(R.string.perfil_salir_desc),
                     modifier = Modifier
                         .size(20.dp)
                         .clickable { }
@@ -301,7 +304,7 @@ fun Perfil(
                 )
                 Text(
                     modifier = Modifier.clickable { showLogoutDialog = true },
-                    text = "Cerrar sesión",
+                    text = stringResource(R.string.perfil_cerrar_sesion_texto),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
@@ -323,14 +326,13 @@ fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "¿Solicitar acceso?",
+                    text = stringResource(R.string.perfil_solicitar_acceso_dialog_titulo),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Estás a punto de solicitar acceso al próximo examen. ¿Estás seguro de " +
-                            "querer solicitar acceso al examen?",
+                    text = stringResource(R.string.perfil_solicitar_acceso_dialog_desc),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -346,7 +348,7 @@ fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Text(
-                            "Aceptar",
+                            stringResource(R.string.perfil_aceptar_btn),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -359,7 +361,7 @@ fun SolicitarExamenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Cancelar",
+                            stringResource(R.string.perfil_cancelar_btn),
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
@@ -388,13 +390,13 @@ fun ConfirmarCambiosDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "¿Guardar cambios?",
+                    text = stringResource(R.string.perfil_guardar_cambios_dialog_titulo),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Se van a modificar tus datos de perfil. ¿Estás seguro de que quieres continuar?",
+                    text = stringResource(R.string.perfil_guardar_cambios_dialog_desc),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -418,7 +420,7 @@ fun ConfirmarCambiosDialog(
                             )
                         } else {
                             Text(
-                                "Aceptar",
+                                stringResource(R.string.perfil_aceptar_btn),
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -432,7 +434,7 @@ fun ConfirmarCambiosDialog(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Cancelar",
+                            stringResource(R.string.perfil_cancelar_btn),
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
@@ -446,7 +448,7 @@ fun ConfirmarCambiosDialog(
 
 @Composable
 fun CampoPerfil(
-    label: String, value: String, onValueChange: (String) -> Unit, enabled: Boolean = true
+    label: String, value: String, onValueChange: (String) -> Unit, enabled: Boolean = true, isPhone: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -454,7 +456,7 @@ fun CampoPerfil(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
         )
-        if (label == "Teléfono") {
+        if (isPhone) {
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
@@ -505,13 +507,13 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "¿Cerrar sesión?",
+                    text = stringResource(R.string.perfil_cerrar_sesion_dialog_titulo),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "¿Estás seguro de que quieres salir de tu cuenta?",
+                    text = stringResource(R.string.perfil_cerrar_sesion_dialog_desc),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -528,7 +530,7 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Salir",
+                            stringResource(R.string.perfil_salir_btn),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -541,7 +543,7 @@ fun CerrarSesionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Cancelar",
+                            stringResource(R.string.perfil_cancelar_btn),
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodySmall
@@ -560,8 +562,3 @@ fun Perfilpreview() {
         Perfil() {}
     }
 }
-
-
-
-
-

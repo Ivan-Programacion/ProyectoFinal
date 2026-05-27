@@ -85,4 +85,30 @@
     <string name="title_gestion_examen">Exam Management</string>
     <string name="title_perfil_alumno">Student Profile</string>
     <string name="navbar_admin">Admin</string>
+
+    <!-- Perfil -->
+    <string name="perfil_datos_titulo">Profile data</string>
+    <string name="perfil_nombre_label">Name</string>
+    <string name="perfil_apellidos_label">Last Name</string>
+    <string name="perfil_telefono_label">Phone</string>
+    <string name="perfil_email_label">Email</string>
+    <string name="perfil_actualizar_btn">Update</string>
+    <string name="perfil_solicitar_examen_titulo">Request exam</string>
+    <string name="perfil_acceder_examen_btn">Access exam</string>
+    <string name="perfil_salir_desc">Sign out</string>
+    <string name="perfil_cerrar_sesion_texto">Log out</string>
+    <string name="perfil_solicitar_acceso_dialog_titulo">Request access?</string>
+    <string name="perfil_solicitar_acceso_dialog_desc">You are about to request access to the next exam. Are you sure you want to request access to the exam?</string>
+    <string name="perfil_aceptar_btn">Accept</string>
+    <string name="perfil_cancelar_btn">Cancel</string>
+    <string name="perfil_guardar_cambios_dialog_titulo">Save changes?</string>
+    <string name="perfil_guardar_cambios_dialog_desc">Your profile data will be modified. Are you sure you want to continue?</string>
+    <string name="perfil_cerrar_sesion_dialog_titulo">Log out?</string>
+    <string name="perfil_cerrar_sesion_dialog_desc">Are you sure you want to sign out of your account?</string>
+    <string name="perfil_salir_btn">Sign out</string>
+
+    <string name="success_update_profile">Data updated successfully</string>
+    <string name="error_update_profile">Connection error. Could not update data</string>
+    <string name="success_request_exam">Exam request sent successfully</string>
+    <string name="error_request_exam">Error sending exam request</string>
 </resources>

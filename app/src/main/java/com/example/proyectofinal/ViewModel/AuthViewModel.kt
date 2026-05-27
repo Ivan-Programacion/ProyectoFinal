@@ -397,10 +397,10 @@ class AuthViewModel(
                 )
                 val success = userRepository.updateUser(updatedUser)
                 if (success) {
-                    _uiState.value = AuthUiState.Success("Datos actualizados correctamente")
+                    _uiState.value = AuthUiState.Success(messageRes = R.string.success_update_profile)
                     onUpdate()
                 } else {
-                    _uiState.value = AuthUiState.Error("Error de conexión. No se pudieron actualizar los datos")
+                    _uiState.value = AuthUiState.Error(messageRes = R.string.error_update_profile)
                 }
             }
         }
@@ -419,9 +419,9 @@ class AuthViewModel(
                 val updatedUser = currentUser.copy(examStatus = "APPLICANT")
                 val success = userRepository.updateUser(updatedUser)
                 if (success) {
-                    _uiState.value = AuthUiState.Success("Solicitud de examen enviada correctamente")
+                    _uiState.value = AuthUiState.Success(messageRes = R.string.success_request_exam)
                 } else {
-                    _uiState.value = AuthUiState.Error("Error al enviar la solicitud de examen")
+                    _uiState.value = AuthUiState.Error(messageRes = R.string.error_request_exam)
                 }
             }
         }

@@ -84,4 +84,30 @@
     <string name="title_gestion_examen">Gestión examen</string>
     <string name="title_perfil_alumno">Perfil alumno</string>
     <string name="navbar_admin">Gestión</string>
+
+    <!-- Perfil -->
+    <string name="perfil_datos_titulo">Datos perfil</string>
+    <string name="perfil_nombre_label">Nombre</string>
+    <string name="perfil_apellidos_label">Apellidos</string>
+    <string name="perfil_telefono_label">Teléfono</string>
+    <string name="perfil_email_label">Email</string>
+    <string name="perfil_actualizar_btn">Actualizar</string>
+    <string name="perfil_solicitar_examen_titulo">Solicitar examen</string>
+    <string name="perfil_acceder_examen_btn">Acceder al examen</string>
+    <string name="perfil_salir_desc">Salir</string>
+    <string name="perfil_cerrar_sesion_texto">Cerrar sesión</string>
+    <string name="perfil_solicitar_acceso_dialog_titulo">¿Solicitar acceso?</string>
+    <string name="perfil_solicitar_acceso_dialog_desc">Estás a punto de solicitar acceso al próximo examen. ¿Estás seguro de querer solicitar acceso al examen?</string>
+    <string name="perfil_aceptar_btn">Aceptar</string>
+    <string name="perfil_cancelar_btn">Cancelar</string>
+    <string name="perfil_guardar_cambios_dialog_titulo">¿Guardar cambios?</string>
+    <string name="perfil_guardar_cambios_dialog_desc">Se van a modificar tus datos de perfil. ¿Estás seguro de que quieres continuar?</string>
+    <string name="perfil_cerrar_sesion_dialog_titulo">¿Cerrar sesión?</string>
+    <string name="perfil_cerrar_sesion_dialog_desc">¿Estás seguro de que quieres salir de tu cuenta?</string>
+    <string name="perfil_salir_btn">Salir</string>
+
+    <string name="success_update_profile">Datos actualizados correctamente</string>
+    <string name="error_update_profile">Error de conexión. No se pudieron actualizar los datos</string>
+    <string name="success_request_exam">Solicitud de examen enviada correctamente</string>
+    <string name="error_request_exam">Error al enviar la solicitud de examen</string>
 </resources>

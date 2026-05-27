@@ -129,4 +129,13 @@
     <string name="content_video_unavailable">Video no disponible</string>
     <string name="success_add_favorite">Contenido agregado a favoritos</string>
     <string name="success_remove_favorite">Contenido eliminado de favoritos</string>
+
+    <!-- Admin Lista Clientes -->
+    <string name="admin_list_exam_management_title">Gestión de exámenes</string>
+    <string name="admin_list_manage_exams_btn">Gestionar exámenes</string>
+    <string name="admin_list_go_to_exams_desc">Ir a gestión de exámenes</string>
+    <string name="admin_list_students_title">Lista de alumnos</string>
+    <string name="admin_list_search_placeholder">Buscar nombre o apellidos...</string>
+    <string name="admin_list_search_desc">Buscar</string>
+    <string name="admin_list_view_profile_desc">Ver perfil de %1$s</string>
 </resources>

@@ -34,9 +34,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.proyectofinal.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -105,7 +107,7 @@ fun AdminListaClientes(
             ) {
                 // Título de la Card
                 Text(
-                    text = "Gestión de exámenes",
+                    text = stringResource(R.string.admin_list_exam_management_title),
                     style = MaterialTheme.typography.titleMedium,
                 )
 
@@ -129,7 +131,7 @@ fun AdminListaClientes(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Gestionar exámenes",
+                            text = stringResource(R.string.admin_list_manage_exams_btn),
                             fontWeight = FontWeight.Bold,
                         )
                         Surface(
@@ -139,7 +141,7 @@ fun AdminListaClientes(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowRight,
-                                contentDescription = "Ir a gestión de exámenes",
+                                contentDescription = stringResource(R.string.admin_list_go_to_exams_desc),
                                 modifier = Modifier.padding(4.dp)
                             )
                         }
@@ -164,7 +166,7 @@ fun AdminListaClientes(
             ) {
                 // Título de la Card
                 Text(
-                    text = "Lista de alumnos",
+                    text = stringResource(R.string.admin_list_students_title),
                     style = MaterialTheme.typography.titleMedium,
                 )
 
@@ -177,12 +179,12 @@ fun AdminListaClientes(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            "Buscar nombre o apellidos...",
+                            stringResource(R.string.admin_list_search_placeholder),
                             style = MaterialTheme.typography.bodySmall
                         )
                     },
                     leadingIcon = {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Buscar")
+                        Icon(imageVector = Icons.Default.Search, contentDescription = stringResource(R.string.admin_list_search_desc))
                     },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,

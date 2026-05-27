@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.proyectofinal.R
 
 class AdminPerfilClienteViewModel(
     private val userRepository: UserRepository,
@@ -262,10 +263,10 @@ class AdminPerfilClienteViewModel(
 
             if (userRepository.updateUser(updatedUser)) {
                 currentUser = updatedUser
-                authViewModel.setUiState(AuthUiState.Success("Alumno actualizado correctamente"))
+                authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_profile_updated))
                 onSuccess()
             } else {
-                authViewModel.setUiState(AuthUiState.Error("Error al actualizar el alumno"))
+                authViewModel.setUiState(AuthUiState.Error(messageRes = R.string.error_admin_profile_updated))
             }
         }
     }
@@ -289,11 +290,11 @@ class AdminPerfilClienteViewModel(
             if (userRepository.updateUser(updatedUser)) {
                 isActive.value = newActiveState
                 currentUser = updatedUser
-                val msg = if (newActiveState) "Alumno activado correctamente" else "Alumno dado de baja correctamente"
-                authViewModel.setUiState(AuthUiState.Success(msg))
+                val msg = if (newActiveState) R.string.success_admin_profile_activated else R.string.success_admin_profile_deactivated
+                authViewModel.setUiState(AuthUiState.Success(messageRes = msg))
                 onSuccess()
             } else {
-                authViewModel.setUiState(AuthUiState.Error("Error al cambiar el estado del alumno"))
+                authViewModel.setUiState(AuthUiState.Error(messageRes = R.string.error_admin_profile_status))
             }
         }
     }

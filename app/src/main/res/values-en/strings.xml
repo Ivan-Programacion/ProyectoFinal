@@ -139,4 +139,23 @@
     <string name="admin_list_search_placeholder">Search by name or last name...</string>
     <string name="admin_list_search_desc">Search</string>
     <string name="admin_list_view_profile_desc">View profile of %1$s</string>
+
+    <!-- Admin Perfil Cliente -->
+    <string name="admin_profile_data_title">Profile data\nstudent/guardian</string>
+    <string name="admin_profile_assigned_teachers">Assigned teachers</string>
+    <string name="admin_profile_belt_label">Belt</string>
+    <string name="admin_profile_is_teacher">Is a gym teacher</string>
+    <string name="admin_profile_deactivate_student">Deactivate student</string>
+    <string name="admin_profile_activate_student">Activate student</string>
+    <string name="admin_profile_confirm_update_desc">Data for %1$s will be modified. Are you sure you want to modify the data?</string>
+    <string name="admin_profile_deactivate_dialog_title">Deactivate student?</string>
+    <string name="admin_profile_activate_dialog_title">Activate student?</string>
+    <string name="admin_profile_change_status_desc">You are about to change the status of student %1$s. Are you sure?</string>
+    <string name="admin_profile_deactivate_btn">Disable</string>
+    <string name="admin_profile_activate_btn">Activate</string>
+    <string name="success_admin_profile_updated">Student updated successfully</string>
+    <string name="error_admin_profile_updated">Error updating student</string>
+    <string name="success_admin_profile_activated">Student activated successfully</string>
+    <string name="success_admin_profile_deactivated">Student deactivated successfully</string>
+    <string name="error_admin_profile_status">Error changing student status</string>
 </resources>

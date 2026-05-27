@@ -138,4 +138,24 @@
     <string name="admin_list_search_placeholder">Buscar nombre o apellidos...</string>
     <string name="admin_list_search_desc">Buscar</string>
     <string name="admin_list_view_profile_desc">Ver perfil de %1$s</string>
+
+    <!-- Admin Perfil Cliente -->
+    <string name="admin_profile_data_title">Datos perfil\nalumno/tutor</string>
+    <string name="admin_profile_assigned_teachers">Profesores asignados</string>
+    <string name="admin_profile_belt_label">Cinturón</string>
+    <string name="admin_profile_is_teacher">Es profesor del gimnasio</string>
+    <string name="admin_profile_deactivate_student">Dar de baja alumno</string>
+    <string name="admin_profile_activate_student">Activar alumno</string>
+    <string name="admin_profile_confirm_update_desc">Se van a modificar los datos de %1$s. ¿Estás seguro de querer modificar los datos?</string>
+    <string name="admin_profile_deactivate_dialog_title">¿Dar de baja alumno?</string>
+    <string name="admin_profile_activate_dialog_title">¿Activar alumno?</string>
+    <string name="admin_profile_change_status_desc">Estás a punto de modificar el estado del alumno %1$s. ¿Estás seguro?</string>
+    <string name="admin_profile_deactivate_btn">Dar de baja</string>
+    <string name="admin_profile_activate_btn">Activar</string>
+    <string name="success_admin_profile_updated">Alumno actualizado correctamente</string>
+    <string name="error_admin_profile_updated">Error al actualizar el alumno</string>
+    <string name="success_admin_profile_activated">Alumno activado correctamente</string>
+    <string name="success_admin_profile_deactivated">Alumno dado de baja correctamente</string>
+    <string name="error_admin_profile_status">Error al cambiar el estado del alumno</string>
+
 </resources>

@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +62,7 @@ import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.dias
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Logic.meses
+import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -160,7 +162,7 @@ fun AdminPerfilCliente(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Datos perfil\nalumno/tutor",
+                        text = stringResource(R.string.admin_profile_data_title),
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
@@ -183,18 +185,18 @@ fun AdminPerfilCliente(
 
                     // CAMPOS DE TEXTO NORMALES
                     CampoPerfilAdmin(
-                        label = "Nombre",
+                        label = stringResource(R.string.perfil_nombre_label),
                         value = nombre,
                         onValueChange = { viewModel.nombre.value = it })
                     CampoPerfilAdmin(
-                        label = "Apellidos",
+                        label = stringResource(R.string.perfil_apellidos_label),
                         value = apellidos,
                         onValueChange = { viewModel.apellidos.value = it })
 
                     // DESPLEGABLES FECHA NACIMIENTO
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Fecha de nacimiento",
+                            text = stringResource(R.string.registro_birthdate_label),
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                         )
@@ -210,7 +212,8 @@ fun AdminPerfilCliente(
                                 onValueChange = { opcion, _ -> viewModel.dia.value = opcion }
                             )
                             CampoDesplegableAdmin(
-                                label = "Mes",
+                                label = stringResource(R.string.registro_month_label),
+                                isMonth = true,
                                 modifier = Modifier.weight(1f),
                                 seleccionado = if (locale == "es") {
                                     meses.entries.find {
@@ -231,7 +234,7 @@ fun AdminPerfilCliente(
                                 }
                             )
                             CampoDesplegableAdmin(
-                                label = anio,
+                                label = anio.ifEmpty { stringResource(R.string.registro_year_label) },
                                 seleccionado = anio,
                                 modifier = Modifier.weight(1f),
                                 opciones = anios,
@@ -241,13 +244,14 @@ fun AdminPerfilCliente(
                     }
 
                     CampoPerfilAdmin(
-                        label = "Teléfono",
+                        label = stringResource(R.string.perfil_telefono_label),
                         value = telefono,
+                        isPhone = true,
                         onValueChange = { viewModel.telefono.value = it })
 
                     // EMAIL (NO Editable)
                     CampoPerfilAdmin(
-                        label = "Email",
+                        label = stringResource(R.string.perfil_email_label),
                         value = email,
                         enabled = false,
                         onValueChange = { viewModel.email.value = it })
@@ -271,7 +275,7 @@ fun AdminPerfilCliente(
                             )
                         )
                         Text(
-                            text = "El alumno es menor de 14 años",
+                            text = stringResource(R.string.registro_minor_checkbox),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -279,20 +283,20 @@ fun AdminPerfilCliente(
                     // --- CAMPOS CONDICIONALES DEL MENOR ---
                     if (esMenor) {
                         CampoPerfilAdmin(
-                            label = "Nombre del niño/a",
+                            label = stringResource(R.string.registro_minor_name_label),
                             value = nombreMenor,
                             onValueChange = { viewModel.nombreMenor.value = it }
                         )
 
                         CampoPerfilAdmin(
-                            label = "Apellidos niño/a",
+                            label = stringResource(R.string.registro_minor_lastname_label),
                             value = apellidosMenor,
                             onValueChange = { viewModel.apellidosMenor.value = it }
                         )
 
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Text(
-                                text = "Fecha de nacimiento niño/a",
+                                text = stringResource(R.string.registro_minor_birthdate_label),
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
                             )
@@ -301,7 +305,7 @@ fun AdminPerfilCliente(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 CampoDesplegableAdmin(
-                                    label = diaMenor.ifEmpty { "Día" },
+                                    label = diaMenor.ifEmpty { stringResource(R.string.registro_day_label) },
                                     seleccionado = diaMenor,
                                     modifier = Modifier.weight(1f),
                                     opciones = dayListMenor,
@@ -310,7 +314,8 @@ fun AdminPerfilCliente(
                                     }
                                 )
                                 CampoDesplegableAdmin(
-                                    label = "Mes",
+                                    label = stringResource(R.string.registro_month_label),
+                                    isMonth = true,
                                     modifier = Modifier.weight(1f),
                                     seleccionado = if (locale == "es") {
                                         meses.entries.find {
@@ -331,7 +336,7 @@ fun AdminPerfilCliente(
                                     }
                                 )
                                 CampoDesplegableAdmin(
-                                    label = anioMenor.ifEmpty { "Año" },
+                                    label = anioMenor.ifEmpty { stringResource(R.string.registro_year_label) },
                                     seleccionado = anioMenor,
                                     modifier = Modifier.weight(1f),
                                     opciones = aniosMenor,
@@ -345,8 +350,8 @@ fun AdminPerfilCliente(
 
                     // --- DESPLEGABLES CENTRO Y PROFESORES ---
                     CampoDesplegableGimnasios(
-                        label = "Gimnasio",
-                        placeholder = "Selecciona un centro",
+                        label = stringResource(R.string.registro_center_label),
+                        placeholder = stringResource(R.string.registro_center_placeholder),
                         opciones = listaCentros,
                         seleccionadoId = centroSeleccionado,
                         onValueChange = { nuevoCentroId ->
@@ -355,8 +360,8 @@ fun AdminPerfilCliente(
                     )
 
                     CampoDesplegableProfesores(
-                        label = "Profesores asignados",
-                        placeholder = "Selecciona profesor/es",
+                        label = stringResource(R.string.admin_profile_assigned_teachers),
+                        placeholder = stringResource(R.string.registro_teachers_placeholder),
                         opciones = profesoresDisponibles,
                         seleccionadosIds = profesoresSeleccionados,
                         enabled = centroSeleccionado.isNotEmpty(),
@@ -368,13 +373,13 @@ fun AdminPerfilCliente(
                     // DESPLEGABLE CINTURÓN
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Cinturón",
+                            text = stringResource(R.string.admin_profile_belt_label),
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
                         )
 
                         val beltNameToShow =
-                            listaCinturones.find { it.id == beltId }?.name?.get(locale) ?: beltId
+                            listaCinturones.find { it.id == beltId }?.name?.get(locale) ?: stringResource(R.string.fav_unknown_belt)
 
                         CampoDesplegableAdmin(
                             label = beltNameToShow,
@@ -408,7 +413,7 @@ fun AdminPerfilCliente(
                             )
                         )
                         Text(
-                            text = "Es profesor del gimnasio",
+                            text = stringResource(R.string.admin_profile_is_teacher),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold
                         )
@@ -422,7 +427,7 @@ fun AdminPerfilCliente(
                             .height(55.dp),
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text("Actualizar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(stringResource(R.string.perfil_actualizar_btn), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
 
                     // BOTÓN DESACTIVAR/ACTIVAR USUARIO
@@ -437,7 +442,7 @@ fun AdminPerfilCliente(
                         )
                     ) {
                         Text(
-                            text = if (isActive) "Dar de baja alumno" else "Activar alumno",
+                            text = if (isActive) stringResource(R.string.admin_profile_deactivate_student) else stringResource(R.string.admin_profile_activate_student),
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -451,7 +456,7 @@ fun AdminPerfilCliente(
 // --- COMPONENTE: CAMPO DE PERFIL REUTILIZABLE ---
 @Composable
 fun CampoPerfilAdmin(
-    label: String, value: String, onValueChange: (String) -> Unit, enabled: Boolean = true
+    label: String, value: String, onValueChange: (String) -> Unit, enabled: Boolean = true, isPhone: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -459,7 +464,7 @@ fun CampoPerfilAdmin(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp, bottom = 4.dp),
         )
-        if (label == "Teléfono") {
+        if (isPhone) {
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
@@ -498,6 +503,7 @@ fun CampoDesplegableAdmin(
     opciones: List<String>,
     seleccionado: String,
     modifier: Modifier = Modifier,
+    isMonth: Boolean = false,
     onValueChange: (String, Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -541,7 +547,7 @@ fun CampoDesplegableAdmin(
                     text = { Text(opcion) },
                     onClick = {
                         var index = 0
-                        if (label == "Mes") index = opciones.indexOf(opcion) + 1
+                        if (isMonth) index = opciones.indexOf(opcion) + 1
                         onValueChange(opcion, index)
                         expanded = false
                     }
@@ -570,13 +576,13 @@ fun ConfirmarCambiosDialogAdmin(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "¿Guardar cambios?",
+                    text = stringResource(R.string.perfil_guardar_cambios_dialog_titulo),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Se van a modificar los datos de $nombreCompleto. ¿Estás seguro de querer modificar los datos?",
+                    text = stringResource(R.string.admin_profile_confirm_update_desc, nombreCompleto),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -598,7 +604,7 @@ fun ConfirmarCambiosDialogAdmin(
                             )
                         } else {
                             Text(
-                                "Aceptar",
+                                stringResource(R.string.perfil_aceptar_btn),
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -611,7 +617,7 @@ fun ConfirmarCambiosDialogAdmin(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Cancelar",
+                            stringResource(R.string.perfil_cancelar_btn),
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall
@@ -643,13 +649,13 @@ fun ModificarStatusAlumnoDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (isActive) "¿Dar de baja alumno?" else "¿Activar alumno?",
+                    text = if (isActive) stringResource(R.string.admin_profile_deactivate_dialog_title) else stringResource(R.string.admin_profile_activate_dialog_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Estás a punto de modificar el estado del alumno $nombreCompleto. ¿Estás seguro?",
+                    text = stringResource(R.string.admin_profile_change_status_desc, nombreCompleto),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -673,7 +679,7 @@ fun ModificarStatusAlumnoDialog(
                             )
                         } else {
                             Text(
-                                text = if (isActive) "Dar de baja" else "Activar",
+                                text = if (isActive) stringResource(R.string.admin_profile_deactivate_btn) else stringResource(R.string.admin_profile_activate_btn),
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.bodySmall,
                                 textAlign = TextAlign.Center
@@ -687,7 +693,7 @@ fun ModificarStatusAlumnoDialog(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Cancelar",
+                            stringResource(R.string.perfil_cancelar_btn),
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.bodySmall,

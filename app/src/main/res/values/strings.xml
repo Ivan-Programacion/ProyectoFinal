@@ -12,4 +12,33 @@
 
     <string name="error_connection">Error de conexión. Inténtelo más tarde</string>
     <string name="error_login_invalid_credentials">Usuario o contraseña no válidos</string>
+    <string name="error_invalid_email">Correo electrónico no válido.</string>
+
+    <!-- Registro Info -->
+    <string name="back_description">Volver atrás</string>
+    <string name="login_create_account_title">Crear cuenta</string>
+    <string name="registro_name_label">Nombre</string>
+    <string name="registro_name_placeholder">Ej. Juan</string>
+    <string name="registro_lastname_label">Apellidos</string>
+    <string name="registro_lastname_placeholder">Ej. Pérez</string>
+    <string name="registro_birthdate_label">Fecha de nacimiento</string>
+    <string name="registro_day_label">Día</string>
+    <string name="registro_month_label">Mes</string>
+    <string name="registro_year_label">Año</string>
+    <string name="registro_email_label">Email</string>
+    <string name="registro_email_placeholder">ej. correo@dominio.com</string>
+    <string name="registro_phone_label">Teléfono</string>
+    <string name="registro_phone_placeholder">ej. 612345678</string>
+    <string name="registro_center_label">Gimnasio</string>
+    <string name="registro_center_placeholder">Selecciona un centro</string>
+    <string name="registro_teachers_label">Profesores</string>
+    <string name="registro_teachers_placeholder">Selecciona profesor/es</string>
+    <string name="registro_minor_checkbox">Esta cuenta es para un menor de 14 años</string>
+    <string name="registro_minor_name_label">Nombre del niño/a</string>
+    <string name="registro_minor_name_placeholder">Ej. Leo</string>
+    <string name="registro_minor_lastname_label">Apellidos niño/a</string>
+    <string name="registro_minor_birthdate_label">Fecha de nacimiento niño/a</string>
+    <string name="registro_next_button">Siguiente</string>
+    <string name="registro_already_account">¿Ya tienes cuenta? </string>
+    <string name="registro_login_link">Iniciar sesión</string>
 </resources>

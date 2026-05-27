@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withTimeoutOrNull
 import androidx.annotation.StringRes
+import com.example.proyectofinal.R
 
 sealed class AuthUiState {
     object Idle : AuthUiState()
@@ -112,11 +113,11 @@ class AuthViewModel(
                     _uiState.value = AuthUiState.Idle
                     onSuccess()
                 } else {
-                    _uiState.value = AuthUiState.Error("Error de conexión. Inténtalo más tarde")
+                    _uiState.value = AuthUiState.Error(messageRes = R.string.error_connection)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                _uiState.value = AuthUiState.Error("Error de conexión. Inténtalo más tarde")
+                _uiState.value = AuthUiState.Error(messageRes = com.example.proyectofinal.R.string.error_connection)
             }
         }
     }
@@ -127,7 +128,7 @@ class AuthViewModel(
             _uiState.value = AuthUiState.Idle
             onSuccess()
         } else {
-            _uiState.value = AuthUiState.Error("Correo electrónico no válido.")
+            _uiState.value = AuthUiState.Error(messageRes = com.example.proyectofinal.R.string.error_invalid_email)
         }
     }
 

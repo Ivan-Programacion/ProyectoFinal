@@ -13,4 +13,33 @@
 
     <string name="error_connection">Connection error. Please try again later</string>
     <string name="error_login_invalid_credentials">Invalid username or password</string>
+    <string name="error_invalid_email">Invalid email address.</string>
+
+    <!-- Registro Info -->
+    <string name="back_description">Go back</string>
+    <string name="login_create_account_title">Create account</string>
+    <string name="registro_name_label">Name</string>
+    <string name="registro_name_placeholder">E.g. John</string>
+    <string name="registro_lastname_label">Last Name</string>
+    <string name="registro_lastname_placeholder">E.g. Smith</string>
+    <string name="registro_birthdate_label">Date of birth</string>
+    <string name="registro_day_label">Day</string>
+    <string name="registro_month_label">Month</string>
+    <string name="registro_year_label">Year</string>
+    <string name="registro_email_label">Email</string>
+    <string name="registro_email_placeholder">e.g. email@domain.com</string>
+    <string name="registro_phone_label">Phone</string>
+    <string name="registro_phone_placeholder">e.g. 612345678</string>
+    <string name="registro_center_label">Gym</string>
+    <string name="registro_center_placeholder">Select a center</string>
+    <string name="registro_teachers_label">Teachers</string>
+    <string name="registro_teachers_placeholder">Select teacher/s</string>
+    <string name="registro_minor_checkbox">This account is for a child under 14</string>
+    <string name="registro_minor_name_label">Child\'s name</string>
+    <string name="registro_minor_name_placeholder">E.g. Leo</string>
+    <string name="registro_minor_lastname_label">Child\'s last name</string>
+    <string name="registro_minor_birthdate_label">Child\'s date of birth</string>
+    <string name="registro_next_button">Next</string>
+    <string name="registro_already_account">Already have an account? </string>
+    <string name="registro_login_link">Log in</string>
 </resources>

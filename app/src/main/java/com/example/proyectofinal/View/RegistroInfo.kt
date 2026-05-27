@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,6 +62,7 @@ import com.example.proyectofinal.Logic.dayPerMonthFunction
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
+import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -127,34 +129,38 @@ fun RegistroInfo(
                     IconButton(onClick = { controller(StateNavigate.login.value) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver atrás",
+                            contentDescription = stringResource(id = R.string.back_description),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     Text(
-                        text = "Crear cuenta",
+                        text = stringResource(id = R.string.login_create_account_title),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
                 // --- CAMPOS DE TEXTO ---
-                FilaRegistro(label = "Nombre", value = nombre, placeholder = "Ej. Juan") {
+                FilaRegistro(
+                    label = stringResource(id = R.string.registro_name_label),
+                    value = nombre,
+                    placeholder = stringResource(id = R.string.registro_name_placeholder)
+                ) {
                     viewModel.nombre.value = it
                 }
                 FilaRegistro(
-                    label = "Apellidos",
+                    label = stringResource(id = R.string.registro_lastname_label),
                     value = apellidos,
-                    placeholder = "Ej. Pérez"
+                    placeholder = stringResource(id = R.string.registro_lastname_placeholder)
                 ) { viewModel.apellidos.value = it }
 
                 // --- FECHA DE NACIMIENTO ---
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Text("Fecha de nacimiento", fontWeight = FontWeight.Bold)
+                    Text(stringResource(id = R.string.registro_birthdate_label), fontWeight = FontWeight.Bold)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         CampoFecha(
-                            label = "Día",
+                            label = stringResource(id = R.string.registro_day_label),
                             opciones = dayList,
                             seleccionado = dia,
                             modifier = Modifier.weight(1f),
@@ -163,7 +169,7 @@ fun RegistroInfo(
                             }
                         )
                         CampoFecha(
-                            label = "Mes",
+                            label = stringResource(id = R.string.registro_month_label),
                             seleccionado = if (locale == "es") {
                                 meses.entries.find {
                                     it.value == mes
@@ -185,7 +191,7 @@ fun RegistroInfo(
                             }
                         )
                         CampoFecha(
-                            label = "Año",
+                            label = stringResource(id = R.string.registro_year_label),
                             opciones = anios,
                             seleccionado = anio,
                             modifier = Modifier.weight(1.3f),
@@ -196,19 +202,20 @@ fun RegistroInfo(
 
                 // --- CAMPOS DE TEXTO ---
                 FilaRegistro(
-                    label = "Email",
+                    label = stringResource(id = R.string.registro_email_label),
                     value = email,
-                    placeholder = "ej. correo@dominio.com"
+                    placeholder = stringResource(id = R.string.registro_email_placeholder)
                 ) { viewModel.email.value = it }
                 FilaRegistro(
-                    label = "Teléfono",
+                    label = stringResource(id = R.string.registro_phone_label),
                     value = telefono,
-                    placeholder = "ej. 612345678"
+                    placeholder = stringResource(id = R.string.registro_phone_placeholder)
                 ) { viewModel.telefono.value = it }
 
                 // --- SELECCIÓN DE CENTRO Y PROFESOR ---
                 CampoDesplegableGimnasios(
-                    label = "Gimnasio",
+                    label = stringResource(id = R.string.registro_center_label),
+                    placeholder = stringResource(id = R.string.registro_center_placeholder),
                     opciones = listaCentros,
                     seleccionadoId = centroSeleccionado,
                     onValueChange = { nuevoCentroId ->
@@ -217,7 +224,8 @@ fun RegistroInfo(
                 )
 
                 CampoDesplegableProfesores(
-                    label = "Profesores",
+                    label = stringResource(id = R.string.registro_teachers_label),
+                    placeholder = stringResource(id = R.string.registro_teachers_placeholder),
                     opciones = profesoresDisponibles,
                     seleccionadosIds = profesoresSeleccionados,
                     enabled = centroSeleccionado.isNotEmpty(), // Solo habilitado si hay centro
@@ -259,7 +267,7 @@ fun RegistroInfo(
                         )
                     )
                     Text(
-                        text = "Esta cuenta es para un menor de 14 años",
+                        text = stringResource(id = R.string.registro_minor_checkbox),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -267,25 +275,25 @@ fun RegistroInfo(
                 // --- CAMPOS CONDICIONALES DEL MENOR ---
                 if (esMenor) {
                     FilaRegistro(
-                        label = "Nombre del niño/a",
+                        label = stringResource(id = R.string.registro_minor_name_label),
                         value = nombreMenor,
-                        placeholder = "Ej. Leo"
+                        placeholder = stringResource(id = R.string.registro_minor_name_placeholder)
                     ) { viewModel.nombreMenor.value = it }
 
                     FilaRegistro(
-                        label = "Apellidos niño/a",
+                        label = stringResource(id = R.string.registro_minor_lastname_label),
                         value = apellidosMenor,
-                        placeholder = "Ej. Pérez"
+                        placeholder = stringResource(id = R.string.registro_lastname_placeholder)
                     ) { viewModel.apellidosMenor.value = it }
 
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        Text("Fecha de nacimiento niño/a", fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.registro_minor_birthdate_label), fontWeight = FontWeight.Bold)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             CampoFecha(
-                                label = "Día",
+                                label = stringResource(id = R.string.registro_day_label),
                                 opciones = dias,
                                 seleccionado = diaMenor,
                                 modifier = Modifier.weight(1f),
@@ -294,7 +302,7 @@ fun RegistroInfo(
                                 }
                             )
                             CampoFecha(
-                                label = "Mes",
+                                label = stringResource(id = R.string.registro_month_label),
                                 seleccionado = if (locale == "es") {
                                     meses.entries.find {
                                         it.value == mesMenor
@@ -315,7 +323,7 @@ fun RegistroInfo(
                                 }
                             )
                             CampoFecha(
-                                label = "Año",
+                                label = stringResource(id = R.string.registro_year_label),
                                 opciones = aniosMenor,
                                 seleccionado = anioMenor,
                                 modifier = Modifier.weight(1.3f),
@@ -342,16 +350,16 @@ fun RegistroInfo(
                         .height(55.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Siguiente", fontWeight = FontWeight.Bold)
+                    Text(stringResource(id = R.string.registro_next_button), fontWeight = FontWeight.Bold)
                 }
 
                 // --- LINK A LOGIN ---
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "¿Ya tienes cuenta? ",
+                        stringResource(id = R.string.registro_already_account),
                         modifier = Modifier.clickable { controller(StateNavigate.login.value) })
                     Text(
-                        text = "Iniciar sesión",
+                        text = stringResource(id = R.string.registro_login_link),
                         color = MaterialTheme.colorScheme.tertiary, // color azul establecido
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { controller(StateNavigate.login.value) }
@@ -409,6 +417,8 @@ fun CampoFecha(
     onValueChange: (String, Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    // Recogemos la traducción del label "Mes" para compararla después en la lógica
+    val mesLabel = stringResource(id = R.string.registro_month_label)
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -437,7 +447,6 @@ fun CampoFecha(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
         // Menu desplegable
         ExposedDropdownMenu(
             expanded = expanded,
@@ -450,7 +459,7 @@ fun CampoFecha(
                     text = { Text(opcion) },
                     onClick = {
                         var index = 0
-                        if (label == "Mes") {
+                        if (label == mesLabel) {
                             index = opciones.indexOf(opcion) + 1
                         }
                         onValueChange(opcion, index)
@@ -466,6 +475,7 @@ fun CampoFecha(
 @Composable
 fun CampoDesplegableGimnasios(
     label: String,
+    placeholder: String,
     opciones: List<Center>,
     seleccionadoId: String,
     onValueChange: (String) -> Unit
@@ -482,7 +492,7 @@ fun CampoDesplegableGimnasios(
             onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
-                value = nombreSeleccionado.ifEmpty { "Selecciona un centro" },
+                value = nombreSeleccionado.ifEmpty { placeholder },
                 onValueChange = {},
                 readOnly = true,
                 modifier = Modifier
@@ -521,6 +531,7 @@ fun CampoDesplegableGimnasios(
 @Composable
 fun CampoDesplegableProfesores(
     label: String,
+    placeholder: String,
     opciones: List<User>,
     seleccionadosIds: Set<String>,
     enabled: Boolean,
@@ -539,7 +550,7 @@ fun CampoDesplegableProfesores(
             val nombresSeleccionados = opciones.filter { seleccionadosIds.contains(it.id) }
                 .map { "${it.name} ${it.lastName}" }
             val textoMostrar =
-                if (nombresSeleccionados.isEmpty()) "Selecciona profesor/es" else nombresSeleccionados.joinToString(
+                if (nombresSeleccionados.isEmpty()) placeholder else nombresSeleccionados.joinToString(
                     ", "
                 )
 

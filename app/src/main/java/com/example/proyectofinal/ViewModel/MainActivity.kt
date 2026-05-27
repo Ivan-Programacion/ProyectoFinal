@@ -187,6 +187,7 @@ fun App(startDestination: String = "login") {
 
     // El mensaje de error o de éxito del snackBar
     // El mensaje será el correspondiente indicado y se le enviará el mensaje traducido según el código de stringResource
+    // Si no tuviera traducción y fuera texto estático, lo muestra sin más
     val errorMessageText = (authUiState as? AuthUiState.Error)?.let { errorState ->
         errorState.messageRes?.let { stringResource(it) } ?: errorState.message ?: ""
     }

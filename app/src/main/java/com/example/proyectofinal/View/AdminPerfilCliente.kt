@@ -346,6 +346,7 @@ fun AdminPerfilCliente(
                     // --- DESPLEGABLES CENTRO Y PROFESORES ---
                     CampoDesplegableGimnasios(
                         label = "Gimnasio",
+                        placeholder = "Selecciona un centro",
                         opciones = listaCentros,
                         seleccionadoId = centroSeleccionado,
                         onValueChange = { nuevoCentroId ->
@@ -355,6 +356,7 @@ fun AdminPerfilCliente(
 
                     CampoDesplegableProfesores(
                         label = "Profesores asignados",
+                        placeholder = "Selecciona profesor/es",
                         opciones = profesoresDisponibles,
                         seleccionadosIds = profesoresSeleccionados,
                         enabled = centroSeleccionado.isNotEmpty(),

@@ -4,7 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
     // Registra al usuario y devuelve su UID único de Firebase si tiene éxito. Si falla, devuelve null.
-    suspend fun register(email: String, password: String, repeatPassword: String, message: (String) -> Unit): String?
+    // message lleva parametro Int para añadir el indice del texto de traducción
+    suspend fun register(email: String, password: String, repeatPassword: String, message: (String?, Int?) -> Unit): String?
 
     // Intenta iniciar sesión y devuelve true si es correcto.
     // message lleva parametro Int para añadir el indice del texto de traducción

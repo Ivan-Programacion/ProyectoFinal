@@ -209,22 +209,24 @@ fun Login(
             Text(
                 stringResource(id = R.string.login_no_account),
                 modifier = Modifier.clickable {
+                    // Para crear cuenta probando conexión primero
                     viewModel.checkConnectionAndNavigate {
                         controller(StateNavigate.registro.value)
                     }
                     viewModel.resetUiState()
-                } // Para crear cuenta probando conexión primero
+                }
             )
             Text(
-                stringResource(id = R.string.login_create_account),
+                " " + stringResource(id = R.string.login_create_account),
                 fontWeight = FontWeight.Bold, // Bold para que se vea
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.clickable {
+                    // Para crear cuenta probando conexión primero
                     viewModel.checkConnectionAndNavigate {
                         controller(StateNavigate.registro.value)
                     }
                     viewModel.resetUiState()
-                } // Para crear cuenta probando conexión primero
+                }
             )
         }
     }

@@ -236,12 +236,16 @@ class AuthViewModel(
     fun registerUser(user: User, password: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            var errorMessage = ""
+            var errorMessage: String? = null
+            var errorRes: Int? = null
             val uid = authRepository.register(
                 user.email,
                 password,
                 registroRepeatPassword.value
-            ) { errorMessage = it }
+            ) { msg, res -> 
+                errorMessage = msg
+                errorRes = res
+            }
             if (uid != null) {
                 // Al ser data class, clonamos el objeto con su nuevo UID
                 val userWithId = user.copy(id = uid)
@@ -254,10 +258,10 @@ class AuthViewModel(
 
                 } else {
                     _uiState.value =
-                        AuthUiState.Error("Error al guardar los datos del usuario. Intentalo más tarde")
+                        AuthUiState.Error(messageRes = com.example.proyectofinal.R.string.error_register_save_data)
                 }
             } else {
-                _uiState.value = AuthUiState.Error(errorMessage)
+                _uiState.value = AuthUiState.Error(message = errorMessage, messageRes = errorRes)
             }
         }
     }

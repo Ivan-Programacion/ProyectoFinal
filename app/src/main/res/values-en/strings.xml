@@ -42,4 +42,20 @@
     <string name="registro_next_button">Next</string>
     <string name="registro_already_account">Already have an account? </string>
     <string name="registro_login_link">Log in</string>
+
+    <!-- Registro Pass & Terms -->
+    <string name="registro_pass_hint">Must be at least 8 characters long, combining letters and numbers.</string>
+    <string name="registro_pass_confirm_label">Confirm password</string>
+    <string name="registro_pass_confirm_placeholder">Repeat password</string>
+    <string name="registro_pass_accept_terms">Accept </string>
+    <string name="registro_pass_terms_link">Terms and Conditions</string>
+    <string name="registro_pass_terms_title">Terms &amp; Conditions</string>
+    <string name="registro_pass_terms_text">1. PROJECT NATURE\n\nThis application, Arkenpo App, has been developed exclusively for educational purposes and as part of the Final Project for the Higher Diploma in Multiplatform Application Development. It has no commercial purposes or corporate nature. The content and functionalities are a simulation of a real martial arts school management environment.\n\n2. DATA USAGE\n\nAll collected personal information (name, email, phone, minor data) will be strictly used for the application\'s internal functioning within the academic project framework. We commit to:\n- Not sharing or selling your data to third parties.\n- Using the information solely to evaluate the software\'s technical capabilities.\n- Deleting the database once the project evaluation stage is completed, if required.\n\n3. DATA PROTECTION AND FIREBASE\n\nData is stored within the Google Firebase infrastructure, complying with its security standards. However, since this is a development (Beta) version, the user acknowledges that infallible security against professional-level data breaches is not guaranteed. It is recommended not to use passwords that the user employs in sensitive services (banking, primary personal email, etc.).\n\n4. AGE REQUIREMENT\n\nBy accepting these terms, you confirm that you are at least 14 years old (or 13 depending on applicable legislation) or that you are registering under the direct supervision of a legal guardian. When registering a minor under 14, the user guarantees they possess the parental authority or legal guardianship required to provide such data for educational purposes.\n\n5. LIMITATION OF LIABILITY\n\nSince this is software in development, the author is not responsible for technical failures, data loss, or misunderstandings arising from the pedagogical content displayed in the application.</string>
+    <string name="dialog_close_description">Close</string>
+    <string name="toggle_password_visibility">Toggle password visibility</string>
+
+    <string name="error_register_email_in_use">Invalid email or already in use</string>
+    <string name="error_register_invalid_password">Passwords do not match or are invalid</string>
+    <string name="error_register_generic">Error registering user</string>
+    <string name="error_register_save_data">Error saving user data. Please try again later.</string>
 </resources>

@@ -359,7 +359,7 @@ fun RegistroInfo(
                         stringResource(id = R.string.registro_already_account),
                         modifier = Modifier.clickable { controller(StateNavigate.login.value) })
                     Text(
-                        text = stringResource(id = R.string.registro_login_link),
+                        text = " " + stringResource(id = R.string.registro_login_link),
                         color = MaterialTheme.colorScheme.tertiary, // color azul establecido
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { controller(StateNavigate.login.value) }

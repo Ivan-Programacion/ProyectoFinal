@@ -21,7 +21,7 @@ class AuthRepositoryImpl(
         email: String,
         password: String,
         repeatPassword: String,
-        message: (String) -> Unit
+        message: (String?, Int?) -> Unit
     ): String? {
         return try {
             val isValidPassword =
@@ -31,26 +31,26 @@ class AuthRepositoryImpl(
             result.user?.uid
         } catch (e: FirebaseAuthUserCollisionException) {
             e.printStackTrace()
-            message("Correo electrónico no válido o ya registrado")
+            message(null, R.string.error_register_email_in_use)
             null
         } catch (e: FirebaseNetworkException) {
             e.printStackTrace()
-            message("Error de conexión. No se pudo registrar el usuario")
+            message(null, R.string.error_connection)
             null
         } catch (e: ConnectException) {
             e.printStackTrace()
-            message("Error de conexión. No se pudo registrar el usuario")
+            message(null, R.string.error_connection)
             null
         } catch (e: FirebaseAuthException) {
-            message("Las contraseñas no coinciden o no es válida")
+            message(null, R.string.error_register_invalid_password)
             e.printStackTrace()
             null
         } catch (e: IllegalArgumentException) {
-            message("Las contraseñas no coinciden o no es válida")
+            message(null, R.string.error_register_invalid_password)
             e.printStackTrace()
             null
         } catch (e: Exception) {
-            message("Otra cosa")
+            message(null, R.string.error_register_generic)
             e.printStackTrace()
             null
         }

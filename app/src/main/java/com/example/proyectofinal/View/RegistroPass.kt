@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
@@ -112,20 +114,19 @@ fun RegistroPass(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver atrás",
+                            contentDescription = stringResource(id = R.string.back_description),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    // Título alineado a la izquierda para mantener simetría
                     Text(
-                        text = "Crear cuenta",
+                        text = stringResource(id = R.string.login_create_account_title),
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
                 // --- CAMPO CONTRASEÑA ---
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Contraseña",
+                        text = stringResource(id = R.string.login_password_label),
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
@@ -133,7 +134,7 @@ fun RegistroPass(
                         value = password,
                         onValueChange = { viewModel.registroPassword.value = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Contraseña") },
+                        placeholder = { Text(stringResource(id = R.string.login_password_placeholder)) },
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -146,14 +147,13 @@ fun RegistroPass(
                             }) {
                                 Icon(
                                     imageVector = image,
-                                    contentDescription = "Toggle password visibility"
+                                    contentDescription = stringResource(id = R.string.toggle_password_visibility)
                                 )
                             }
                         }
                     )
-                    // Texto de condiciones (basado en tu imagen)
                     Text(
-                        text = "Debe tener al menos 8 caracteres, combinando letras y números.",
+                        text = stringResource(id = R.string.registro_pass_hint),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -161,9 +161,9 @@ fun RegistroPass(
 
                 // --- CAMPO REPETIR CONTRASEÑA ---
                 FilaRegistroPassword(
-                    label = "Confirmar contraseña",
+                    label = stringResource(id = R.string.registro_pass_confirm_label),
                     value = repeatPassword,
-                    placeholder = "Repite la contraseña",
+                    placeholder = stringResource(id = R.string.registro_pass_confirm_placeholder),
                     isVisible = repeatPasswordVisible,
                     onToggleVisibility = {
                         viewModel.registroRepeatPasswordVisible.value = !repeatPasswordVisible
@@ -182,9 +182,9 @@ fun RegistroPass(
                         onCheckedChange = { viewModel.registroAceptoTerminos.value = it },
                         colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2D0C03))
                     )
-                    Text(text = "Aceptar ", style = MaterialTheme.typography.bodySmall)
+                    Text(text = stringResource(id = R.string.registro_pass_accept_terms) + " ", style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = "Términos Condiciones",
+                        text = stringResource(id = R.string.registro_pass_terms_link),
                         color = MaterialTheme.colorScheme.tertiary,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
@@ -202,7 +202,7 @@ fun RegistroPass(
                         .fillMaxWidth()
                         .height(55.dp),
                     shape = RoundedCornerShape(12.dp),
-                    enabled = aceptoTerminos && password.isNotEmpty() // Validación básica
+                    enabled = aceptoTerminos && password.isNotEmpty()
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
@@ -211,20 +211,20 @@ fun RegistroPass(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Crear cuenta", fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.login_create_account_title), fontWeight = FontWeight.Bold)
                     }
                 }
 
                 // --- LINK A LOGIN ---
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "¿Ya tienes cuenta? ",
+                        stringResource(id = R.string.registro_already_account) + " ",
                         modifier = Modifier.clickable {
                             controller(StateNavigate.login.value)
                             viewModel.resetRegisterPassViewModelsStates()
                         })
                     Text(
-                        text = "Iniciar sesión",
+                        text = stringResource(id = R.string.registro_login_link),
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable {
@@ -240,31 +240,7 @@ fun RegistroPass(
 
 @Composable
 fun TerminosCondiciones(onDismiss: () -> Unit) {
-    val termsText = "1. NATURALEZA DEL PROYECTO\n\n" +
-            "Esta aplicación, Arkenpo App, ha sido desarrollada exclusivamente con fines educativos " +
-            "y como parte del Trabajo Final del Ciclo Superior de Desarrollode Aplicaciones Multiplataforma. " +
-            "No tiene fines comerciales ni carácter de empresa constituida. El contenido y las funcionalidades " +
-            "son una simulación de un entorno real de gestión de escuelas de artes marciales.\n\n" +
-            "2. USO DE LOS DATOS\n\n" +
-            "Toda la información personal recopilada (nombre, email, teléfono, datos de menores) será utilizada " +
-            "estrictamente para el funcionamiento interno de la aplicación en el marco del proyecto académico. " +
-            "Nos comprometemos a:\n" +
-            "- No ceder ni vender tus datos a terceros.\n" +
-            "- Utilizar la información únicamente para la evaluación de las capacidades técnicas del software.\n" +
-            "- Eliminar la base de datos una vez finalizada la etapa de evaluación del proyecto si así se requiere.\n\n" +
-            "3. PROTECCIÓN DE DATOS Y FIREBASE\n\n" +
-            "Los datos son almacenados en la infraestructura de Google Firebase, cumpliendo con los estándares de " +
-            "seguridad de dicha plataforma. Sin embargo, al ser una versión de desarrollo (Beta), el usuario reconoce " +
-            "que no se garantiza la seguridad infalible contra brechas de datos de nivel profesional. Se recomienda no " +
-            "utilizar contraseñas que el usuario emplee en servicios sensibles (banca, correo personal principal, etc.).\n\n" +
-            "4. REQUSITO DE EDAD\n\n" +
-            "Al aceptar estos términos, confirmas que tienes al menos 14 años de edad (o 13 según la legislación " +
-            "aplicable) o que, en su defecto, estás realizando este registro bajo la supervisión directa de un " +
-            "tutor legal. En el caso de registrar a un menor de 14 años, el usuario garantiza que posee la patria " +
-            "potestad o tutoría legal necesaria para ceder dichos datos con fines educativos.\n\n" +
-            "5. LIMITACIONES DE RESPONSABILIDAD\n\n" +
-            "Dado que es un software en desarrollo, el autor no se hace responsable de fallos técnicos, pérdida " +
-            "de datos o malentendidos derivados del contenido pedagógico mostrado en la aplicación."
+    val termsText = stringResource(id = R.string.registro_pass_terms_text)
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -283,7 +259,7 @@ fun TerminosCondiciones(onDismiss: () -> Unit) {
                 // --- CABECERA MEJORADA ---
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Términos y Condiciones",
+                        text = stringResource(id = R.string.registro_pass_terms_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF2D0C03),
@@ -302,7 +278,7 @@ fun TerminosCondiciones(onDismiss: () -> Unit) {
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Cerrar",
+                            contentDescription = stringResource(id = R.string.dialog_close_description),
                             tint = Color(0xFF2D0C03),
                             modifier = Modifier.size(24.dp)
                         )
@@ -349,7 +325,7 @@ fun FilaRegistroPassword(
             trailingIcon = {
                 val image = if (isVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                 IconButton(onClick = onToggleVisibility) {
-                    Icon(imageVector = image, contentDescription = "Toggle password visibility")
+                    Icon(imageVector = image, contentDescription = stringResource(id = R.string.toggle_password_visibility))
                 }
             }
         )

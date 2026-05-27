@@ -75,4 +75,14 @@
     <string name="success_reset_email_sent">Email sent successfully</string>
     <string name="error_too_many_requests">Too many attempts to reset your password. Please try again later.</string>
     <string name="error_send_email_generic">Error sending email. Please check the address.</string>
+
+    <!-- TopBar & NavBar -->
+    <string name="title_cinturones">Belts</string>
+    <string name="title_perfil">Profile</string>
+    <string name="title_favoritos">Favorites</string>
+    <string name="title_cinturon_format">"Belt: "</string>
+    <string name="title_gestion">Management</string>
+    <string name="title_gestion_examen">Exam Management</string>
+    <string name="title_perfil_alumno">Student Profile</string>
+    <string name="navbar_admin">Admin</string>
 </resources>

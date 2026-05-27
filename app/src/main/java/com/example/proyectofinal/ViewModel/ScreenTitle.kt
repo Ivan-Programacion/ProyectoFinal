@@ -1,13 +1,16 @@
 package com.example.proyectofinal.ViewModel
 
-enum class ScreenTitle(val value: String) {
-    listaCinturones("Cinturones"),
-    perfil("Perfil"),
-    favoritos("Favoritos"),
-    listaContenido("Cinturón: Marrón"),
-    contenido("Cinturón: Marrón"),
-    adminListaClientes("Gestión"),
-    adminGestionExamen("Gestión examen"),
-    adminPerfilCliente("Perfil alumno")
+import androidx.compose.ui.res.stringResource
+import com.example.proyectofinal.R
+
+enum class ScreenTitle(val value: Int) {
+    listaCinturones(R.string.title_cinturones),
+    perfil(R.string.title_perfil),
+    favoritos(R.string.title_favoritos),
+    listaContenido(R.string.title_cinturon_format),
+    contenido(R.string.title_cinturon_format),
+    adminListaClientes(R.string.title_gestion),
+    adminGestionExamen(R.string.title_gestion_examen),
+    adminPerfilCliente(R.string.title_perfil_alumno)
 
 }

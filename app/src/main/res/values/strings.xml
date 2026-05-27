@@ -74,4 +74,14 @@
     <string name="success_reset_email_sent">Correo enviado con éxito</string>
     <string name="error_too_many_requests">Demasiados intentos para restablecer la contraseña. Inténtalo más tarde.</string>
     <string name="error_send_email_generic">Error al enviar el correo. Verifique la dirección.</string>
+
+    <!-- NavBar and TopBar Titles -->
+    <string name="title_cinturones">Cinturones</string>
+    <string name="title_perfil">Perfil</string>
+    <string name="title_favoritos">Favoritos</string>
+    <string name="title_cinturon_format">"Cinturón: "</string>
+    <string name="title_gestion">Gestión</string>
+    <string name="title_gestion_examen">Gestión examen</string>
+    <string name="title_perfil_alumno">Perfil alumno</string>
+    <string name="navbar_admin">Gestión</string>
 </resources>

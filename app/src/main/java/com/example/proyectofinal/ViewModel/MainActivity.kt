@@ -80,8 +80,10 @@ import com.example.proyectofinal.Repository.ContentRepositoryImpl
 import com.example.proyectofinal.Repository.ExamRepositoryImpl
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectofinal.Logic.belts
 import com.example.proyectofinal.Logic.removeFcmTokenOnLogout
 import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
+import com.example.proyectofinal.R
 import com.example.proyectofinal.View.OlvidoPass
 
 class MainActivity : ComponentActivity() {
@@ -191,7 +193,7 @@ fun App(startDestination: String = "login") {
     val errorMessageText = (authUiState as? AuthUiState.Error)?.let { errorState ->
         errorState.messageRes?.let { stringResource(it) } ?: errorState.message ?: ""
     }
-    
+
     val successMessageText = (authUiState as? AuthUiState.Success)?.let { successState ->
         successState.messageRes?.let { stringResource(it) } ?: successState.message
     }
@@ -478,10 +480,17 @@ fun App(startDestination: String = "login") {
 fun TopBar(currentRoute: String?, beltName: String = "", backNavigation: () -> Unit = {}) {
     TopAppBar(
         {
-            Text(
-                tituloTopBar(currentRoute, beltName),
-                style = MaterialTheme.typography.titleMedium
-            )
+            if (currentRoute == StateNavigate.listaContenido.value || currentRoute == StateNavigate.contenido.value) {
+                Text(
+                    stringResource(tituloTopBar(currentRoute)) + beltName,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            } else {
+                Text(
+                    stringResource(tituloTopBar(currentRoute)),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         },
         navigationIcon = {
             // Si es una pantalla secundaría que proviene de una principal:
@@ -517,44 +526,44 @@ fun NavBar(
             NavigationBarItem(
                 selected = currentRoute == StateNavigate.adminListaClientes.value,
                 { controller(StateNavigate.adminListaClientes.value) },
-                icon = { Icon(Icons.Default.Book, contentDescription = "Gestion exámenes") },
+                icon = { Icon(Icons.Default.Book, contentDescription = stringResource(R.string.navbar_admin)) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     unselectedIconColor = MaterialTheme.colorScheme.primary,
                     indicatorColor = MaterialTheme.colorScheme.onSecondary
                 ),
-                label = { Text("Gestión") })
+                label = { Text(stringResource(R.string.navbar_admin)) })
         }
         NavigationBarItem(
             selected = currentRoute == StateNavigate.favoritos.value,
             { controller(StateNavigate.favoritos.value) },
-            icon = { Icon(Icons.Default.Star, contentDescription = "Favoritos") },
+            icon = { Icon(Icons.Default.Star, contentDescription = stringResource(R.string.title_favoritos)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Favoritos") })
+            label = { Text(stringResource(R.string.title_favoritos)) })
         NavigationBarItem(
             selected = currentRoute == StateNavigate.listaCinturones.value,
             onClick = { controller(StateNavigate.listaCinturones.value) },
-            icon = { Icon(Icons.Default.MilitaryTech, contentDescription = "Cinturones") },
+            icon = { Icon(Icons.Default.MilitaryTech, contentDescription = stringResource(R.string.title_cinturones)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Cinturones") })
+            label = { Text(stringResource(R.string.title_cinturones)) })
         NavigationBarItem(
             selected = currentRoute == StateNavigate.perfil.value,
             onClick = { controller(StateNavigate.perfil.value) },
-            icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Perfil") },
+            icon = { Icon(Icons.Default.AccountCircle, contentDescription = stringResource(R.string.title_perfil)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.onSecondary
             ),
-            label = { Text("Perfil") })
+            label = { Text(stringResource(R.string.title_perfil)) })
     }
 }
 

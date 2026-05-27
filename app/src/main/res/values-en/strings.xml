@@ -111,4 +111,16 @@
     <string name="error_update_profile">Connection error. Could not update data</string>
     <string name="success_request_exam">Exam request sent successfully</string>
     <string name="error_request_exam">Error sending exam request</string>
+
+    <!-- Favoritos -->
+    <string name="fav_section_tech">Techniques</string>
+    <string name="fav_section_forms">Forms (Kata)</string>
+    <string name="fav_section_sets">Sets</string>
+    <string name="fav_empty_category">You have no favorites in this category</string>
+    <string name="fav_unknown_belt">Unknown</string>
+
+    <!-- Lista Contenido -->
+    <string name="content_section_tech">Techniques</string>
+    <string name="content_section_forms">Form (Kata)</string>
+    <string name="content_section_sets">Set</string>
 </resources>

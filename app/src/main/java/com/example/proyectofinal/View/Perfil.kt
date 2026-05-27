@@ -129,12 +129,10 @@ fun Perfil(
             onDismiss = { showSolicitarExamenDialog = false }
         )
     }
-    // Para botón atrás del móvil
-    val context = LocalContext.current as? Activity
 
     // Interceptamos el botón de atrás
     BackHandler {
-        // Cerramos la aplicación por completo
+        // Volvemos a la pantalla principal ListaCinturones
         controller(StateNavigate.listaCinturones.value)
     }
     LazyColumn(

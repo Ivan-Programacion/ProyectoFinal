@@ -110,4 +110,16 @@
     <string name="error_update_profile">Error de conexión. No se pudieron actualizar los datos</string>
     <string name="success_request_exam">Solicitud de examen enviada correctamente</string>
     <string name="error_request_exam">Error al enviar la solicitud de examen</string>
+
+    <!-- Favoritos -->
+    <string name="fav_section_tech">Técnicas</string>
+    <string name="fav_section_forms">Formas (Kata)</string>
+    <string name="fav_section_sets">Sets</string>
+    <string name="fav_empty_category">No tienes favoritos en esta categoría</string>
+    <string name="fav_unknown_belt">Desconocido</string>
+
+    <!-- Lista Contenido -->
+    <string name="content_section_tech">Técnicas</string>
+    <string name="content_section_forms">Forma (Kata)</string>
+    <string name="content_section_sets">Set</string>
 </resources>

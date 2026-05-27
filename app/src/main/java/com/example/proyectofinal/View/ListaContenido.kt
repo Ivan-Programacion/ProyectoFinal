@@ -32,10 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Logic.mapBeltColor
+import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.ContentViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -84,7 +86,7 @@ fun ListaContenido(
             if (tecnicas.isNotEmpty()) {
                 item {
                     ContenedorContenido(
-                        titulo = "Técnicas",
+                        titulo = stringResource(R.string.content_section_tech),
                         items = tecnicas
                     ) {
                         // Cambiamos el valor del id del contenido según el que se seleccione, y se navega a la pantalla después
@@ -98,7 +100,7 @@ fun ListaContenido(
             if (formas.isNotEmpty()) {
                 item {
                     ContenedorContenido(
-                        titulo = "Forma (Kata)",
+                        titulo = stringResource(R.string.content_section_forms),
                         items = formas
                     ) {
                         // Cambiamos el valor del id del contenido según el que se seleccione, y se navega a la pantalla después
@@ -112,7 +114,7 @@ fun ListaContenido(
             if (sets.isNotEmpty()) {
                 item {
                     ContenedorContenido(
-                        titulo = "Set",
+                        titulo = stringResource(R.string.content_section_sets),
                         items = sets
                     ) {
                         // Cambiamos el valor del id del contenido según el que se seleccione, y se navega a la pantalla después

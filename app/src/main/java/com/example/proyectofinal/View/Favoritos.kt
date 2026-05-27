@@ -32,9 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.proyectofinal.R
 import com.example.proyectofinal.Logic.belts
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
@@ -78,9 +80,6 @@ fun Favoritos(
     val sortedForms = userFavoritesForms.sortedWith(compareBy({ getBeltOrder(it.beltId) }, { it.number }))
     val sortedSets = userFavoritesSets.sortedWith(compareBy({ getBeltOrder(it.beltId) }, { it.number }))
 
-    // Para botón atrás del móvil
-    val context = LocalContext.current as? Activity
-
     // Interceptamos el botón de atrás
     BackHandler {
         // Cerramos la aplicación por completo
@@ -95,7 +94,7 @@ fun Favoritos(
         // SECCIÓN TÉCNICAS
         item {
             SeccionFavoritos(
-                titulo = "Técnicas",
+                titulo = stringResource(R.string.fav_section_tech),
                 items = sortedTech,
                 beltsList = allBelts.map { it.belt }
             ) { content ->
@@ -108,7 +107,7 @@ fun Favoritos(
         // SECCIÓN FORMA (KATA)
         item {
             SeccionFavoritos(
-                titulo = "Formas (Kata)",
+                titulo = stringResource(R.string.fav_section_forms),
                 items = sortedForms,
                 beltsList = allBelts.map { it.belt }
             ) { content ->
@@ -121,7 +120,7 @@ fun Favoritos(
         // SECCIÓN SET
         item {
             SeccionFavoritos(
-                titulo = "Sets",
+                titulo = stringResource(R.string.fav_section_sets),
                 items = sortedSets,
                 beltsList = allBelts.map { it.belt }
             ) { content ->
@@ -160,13 +159,13 @@ fun SeccionFavoritos(
 
             if (items.isEmpty()) {
                 Text(
-                    text = "No tienes favoritos en esta categoría",
+                    text = stringResource(R.string.fav_empty_category),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             } else {
                 items.forEach { content ->
-                    val beltName = beltsList.find { it.id == content.beltId }?.name?.get(locale) ?: "Desconocido"
+                    val beltName = beltsList.find { it.id == content.beltId }?.name?.get(locale) ?: stringResource(R.string.fav_unknown_belt)
                     val contentName = content.name[locale] ?: ""
                     val title = if (content.contentType == "TECH") "${content.number}. $contentName" else contentName
                     val beltColor = mapBeltColor[content.beltId] ?: Color.Gray

@@ -20,13 +20,16 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withTimeoutOrNull
+import androidx.annotation.StringRes
 
-// Clase de estados
 sealed class AuthUiState {
     object Idle : AuthUiState()
     object Loading : AuthUiState()
-    data class Success(val message: String = "") : AuthUiState()
-    data class Error(val message: String) : AuthUiState()
+    // Error y Success:
+    // Primer parámetro -> Texto sin traducir (en caso de haberlo)
+    // Segundo parametro -> indica el indice del texto de traducción
+    data class Success(val message: String = "", @StringRes val messageRes: Int? = null) : AuthUiState()
+    data class Error(val message: String? = null, @StringRes val messageRes: Int? = null) : AuthUiState()
 }
 
 class AuthViewModel(
@@ -329,8 +332,12 @@ class AuthViewModel(
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             _uiState.value = AuthUiState.Loading
-            var errorMessage = ""
-            val loginSuccess = authRepository.login(email, password) { errorMessage = it }
+            var errorMessage: String? = null
+            var errorRes: Int? = null
+            val loginSuccess = authRepository.login(email, password) { msg, res -> 
+                errorMessage = msg
+                errorRes = res
+            }
 
             if (loginSuccess) {
                 val uid = authRepository.getCurrentUserUid()
@@ -347,7 +354,7 @@ class AuthViewModel(
                 _uiState.value = AuthUiState.Success()
                 resetViewModelsStates()
             } else {
-                _uiState.value = AuthUiState.Error(errorMessage)
+                _uiState.value = AuthUiState.Error(message = errorMessage, messageRes = errorRes)
             }
         }
     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AR Kenpo App</string>
+    <string name="login_logo_description">Logo</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_email_placeholder">e.g. carlos@gmail.com</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_password_placeholder">Password</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="login_button_access">Log in</string>
+    <string name="login_no_account">Don\'t have an account? </string>
+    <string name="login_create_account">Create account</string>
+
+    <string name="error_connection">Connection error. Please try again later</string>
+    <string name="error_login_invalid_credentials">Invalid username or password</string>
+</resources>

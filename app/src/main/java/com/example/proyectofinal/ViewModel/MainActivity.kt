@@ -49,6 +49,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -109,8 +111,7 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun App(startDestination: String = "login") {
-    // Creamos la factoría y el ViewModel para poder usar AuthRepository y UserRepository en cada
-    // uno de los ViewModel que utilicemos
+    // Creamos las factorias para poder utilizar los diferentes repositories en cada viewModel que correspondan
     val userRepository = UserRepositoryImpl()
     val authRepository = AuthRepositoryImpl()
     val contentRepository = ContentRepositoryImpl()
@@ -184,6 +185,16 @@ fun App(startDestination: String = "login") {
         beltsState.find { it.belt.id == selectedBeltId }?.belt?.name?.get(com.example.proyectofinal.Logic.locale)
             ?: ""
 
+    // El mensaje de error o de éxito del snackBar
+    // El mensaje será el correspondiente indicado y se le enviará el mensaje traducido según el código de stringResource
+    val errorMessageText = (authUiState as? AuthUiState.Error)?.let { errorState ->
+        errorState.messageRes?.let { stringResource(it) } ?: errorState.message ?: ""
+    }
+    
+    val successMessageText = (authUiState as? AuthUiState.Success)?.let { successState ->
+        successState.messageRes?.let { stringResource(it) } ?: successState.message
+    }
+
     // Permisos de notificación y guardar el token FCM de Firebase en el documento del usuario actual
     NotificationPermissionAndTokenSetup(currentUser?.id)
 
@@ -217,15 +228,14 @@ fun App(startDestination: String = "login") {
                     currentRoute == StateNavigate.adminGestionExamen.value ||
                     currentRoute == StateNavigate.olvidoPass.value
                 ) {
-                    snackbarHostState.showSnackbar((authUiState as AuthUiState.Error).message)
+                    snackbarHostState.showSnackbar(errorMessageText ?: "")
                     authViewModel.resetUiState() // IMPORTANTE: Reseteamos el estado para que detecte futuros errores iguales
                 }
             }
 
             is AuthUiState.Success -> {
-                val message = (authUiState as AuthUiState.Success).message
                 // Solo lo enseñamos si hay mensaje y estamos en las pantallas indicadas
-                if (message.isNotEmpty() && (
+                if (!successMessageText.isNullOrEmpty() && (
                             currentRoute == StateNavigate.perfil.value ||
                                     currentRoute == StateNavigate.adminPerfilCliente.value ||
                                     currentRoute == StateNavigate.adminGestionExamen.value ||
@@ -234,7 +244,7 @@ fun App(startDestination: String = "login") {
                             )
                 ) {
                     isErrorSnackbar = false
-                    snackbarHostState.showSnackbar(message)
+                    snackbarHostState.showSnackbar(successMessageText)
                     // Si es la pantalla de OlvidoPass, reseteamos la Ui cuando se salga de dicha pantalla
                     if (currentRoute != StateNavigate.olvidoPass.value)
                         authViewModel.resetUiState()

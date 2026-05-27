@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -104,7 +105,7 @@ fun Login(
     ) {
         Image(
             painter = painterResource(id = R.drawable.logo_arkenpoapp),
-            contentDescription = "Logo",
+            contentDescription = stringResource(id = R.string.login_logo_description),
             modifier = Modifier.size(150.dp) // Ajustado para que no ocupe todo el ancho
         )
 
@@ -122,7 +123,7 @@ fun Login(
                 horizontalAlignment = Alignment.Start // Alineación a la izquierda para las etiquetas
             ) {
                 Text(
-                    "Correo electrónico",
+                    stringResource(id = R.string.login_email_label),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -130,7 +131,7 @@ fun Login(
                     modifier = Modifier.fillMaxWidth(),
                     value = userValue,
                     onValueChange = { viewModel.loginEmail.value = it },
-                    placeholder = { Text("ej. carlos@gmail.com") },
+                    placeholder = { Text(stringResource(id = R.string.login_email_placeholder)) },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true
@@ -139,7 +140,7 @@ fun Login(
                 Spacer(Modifier.height(16.dp))
 
                 Text(
-                    "Contraseña",
+                    stringResource(id = R.string.login_password_label),
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -147,7 +148,7 @@ fun Login(
                     modifier = Modifier.fillMaxWidth(),
                     value = passValue,
                     onValueChange = { viewModel.loginPassword.value = it },
-                    placeholder = { Text("Contraseña") },
+                    placeholder = { Text(stringResource(id = R.string.login_password_placeholder)) },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,
@@ -167,7 +168,7 @@ fun Login(
                     ),
                 )
                 Text(
-                    text = "¿Olvidaste la contraseña?",
+                    text = stringResource(id = R.string.login_forgot_password),
                     color = MaterialTheme.colorScheme.tertiary, // Validaciones
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
@@ -196,7 +197,7 @@ fun Login(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Acceder", fontWeight = FontWeight.Bold)
+                        Text(stringResource(id = R.string.login_button_access), fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -206,7 +207,7 @@ fun Login(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "¿No tienes cuenta? ",
+                stringResource(id = R.string.login_no_account),
                 modifier = Modifier.clickable {
                     viewModel.checkConnectionAndNavigate {
                         controller(StateNavigate.registro.value)
@@ -215,7 +216,7 @@ fun Login(
                 } // Para crear cuenta probando conexión primero
             )
             Text(
-                "Crear cuenta",
+                stringResource(id = R.string.login_create_account),
                 fontWeight = FontWeight.Bold, // Bold para que se vea
                 color = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.clickable {

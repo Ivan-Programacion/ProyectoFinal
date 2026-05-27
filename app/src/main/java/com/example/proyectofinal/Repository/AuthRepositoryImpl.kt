@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.net.ConnectException
+import com.example.proyectofinal.R
 
 class AuthRepositoryImpl(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -58,30 +59,30 @@ class AuthRepositoryImpl(
     override suspend fun login(
         email: String,
         password: String,
-        message: (String) -> Unit
+        message: (String?, Int?) -> Unit
     ): Boolean {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
             true
         } catch (e: FirebaseNetworkException) {
             e.printStackTrace()
-            message("Error de conexión. Inténtelo más tarde")
+            message(null, R.string.error_connection)
             false
         } catch (e: ConnectException) {
             e.printStackTrace()
-            message("Error de conexión. Inténtelo más tarde")
+            message(null, R.string.error_connection)
             false
         } catch (e: FirebaseAuthException) {
             e.printStackTrace()
-            message("Usuario o contraseña no válidos")
+            message(null, R.string.error_login_invalid_credentials)
             false
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()
-            message("Usuario o contraseña no válidos")
+            message(null, R.string.error_login_invalid_credentials)
             false
         } catch (e: Exception) {
             e.printStackTrace()
-            message("Usuario o contraseña no válidos")
+            message(null, R.string.error_login_invalid_credentials)
             false
         }
     }

@@ -7,7 +7,8 @@ interface AuthRepository {
     suspend fun register(email: String, password: String, repeatPassword: String, message: (String) -> Unit): String?
 
     // Intenta iniciar sesión y devuelve true si es correcto.
-    suspend fun login(email: String, password: String, message: (String) -> Unit): Boolean
+    // message lleva parametro Int para añadir el indice del texto de traducción
+    suspend fun login(email: String, password: String, message: (String?, Int?) -> Unit): Boolean
 
     // Devuelve el UID del usuario actual si está logueado, o null si no hay sesión activa.
     fun getCurrentUserUid(): String?

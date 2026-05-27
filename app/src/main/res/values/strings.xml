@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">AR Kenpo App</string>
+    <string name="login_logo_description">Logo</string>
+    <string name="login_email_label">Correo electrónico</string>
+    <string name="login_email_placeholder">ej. carlos@gmail.com</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_password_placeholder">Contraseña</string>
+    <string name="login_forgot_password">¿Olvidaste la contraseña?</string>
+    <string name="login_button_access">Acceder</string>
+    <string name="login_no_account">¿No tienes cuenta? </string>
+    <string name="login_create_account">Crear cuenta</string>
+
+    <string name="error_connection">Error de conexión. Inténtelo más tarde</string>
+    <string name="error_login_invalid_credentials">Usuario o contraseña no válidos</string>
 </resources>

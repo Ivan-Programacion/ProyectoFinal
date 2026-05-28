@@ -8,6 +8,7 @@ import com.example.proyectofinal.Logic.isNetworkAvailable
 import com.example.proyectofinal.Model.Belt
 import com.example.proyectofinal.Model.Exam
 import com.example.proyectofinal.Model.User
+import com.example.proyectofinal.R
 import com.example.proyectofinal.Repository.AuthRepository
 import com.example.proyectofinal.Repository.ContentRepository
 import com.example.proyectofinal.Repository.ExamRepository
@@ -134,7 +135,7 @@ class AdminGestionExamenViewModel(
     fun startOpenRequests(globalMessage: String) {
         viewModelScope.launch {
             val centerId = currentTeacher.value?.centerId ?: return@launch
-            authViewModel.setUiState(AuthUiState.Success("Estado de solicitud de exámenes activado correctamente"))
+            authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_requests_started))
             examRepository.updateExamStatus(centerId, "OPEN_REQUESTS", globalMessage)
         }
     }
@@ -146,7 +147,7 @@ class AdminGestionExamenViewModel(
             // Comprobación de conexión real antes de proceder
             val hasConnection = isNetworkAvailable(context)
             if (!hasConnection) {
-                authViewModel.setUiState(AuthUiState.Error("Error al cambiar de estado del examen. No hay conexión"))
+                authViewModel.setUiState(AuthUiState.Error(messageRes = R.string.error_admin_exam_connection))
                 onUpdate()
                 return@launch
             }
@@ -168,7 +169,7 @@ class AdminGestionExamenViewModel(
             )
             onUpdate()
             examRepository.updateExamStatus(centerId, "IN_PROGRESS", currentExam.value.infoMessage)
-            authViewModel.setUiState(AuthUiState.Success("Examen empezado correctamente"))
+            authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_started))
         }
     }
 
@@ -180,7 +181,7 @@ class AdminGestionExamenViewModel(
             val hasConnection = isNetworkAvailable(context)
 
             if (!hasConnection) {
-                authViewModel.setUiState(AuthUiState.Error("Error al cambiar de estado del examen. No hay conexión"))
+                authViewModel.setUiState(AuthUiState.Error(messageRes = R.string.error_admin_exam_connection))
                 onUpdate()
                 return@launch
             }
@@ -216,13 +217,13 @@ class AdminGestionExamenViewModel(
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "REFUSED", "NONE", "")
             userRepository.updateAllStudentsExamStatusByCenter(centerId, "APPLICANT", "NONE", "")
             onUpdate()
-            authViewModel.setUiState(AuthUiState.Success("Examen finalizado correctamente"))
+            authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_finished))
         }
     }
 
     fun cancelExam() = viewModelScope.launch {
         val centerId = currentTeacher.value?.centerId ?: return@launch
-        authViewModel.setUiState(AuthUiState.Success("Examen cancelado correctamente"))
+        authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_cancelled))
         examRepository.updateExamStatus(centerId, "CLOSED", "CANCELLED")
         
         userRepository.updateAllStudentsExamStatusByCenter(centerId, "CANDIDATE", "NONE", "")
@@ -234,22 +235,22 @@ class AdminGestionExamenViewModel(
 
     // ACCIONES SOBRE EL ALUMNO INDIVIDUAL
     fun approveStudentRequest(userId: String) = viewModelScope.launch {
-        authViewModel.setUiState(AuthUiState.Success("Solicitud de alumno aprobada correctamente"))
+        authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_request_approved))
         userRepository.updateStudentExamStatus(userId, "CANDIDATE", "¡Tu solicitud ha sido aprobada! El examen está a punto de empezar.")
     }
 
     fun refuseStudentRequest(userId: String) = viewModelScope.launch {
-        authViewModel.setUiState(AuthUiState.Success("Solicitud de alumno denegada correctamente"))
+        authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_request_refused))
         userRepository.updateStudentExamStatus(userId, "REFUSED", "Tu solicitud ha sido denegada.")
     }
 
     fun passStudentExam(user: User) = viewModelScope.launch {
-        authViewModel.setUiState(AuthUiState.Success("Aprobado el examen del alumno correctamente"))
+        authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_student_passed))
         userRepository.updateStudentExamStatus(user.id, "APPROVED", "¡Has aprobado el examen! Recibirás tu nuevo cinturón al finalizar.")
     }
 
     fun failStudentExam(userId: String) = viewModelScope.launch {
-        authViewModel.setUiState(AuthUiState.Success("Suspendido el examen del alumno correctamente"))
+        authViewModel.setUiState(AuthUiState.Success(messageRes = R.string.success_admin_exam_student_failed))
         userRepository.updateStudentExamStatus(userId, "FAILED", "Lo siento, no has superado el examen.")
     }
 

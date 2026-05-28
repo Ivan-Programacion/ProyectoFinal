@@ -351,7 +351,7 @@ class AuthViewModel(
                     val user = userRepository.getUser(uid)
                     if (user != null && !user.isActive) {
                         authRepository.logout()
-                        _uiState.value = AuthUiState.Error("Su cuenta ha sido desactivada")
+                        _uiState.value = AuthUiState.Error(messageRes = R.string.error_account_deactivated)
                         return@launch
                     }
                     currentUserUid.value = uid // Actualizamos al nuevo logueado

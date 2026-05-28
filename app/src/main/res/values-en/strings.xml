@@ -156,6 +156,54 @@
     <string name="success_admin_profile_updated">Student updated successfully</string>
     <string name="error_admin_profile_updated">Error updating student</string>
     <string name="success_admin_profile_activated">Student activated successfully</string>
-    <string name="success_admin_profile_deactivated">Student deactivated successfully</string>
+    <string name="success_admin_profile_deactivated">Student successfully deactivated</string>
     <string name="error_admin_profile_status">Error changing student status</string>
+
+    <!-- AuthViewModel Errors -->
+    <string name="error_account_deactivated">Your account has been deactivated</string>
+
+    <!-- Admin Gestion Examen -->
+    <string name="language_code">en</string>
+    <string name="admin_exam_cancel_title">Cancel exam</string>
+    <string name="admin_exam_cancel_desc">This action will delete all current requests and close the exam period, notifying all affected students. Are you sure you want to cancel the exam?</string>
+    <string name="admin_exam_cancel_btn">Cancel exam</string>
+    <string name="admin_exam_continue_btn">Continue exam</string>
+    <string name="admin_exam_start_requests_title">Start exam </string>
+    <string name="admin_exam_start_requests_desc">You are about to open the exam period. Students will be able to start sending their requests. You can add a description or general instructions for the students below:</string>
+    <string name="admin_exam_start_exam_title">Start exam</string>
+    <string name="admin_exam_finish_exam_title">Finish exam</string>
+    <string name="admin_exam_start_exam_desc">You are going to start the exam. This will accept ALL requests. Are you sure you want to accept all requests?</string>
+    <string name="admin_exam_finish_exam_desc">You are going to finish the exam. This will PASS all students. Are you sure you want to pass all students?</string>
+    <string name="admin_exam_accept_request_title">Accept request</string>
+    <string name="admin_exam_approve_exam_title">Approve exam</string>
+    <string name="admin_exam_accept_request_desc">Are you sure you want to ACCEPT the request from %1$s %2$s?</string>
+    <string name="admin_exam_approve_exam_desc">Are you sure you want to APPROVE the exam for %1$s %2$s?</string>
+    <string name="admin_exam_refuse_request_title">Reject request</string>
+    <string name="admin_exam_fail_exam_title">Fail exam</string>
+    <string name="admin_exam_refuse_request_desc">Are you sure you want to REJECT the request from %1$s %2$s?</string>
+    <string name="admin_exam_fail_exam_desc">Are you sure you want to FAIL the exam for %1$s %2$s?</string>
+    <string name="admin_exam_deny_btn">Deny</string>
+    <string name="admin_exam_yes_btn">Yes</string>
+    <string name="admin_exam_actions_title">Exam actions</string>
+    <string name="admin_exam_examined_tab">Examined</string>
+    <string name="admin_exam_requests_tab">Requests</string>
+    <string name="admin_exam_search_placeholder">Search student...</string>
+    <string name="admin_exam_sort_options_desc">Sort options</string>
+    <string name="admin_exam_sort_asc">Lowest to highest belt</string>
+    <string name="admin_exam_sort_desc">Highest to lowest belt</string>
+    <string name="admin_exam_empty_list">The list is empty</string>
+    <string name="admin_exam_approve_desc">Approve</string>
+    <string name="admin_exam_reject_desc">Reject</string>
+    <string name="admin_exam_optional_message">Optional message for students...</string>
+    <string name="admin_exam_unknown_belt">White</string>
+
+    <string name="success_admin_exam_requests_started">Exam request status successfully activated</string>
+    <string name="error_admin_exam_connection">Error changing exam status. No internet connection</string>
+    <string name="success_admin_exam_started">Exam successfully started</string>
+    <string name="success_admin_exam_finished">Exam successfully finished</string>
+    <string name="success_admin_exam_cancelled">Exam successfully cancelled</string>
+    <string name="success_admin_exam_request_approved">Student request successfully approved</string>
+    <string name="success_admin_exam_request_refused">Student request successfully refused</string>
+    <string name="success_admin_exam_student_passed">Student exam successfully approved</string>
+    <string name="success_admin_exam_student_failed">Student exam successfully failed</string>
 </resources>

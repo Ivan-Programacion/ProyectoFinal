@@ -78,30 +78,52 @@ import com.example.proyectofinal.Repository.UserRepositoryImpl
 import com.example.proyectofinal.Repository.ContentRepositoryImpl
 import com.example.proyectofinal.Repository.ExamRepositoryImpl
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Logic.removeFcmTokenOnLogout
 import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
 import com.example.proyectofinal.R
+import com.example.proyectofinal.Services.checkIsAppExpiredSecurely
 import com.example.proyectofinal.View.OlvidoPass
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    // 1. Variable de estado para controlar cuándo desaparece el logotipo de carga
+    private var isCheckingSecurity = true
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         // Para la pantalla de carga
-        installSplashScreen()
+        // 2. Guardamos la instancia del SplashScreen al instalarlo
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        // Comprobación de token para login automático o no
-        val authRepository: AuthRepository = AuthRepositoryImpl()
-        val startDestination = if (authRepository.getCurrentUserUid() != null) {
-            "listaCinturones"
-        } else {
-            "login"
-        }
+        // 3. Le decimos al SplashScreen que se quede congelado en pantalla
+        // mientras 'isCheckingSecurity' sea true
+        splashScreen.setKeepOnScreenCondition { isCheckingSecurity }
+        // 4. Lanzamos la comprobación de seguridad en segundo plano antes de cargar la app
+        lifecycleScope.launch {
+            val isExpired = checkIsAppExpiredSecurely()
+            // 5. Añadimos las variables de la logica de los repositorios
+            val authRepository: AuthRepository = AuthRepositoryImpl()
+            val startDestination = if (authRepository.getCurrentUserUid() != null) {
+                "listaCinturones"
+            } else {
+                "login"
+            }
+            if (isExpired) {
+                // Cerramos el proceso y el usuario nunca llega a ver la interfaz.
+                authRepository.logout()
+            } else {
+                // ¡VÍA LIBRE! La app está en vigor.
+                isCheckingSecurity = false // Quitamos el Splash
 
-        setContent {
-            ProyectoFinalTheme(dynamicColor = false) {
-                App(startDestination = startDestination)
+                // 6. Finalmente, pintamos tu UI de Compose
+                setContent {
+                    ProyectoFinalTheme(dynamicColor = false) {
+                        App(startDestination = startDestination)
+                    }
+                }
             }
         }
     }
@@ -524,7 +546,12 @@ fun NavBar(
             NavigationBarItem(
                 selected = currentRoute == StateNavigate.adminListaClientes.value,
                 { controller(StateNavigate.adminListaClientes.value) },
-                icon = { Icon(Icons.Default.Book, contentDescription = stringResource(R.string.navbar_admin)) },
+                icon = {
+                    Icon(
+                        Icons.Default.Book,
+                        contentDescription = stringResource(R.string.navbar_admin)
+                    )
+                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     unselectedIconColor = MaterialTheme.colorScheme.primary,
@@ -535,7 +562,12 @@ fun NavBar(
         NavigationBarItem(
             selected = currentRoute == StateNavigate.favoritos.value,
             { controller(StateNavigate.favoritos.value) },
-            icon = { Icon(Icons.Default.Star, contentDescription = stringResource(R.string.title_favoritos)) },
+            icon = {
+                Icon(
+                    Icons.Default.Star,
+                    contentDescription = stringResource(R.string.title_favoritos)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
@@ -545,7 +577,12 @@ fun NavBar(
         NavigationBarItem(
             selected = currentRoute == StateNavigate.listaCinturones.value,
             onClick = { controller(StateNavigate.listaCinturones.value) },
-            icon = { Icon(Icons.Default.MilitaryTech, contentDescription = stringResource(R.string.title_cinturones)) },
+            icon = {
+                Icon(
+                    Icons.Default.MilitaryTech,
+                    contentDescription = stringResource(R.string.title_cinturones)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,
@@ -555,7 +592,12 @@ fun NavBar(
         NavigationBarItem(
             selected = currentRoute == StateNavigate.perfil.value,
             onClick = { controller(StateNavigate.perfil.value) },
-            icon = { Icon(Icons.Default.AccountCircle, contentDescription = stringResource(R.string.title_perfil)) },
+            icon = {
+                Icon(
+                    Icons.Default.AccountCircle,
+                    contentDescription = stringResource(R.string.title_perfil)
+                )
+            },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 unselectedIconColor = MaterialTheme.colorScheme.primary,

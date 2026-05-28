@@ -487,7 +487,7 @@ class AuthViewModel(
     ): String {
         return when {
             !isActive -> "Tu cuenta está dada de baja. Habla con tu sensei para reactivarla."
-            examStatus == "APPROVED" -> examText.takeIf { it.isNotBlank() } ?: "¡Enhorabuena! Has aprobado tu último examen."
+            examStatus == "APPROVED" -> examText.takeIf { it.isNotBlank() } ?: "¡Has aprobado el examen! Recibirás tu nuevo cinturón al finalizar."
             examStatus == "FAILED" -> examText.takeIf { it.isNotBlank() } ?: "Lo siento, no has superado el examen."
             examStatus == "APPLICANT" -> examText.takeIf { it.isNotBlank() } ?: "Esperando aprobación de solicitud..."
             examStatus == "REFUSED" -> examText.takeIf { it.isNotBlank() } ?: "Tu solicitud de examen ha sido denegada."

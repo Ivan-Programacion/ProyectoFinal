@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectofinal.Model.User
+import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.AdminGestionExamenViewModel
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.AuthUiState
@@ -114,11 +116,10 @@ fun AdminGestionExamen(
     // --- DIALOGS ---
     if (showCancelarDialog) {
         DialogAccionExamen(
-            titulo = "Cancelar examen",
-            descripcion = "Esta acción eliminará todas las solicitudes actuales y cerrará el periodo" +
-                    " de examen notificando a todos los alumnos afectados. ¿Estás seguro de querer cancelar el examen?",
-            textoAceptar = "Cancelar examen",
-            textoCancelar = "Seguir examen",
+            titulo = stringResource(R.string.admin_exam_cancel_title),
+            descripcion = stringResource(R.string.admin_exam_cancel_desc),
+            textoAceptar = stringResource(R.string.admin_exam_cancel_btn),
+            textoCancelar = stringResource(R.string.admin_exam_continue_btn),
             colorAceptar = MaterialTheme.colorScheme.error,
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
@@ -133,12 +134,10 @@ fun AdminGestionExamen(
 
     if (showRealizarDialog) {
         DialogAccionExamen(
-            titulo = "Realizar examen",
-            descripcion = "Estás a punto de abrir el periodo de examen. Los alumnos podrán empezar " +
-                    "a enviar sus solicitudes. Puedes añadir una descripción o indicaciones generales " +
-                    "a los alumnos a continuación:",
-            textoAceptar = "Aceptar",
-            textoCancelar = "Cancelar",
+            titulo = stringResource(R.string.admin_exam_start_requests_title),
+            descripcion = stringResource(R.string.admin_exam_start_requests_desc),
+            textoAceptar = stringResource(R.string.perfil_aceptar_btn),
+            textoCancelar = stringResource(R.string.perfil_cancelar_btn),
             colorAceptar = MaterialTheme.colorScheme.tertiary,
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
@@ -153,15 +152,13 @@ fun AdminGestionExamen(
 
     if (showAprobarDialog) {
         DialogAccionExamen(
-            titulo = if (estadoExamen == "OPEN_REQUESTS") "Empezar examen" else "Terminar examen",
+            titulo = if (estadoExamen == "OPEN_REQUESTS") stringResource(R.string.admin_exam_start_exam_title) else stringResource(R.string.admin_exam_finish_exam_title),
             descripcion =
                 if (estadoExamen == "OPEN_REQUESTS")
-                    "Vas a proceder a empezar el examen. Esto hará que se acepten TODAS las solicitudes. " +
-                            "¿Estás seguro de querer aceptar todas las solicitudes?"
-                else "Se va proceder a terminar el examen. Esto hará que se APRUEBEN a todos los alumnos. " +
-                        "¿Estás seguro de querer aprobar a todos los alumnos?",
-            textoAceptar = "Aceptar",
-            textoCancelar = "Cancelar",
+                    stringResource(R.string.admin_exam_start_exam_desc)
+                else stringResource(R.string.admin_exam_finish_exam_desc),
+            textoAceptar = stringResource(R.string.perfil_aceptar_btn),
+            textoCancelar = stringResource(R.string.perfil_cancelar_btn),
             isLoading = isLoading,
             colorAceptar = MaterialTheme.colorScheme.tertiary,
             colorCancelar = Color.LightGray,
@@ -181,17 +178,17 @@ fun AdminGestionExamen(
     // --- DIALOGS INDIVIDUALES ---
     if (showAprobarIndividualDialog && alumnoSeleccionado != null) {
         val accionText =
-            if (estadoExamen == "OPEN_REQUESTS") "Aceptar solicitud" else "Aprobar examen"
+            if (estadoExamen == "OPEN_REQUESTS") stringResource(R.string.admin_exam_accept_request_title) else stringResource(R.string.admin_exam_approve_exam_title)
         val descripcionText = if (estadoExamen == "OPEN_REQUESTS")
-            "¿Estás seguro de querer ACEPTAR la solicitud de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
+            stringResource(R.string.admin_exam_accept_request_desc, alumnoSeleccionado?.name ?: "", alumnoSeleccionado?.lastName ?: "")
         else
-            "¿Estás seguro de querer APROBAR el examen de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
+            stringResource(R.string.admin_exam_approve_exam_desc, alumnoSeleccionado?.name ?: "", alumnoSeleccionado?.lastName ?: "")
 
         DialogAccionExamen(
             titulo = accionText,
             descripcion = descripcionText,
-            textoAceptar = "Aceptar",
-            textoCancelar = "Cancelar",
+            textoAceptar = stringResource(R.string.perfil_aceptar_btn),
+            textoCancelar = stringResource(R.string.perfil_cancelar_btn),
             colorAceptar = MaterialTheme.colorScheme.tertiary,
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
@@ -214,18 +211,18 @@ fun AdminGestionExamen(
 
     if (showRechazarIndividualDialog && alumnoSeleccionado != null) {
         val accionText =
-            if (estadoExamen == "OPEN_REQUESTS") "Rechazar solicitud" else "Suspender examen"
+            if (estadoExamen == "OPEN_REQUESTS") stringResource(R.string.admin_exam_refuse_request_title) else stringResource(R.string.admin_exam_fail_exam_title)
         val descripcionText = if (estadoExamen == "OPEN_REQUESTS")
-            "¿Estás seguro de querer DENEGAR la solicitud de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
+            stringResource(R.string.admin_exam_refuse_request_desc, alumnoSeleccionado?.name ?: "", alumnoSeleccionado?.lastName ?: "")
         else
-            "¿Estás seguro de querer SUSPENDER el examen de ${alumnoSeleccionado?.name} ${alumnoSeleccionado?.lastName}?"
+            stringResource(R.string.admin_exam_fail_exam_desc, alumnoSeleccionado?.name ?: "", alumnoSeleccionado?.lastName ?: "")
 
         DialogAccionExamen(
             titulo = accionText,
             descripcion = descripcionText,
             textoAceptar =
-                if (estadoExamen == "OPEN_REQUESTS") "Denegar" else "Sí",
-            textoCancelar = "Cancelar",
+                if (estadoExamen == "OPEN_REQUESTS") stringResource(R.string.admin_exam_deny_btn) else stringResource(R.string.admin_exam_yes_btn),
+            textoCancelar = stringResource(R.string.perfil_cancelar_btn),
             colorAceptar = MaterialTheme.colorScheme.error, // Rojo porque es una acción destructiva/negativa
             colorCancelar = Color.LightGray,
             colorTextoCancelar = MaterialTheme.colorScheme.primary,
@@ -267,7 +264,7 @@ fun AdminGestionExamen(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Acciones de examen",
+                    text = stringResource(R.string.admin_exam_actions_title),
                     style = MaterialTheme.typography.titleMedium,
                 )
 
@@ -289,17 +286,17 @@ fun AdminGestionExamen(
                         )
                     ) {
                         Text(
-                            "Cancelar examen",
+                            stringResource(R.string.admin_exam_cancel_btn),
                             color = if (estadoExamen != "CLOSED") Color.White else Color.DarkGray,
                         )
                     }
 
                     // Botón Izquierdo: Realizar / Aceptar / Aprobar
                     val textoBtnDerecho = when (estadoExamen) {
-                        "CLOSED" -> "Realizar examen"
-                        "OPEN_REQUESTS" -> "Empezar examen"
-                        "IN_PROGRESS" -> "Terminar examen"
-                        else -> "Realizar examen"
+                        "CLOSED" -> stringResource(R.string.admin_exam_start_requests_title)
+                        "OPEN_REQUESTS" -> stringResource(R.string.admin_exam_start_exam_title)
+                        "IN_PROGRESS" -> stringResource(R.string.admin_exam_finish_exam_title)
+                        else -> stringResource(R.string.admin_exam_start_requests_title)
                     }
                     Button(
                         modifier = Modifier.fillMaxWidth(),
@@ -331,7 +328,7 @@ fun AdminGestionExamen(
             ) {
                 // Título condicional
                 val textoCondicion =
-                    if (estadoExamen == "IN_PROGRESS") "Examinados" else "Solicitudes"
+                    if (estadoExamen == "IN_PROGRESS") stringResource(R.string.admin_exam_examined_tab) else stringResource(R.string.admin_exam_requests_tab)
                 Text(
                     text = textoCondicion,
                     style = MaterialTheme.typography.titleMedium,
@@ -351,11 +348,11 @@ fun AdminGestionExamen(
                         modifier = Modifier.weight(1f),
                         placeholder = {
                             Text(
-                                "Buscar alumno...",
+                                stringResource(R.string.admin_exam_search_placeholder),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = stringResource(R.string.admin_list_search_desc)) },
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                     )
@@ -371,7 +368,7 @@ fun AdminGestionExamen(
                             Icon(
                                 // Puedes usar Icons.Default.Menu, Icons.Default.MoreVert o Icons.Default.FilterList
                                 imageVector = Icons.Default.FilterList,
-                                contentDescription = "Opciones de orden",
+                                contentDescription = stringResource(R.string.admin_exam_sort_options_desc),
                                 tint = Color.White,
                                 modifier = Modifier.padding(12.dp) // Ajusta el tamaño del icono dentro del recuadro
                             )
@@ -387,7 +384,7 @@ fun AdminGestionExamen(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "De menor a mayor cinturón",
+                                        stringResource(R.string.admin_exam_sort_asc),
                                         // Ponemos en negrita el que esté seleccionado actualmente
                                         fontWeight = if (ordenAscendente) FontWeight.Bold else FontWeight.Normal
                                     )
@@ -400,7 +397,7 @@ fun AdminGestionExamen(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "De mayor a menor cinturon",
+                                        stringResource(R.string.admin_exam_sort_desc),
                                         fontWeight = if (!ordenAscendente) FontWeight.Bold else FontWeight.Normal
                                     )
                                 },
@@ -419,7 +416,7 @@ fun AdminGestionExamen(
                 if (listaAlumnos.isEmpty() || estadoExamen == "CLOSED") {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "La lista está vacía",
+                            text = stringResource(R.string.admin_exam_empty_list),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -456,8 +453,8 @@ fun AdminGestionExamen(
                                         )
                                         val beltName =
                                             (listaCinturones.find { it.id == alumno.beltId }?.name?.get(
-                                                "es"
-                                            ) as? String) ?: "Blanco"
+                                                stringResource(R.string.language_code)
+                                            ) as? String) ?: stringResource(R.string.admin_exam_unknown_belt)
                                         Text(
                                             text = beltName,
                                             style = MaterialTheme.typography.bodySmall,
@@ -478,7 +475,7 @@ fun AdminGestionExamen(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Check,
-                                                contentDescription = "Aprobar",
+                                                contentDescription = stringResource(R.string.admin_exam_approve_desc),
                                                 tint = MaterialTheme.colorScheme.tertiary,
                                                 modifier = Modifier.padding(6.dp)
                                             )
@@ -495,7 +492,7 @@ fun AdminGestionExamen(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Close,
-                                                contentDescription = "Rechazar",
+                                                contentDescription = stringResource(R.string.admin_exam_reject_desc),
                                                 tint = MaterialTheme.colorScheme.error,
                                                 modifier = Modifier.padding(6.dp)
                                             )
@@ -559,7 +556,7 @@ fun DialogAccionExamen(
                             .height(100.dp), // TextArea más grande
                         placeholder = {
                             Text(
-                                "Mensaje opcional para alumnos ...",
+                                stringResource(R.string.admin_exam_optional_message),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         },

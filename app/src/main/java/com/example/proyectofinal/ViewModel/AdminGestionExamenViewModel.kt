@@ -205,7 +205,7 @@ class AdminGestionExamenViewModel(
                     user.id,
                     finalBeltId,
                     "APPROVED",
-                    "¡Enhorabuena, has aprobado el examen!"
+                    ""
                 )
             }
             // 2. Cerrar el examen y resetear estados

@@ -10,7 +10,6 @@ import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.Repository.ContentRepository
 import com.example.proyectofinal.Repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

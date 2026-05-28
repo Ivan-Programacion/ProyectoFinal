@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.firebase.auth.FirebaseAuth
-import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 import com.example.proyectofinal.ViewModel.MainActivity

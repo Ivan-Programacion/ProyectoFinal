@@ -6,6 +6,8 @@ data class User(
     val id: String = "", // UID de Firebase Auth
     val email: String = "",
     val role: String = "STUDENT", // "STUDENT", "TEACHER", "SUPERADMIN"
+    // PropertyName -> un booleano que empieza por is en Firebase lo traduce sin el is.
+    // Por lo tanto, se necesita hacer un PropertyName, para que sepa bien a qué propiedad pertenece
     @get:PropertyName("clientApproved")
     @set:PropertyName("clientApproved")
     var isClientApproved: Boolean = true,

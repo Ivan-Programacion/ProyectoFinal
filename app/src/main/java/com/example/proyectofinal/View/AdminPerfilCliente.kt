@@ -65,7 +65,6 @@ import com.example.proyectofinal.Logic.meses
 import com.example.proyectofinal.R
 import com.example.proyectofinal.ViewModel.AdminPerfilClienteViewModel
 import com.example.proyectofinal.ViewModel.AuthUiState
-import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme
 
 @RequiresApi(Build.VERSION_CODES.O)

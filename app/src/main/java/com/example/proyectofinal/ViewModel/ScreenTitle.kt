@@ -1,6 +1,5 @@
 package com.example.proyectofinal.ViewModel
 
-import androidx.compose.ui.res.stringResource
 import com.example.proyectofinal.R
 
 enum class ScreenTitle(val value: Int) {

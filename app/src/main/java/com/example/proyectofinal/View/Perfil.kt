@@ -1,7 +1,6 @@
 package com.example.proyectofinal.View
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

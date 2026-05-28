@@ -49,7 +49,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -80,7 +79,6 @@ import com.example.proyectofinal.Repository.ContentRepositoryImpl
 import com.example.proyectofinal.Repository.ExamRepositoryImpl
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectofinal.Logic.belts
 import com.example.proyectofinal.Logic.removeFcmTokenOnLogout
 import com.example.proyectofinal.Logic.updateFcmTokenInFirestore
 import com.example.proyectofinal.R

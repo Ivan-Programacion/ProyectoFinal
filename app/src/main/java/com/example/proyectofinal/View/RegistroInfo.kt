@@ -63,7 +63,6 @@ import com.example.proyectofinal.Logic.locale
 import com.example.proyectofinal.Model.Center
 import com.example.proyectofinal.Model.User
 import com.example.proyectofinal.R
-import com.example.proyectofinal.ViewModel.AuthUiState
 import com.example.proyectofinal.ViewModel.AuthViewModel
 import com.example.proyectofinal.ViewModel.StateNavigate
 import com.example.proyectofinal.ui.theme.ProyectoFinalTheme

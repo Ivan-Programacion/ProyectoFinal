@@ -121,6 +121,7 @@ class MainActivity : ComponentActivity() {
             if (isExpired) {
                 // Cerramos el proceso y el usuario nunca llega a ver la interfaz.
                 authRepository.logout()
+                finishAffinity()
             } else {
                 // ¡VÍA LIBRE! La app está en vigor.
                 isCheckingSecurity = false // Quitamos el Splash

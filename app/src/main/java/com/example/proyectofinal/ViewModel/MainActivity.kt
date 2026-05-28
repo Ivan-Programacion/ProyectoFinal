@@ -86,6 +86,13 @@ import com.example.proyectofinal.R
 import com.example.proyectofinal.Services.checkIsAppExpiredSecurely
 import com.example.proyectofinal.View.OlvidoPass
 import kotlinx.coroutines.launch
+import android.app.Activity
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 class MainActivity : ComponentActivity() {
     // 1. Variable de estado para controlar cuándo desaparece el logotipo de carga
@@ -196,6 +203,34 @@ fun App(startDestination: String = "login") {
     val snackbarHostState = remember { SnackbarHostState() }
     // Guardamos si el snackbar mostrado es de error o no para darle estilo
     var isErrorSnackbar by remember { mutableStateOf(true) }
+
+    // PARA COMPROBAR LA APP Y CERRARLA PASADA LA FECHA EN EL TESTING
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val coroutineScope = rememberCoroutineScope()
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                // Lanzamos una corrutina porque la comprobación es una función suspend
+                coroutineScope.launch {
+                    val isExpired = checkIsAppExpiredSecurely()
+                    if (isExpired) {
+                        // Si se dejó la app abierta y caduca, cerramos sesión y matamos la app
+                        authRepository.logout()
+                        (context as? Activity)?.finishAffinity()
+                    }
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+    // -------------------------------------
 
     val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
     val currentUser by authViewModel.currentUserState.collectAsStateWithLifecycle()

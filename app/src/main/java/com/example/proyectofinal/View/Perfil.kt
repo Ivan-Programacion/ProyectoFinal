@@ -230,6 +230,7 @@ fun Perfil(
 
                     // Lógica para el mensaje informativo extraída al ViewModel
                     val mensajeInformativo = viewModel.getMensajeInformativoExamen(
+                        context = LocalContext.current, // Para poder traducir los mensajes
                         isActive = isActive,
                         examStatus = examStatus,
                         examText = examText,

@@ -479,6 +479,7 @@ class AuthViewModel(
 
     // Lógica para el mensaje informativo en la pantalla Perfil
     fun getMensajeInformativoExamen(
+        context: android.content.Context,
         isActive: Boolean,
         examStatus: String,
         examText: String,
@@ -486,18 +487,18 @@ class AuthViewModel(
         infoMessage: String?
     ): String {
         return when {
-            !isActive -> "Tu cuenta está dada de baja. Habla con tu sensei para reactivarla."
-            examStatus == "APPROVED" -> examText.takeIf { it.isNotBlank() } ?: "¡Has aprobado el examen! Recibirás tu nuevo cinturón al finalizar."
-            examStatus == "FAILED" -> examText.takeIf { it.isNotBlank() } ?: "Lo siento, no has superado el examen."
-            examStatus == "APPLICANT" -> examText.takeIf { it.isNotBlank() } ?: "Esperando aprobación de solicitud..."
-            examStatus == "REFUSED" -> examText.takeIf { it.isNotBlank() } ?: "Tu solicitud de examen ha sido denegada."
-            examStatus == "CANDIDATE" && estadoExamenGlobal == "IN_PROGRESS" -> examText.takeIf { it.isNotBlank() } ?: "¡El proceso de examen ha comenzado!"
-            examStatus == "CANDIDATE" && estadoExamenGlobal == "OPEN_REQUESTS" -> examText.takeIf { it.isNotBlank() } ?: "¡Tu solicitud ha sido aprobada! El examen está a punto de empezar."
+            !isActive -> context.getString(R.string.exam_info_account_deactivated)
+            examStatus == "APPROVED" -> context.getString(R.string.exam_info_approved)
+            examStatus == "FAILED" -> context.getString(R.string.exam_info_failed)
+            examStatus == "APPLICANT" -> context.getString(R.string.exam_info_applicant)
+            examStatus == "REFUSED" -> context.getString(R.string.exam_info_refused)
+            examStatus == "CANDIDATE" && estadoExamenGlobal == "IN_PROGRESS" -> context.getString(R.string.exam_info_candidate_in_progress)
+            examStatus == "CANDIDATE" && estadoExamenGlobal == "OPEN_REQUESTS" -> context.getString(R.string.exam_info_candidate_open_requests)
             estadoExamenGlobal == "OPEN_REQUESTS" && examStatus == "NONE" -> {
-                infoMessage?.takeIf { it.isNotBlank() } ?: "¡Ya puedes solicitar tu examen!"
+                infoMessage?.takeIf { it.isNotBlank() } ?: context.getString(R.string.exam_info_open_requests_none)
             }
-            estadoExamenGlobal == "IN_PROGRESS" && examStatus == "NONE" -> "Hay un examen en proceso al cual no llegaste a solicitar acceso a tiempo."
-            else -> "No hay proceso de examen en estos momentos."
+            estadoExamenGlobal == "IN_PROGRESS" && examStatus == "NONE" -> context.getString(R.string.exam_info_in_progress_none)
+            else -> context.getString(R.string.exam_info_default)
         }
     }
 

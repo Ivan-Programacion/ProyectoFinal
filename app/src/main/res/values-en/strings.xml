@@ -162,6 +162,18 @@
     <!-- AuthViewModel Errors -->
     <string name="error_account_deactivated">Your account has been deactivated</string>
 
+    <!-- Mensajes Informativos Examen -->
+    <string name="exam_info_account_deactivated">Your account is deactivated. Talk to your sensei to reactivate it.</string>
+    <string name="exam_info_approved">You have passed the exam! You will receive your new belt at the end.</string>
+    <string name="exam_info_failed">I\'m sorry, you did not pass the exam.</string>
+    <string name="exam_info_applicant">Pending request approval...</string>
+    <string name="exam_info_refused">Your exam request has been denied.</string>
+    <string name="exam_info_candidate_in_progress">The exam process has started!</string>
+    <string name="exam_info_candidate_open_requests">Your request has been approved! The exam is about to start.</string>
+    <string name="exam_info_open_requests_none">You can now request your exam!</string>
+    <string name="exam_info_in_progress_none">There is an exam in progress for which you did not request access in time.</string>
+    <string name="exam_info_default">There is no exam process at this time.</string>
+
     <!-- Admin Gestion Examen -->
     <string name="language_code">en</string>
     <string name="admin_exam_cancel_title">Cancel exam</string>

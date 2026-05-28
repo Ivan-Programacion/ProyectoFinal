@@ -161,6 +161,18 @@
     <!-- AuthViewModel Errors -->
     <string name="error_account_deactivated">Su cuenta ha sido desactivada</string>
 
+    <!-- Mensajes Informativos Examen -->
+    <string name="exam_info_account_deactivated">Tu cuenta está dada de baja. Habla con tu sensei para reactivarla.</string>
+    <string name="exam_info_approved">¡Has aprobado el examen! Recibirás tu nuevo cinturón al finalizar.</string>
+    <string name="exam_info_failed">Lo siento, no has superado el examen.</string>
+    <string name="exam_info_applicant">Esperando aprobación de solicitud...</string>
+    <string name="exam_info_refused">Tu solicitud de examen ha sido denegada.</string>
+    <string name="exam_info_candidate_in_progress">¡El proceso de examen ha comenzado!</string>
+    <string name="exam_info_candidate_open_requests">¡Tu solicitud ha sido aprobada! El examen está a punto de empezar.</string>
+    <string name="exam_info_open_requests_none">¡Ya puedes solicitar tu examen!</string>
+    <string name="exam_info_in_progress_none">Hay un examen en proceso al cual no llegaste a solicitar acceso a tiempo.</string>
+    <string name="exam_info_default">No hay proceso de examen en estos momentos.</string>
+
     <!-- Admin Gestion Examen -->
     <string name="language_code">es</string>
     <string name="admin_exam_cancel_title">Cancelar examen</string>

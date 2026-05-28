@@ -357,7 +357,6 @@ fun AdminGestionExamen(
                         singleLine = true,
                     )
 
-                    // Box actúa como ancla para que el DropdownMenu sepa dónde aparecer
                     Box {
                         Surface(
                             shape = RoundedCornerShape(12.dp),
@@ -366,7 +365,6 @@ fun AdminGestionExamen(
                             onClick = { expandedMenuFiltro = true }
                         ) {
                             Icon(
-                                // Puedes usar Icons.Default.Menu, Icons.Default.MoreVert o Icons.Default.FilterList
                                 imageVector = Icons.Default.FilterList,
                                 contentDescription = stringResource(R.string.admin_exam_sort_options_desc),
                                 tint = Color.White,

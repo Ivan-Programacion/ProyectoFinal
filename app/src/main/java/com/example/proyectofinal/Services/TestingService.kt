@@ -35,7 +35,7 @@ suspend fun checkIsAppExpiredSecurely(): Boolean {
 
             // AQUI PONES TU FECHA LÍMITE (Año, Mes, Día).
             // A las 00:00 de ese día, la app dejará de abrir.
-            val expirationDate = LocalDate.of(2026, 5, 29)
+            val expirationDate = LocalDate.of(2026, 6, 4)
 
             return@withContext networkDate.isEqual(expirationDate) || networkDate.isAfter(expirationDate)
 

@@ -72,7 +72,15 @@ class AdminGestionExamenViewModel(
     val ordenAscendente: StateFlow<Boolean> = _ordenAscendente.asStateFlow()
 
     // Flujo Reactivo de Cinturones de Base de Datos
-    val listaCinturones: StateFlow<List<Belt>> = contentRepository.getBeltsStream()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val listaCinturones: StateFlow<List<Belt>> = authRepository.getAuthStateStream()
+        .flatMapLatest { uid ->
+            if (!uid.isNullOrBlank()) {
+                contentRepository.getBeltsStream()
+            } else {
+                flowOf(emptyList())
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     // Flujo de alumnos del profesor
